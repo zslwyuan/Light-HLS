@@ -1,0 +1,6 @@
+1. In HLS, it will first serialize the multi-dimensional to single-dimensional with multipliers
+2. In HLS, LoopStrengthReduce Pass is diabled.
+
+3. HLS will automatically reduce the width of variables. This should be considered!
+4. The uncertainty for clock period is clockPeriod/8.
+5. BRAM write latency 3.25ns, read-latency=next-cycle + 3.25
