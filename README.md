@@ -32,7 +32,7 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 
 **[Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)**
 
-**[Light-HLS Organization and Further development](https://github.com/zslwyuan/Light-HLS#light-hls-organization-and-further-development)**
+**[Implementation of Light-HLS and Further development](https://github.com/zslwyuan/Light-HLS#implementation-of-light-hls-and-further-development)**
 
 
 ***
@@ -69,7 +69,7 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 
 ***
 
-## [Light-HLS Organization and Further development](https://github.com/zslwyuan/Light-HLS#light-hls-organization-and-further-development)
+## [Implementation of Light-HLS and Further development](https://github.com/zslwyuan/Light-HLS#implementation-of-light-hls-and-further-development)
 
 If you want to do your own works based on this project, following hints might be useful.
 
