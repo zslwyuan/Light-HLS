@@ -52,6 +52,7 @@ If you have problems in building the LLVM package or applying the patch, we prov
 2. In the directory **[Tests](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**, a series of experiments are conducted during development. The standard Light-HLS is implemented in **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**
 3. In the directory **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**, a bash script **[Build.sh](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Build.sh)** will help to build the project.
 4. You can find the built Light-HLS in the directory "build", in which you can test it with the following command:
+
             ./Light_HLS_Top ../../../App/conv/conv.cc convs ../config_conv.txt DEBUG
    
  
