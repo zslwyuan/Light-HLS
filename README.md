@@ -49,7 +49,11 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 
 1. Install LLVM-9.0.0: Download LLVM-9.0.0, make and install it. If you want to support arbitary precision integer, please apply **[the batch](https://github.com/zslwyuan/Light-HLS/tree/master/Patch_for_LLVM)** to Clang before make and build. 
 If you have problems in building the LLVM package or applying the patch, we provide **[a source code repository](https://github.com/zslwyuan/LLVM-9-for-Light-HLS)** with the patch applied. 
-2. In the directory **[/Tests](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**, a series of experiments are conducted during development. The standard Light-HLS is implemented in **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**
+2. In the directory **[Tests](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**, a series of experiments are conducted during development. The standard Light-HLS is implemented in **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**
+3. In the directory **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**, a bash script **[Build.sh](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Build.sh)** will help to build the project.
+4. You can find the built Light-HLS in the directory "build", in which you can test it with the following command:
+    ./Light_HLS_Top ../../../App/conv/conv.cc convs ../config_conv.txt DEBUG
+   
  
 ## [Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)
 
