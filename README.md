@@ -94,12 +94,33 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 ### The Implementation of Light-HLS
 
-As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Light_HLS_Top.cc)**, the procedure of Light-HLS contains mainly five steps:
+As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Light_HLS_Top.cc)**, the procedure of Light-HLS contains mainly four steps:
 
 1. Clang part for Front-End Processing: 
 
          extract the information of arrays in the source code   
          set labels for each loop in the source code   
+
+2. Front-end Passes running for optimizations:     
+
+         Loop Extraction                                                               
+         Loop Simplification                                                           
+         Loop Stregnth Reducation                                                      
+         Duplicated Instruction Removal                                                
+         Function Initiation                                                           
+         Instruction Optimization: Multiplication / Instruction Hoisting / Redundant Access Removal / Bitwidth Reduction/ etc.. 
+
+3. Front-end Passes running just before back-end analysis:
+
+         map the IR loops to the loop labels in the source code for the configurations of loops. 
+         mainly account for inserting MUX for the accesses to array partitions.   
+
+4. Backend-end Pass
+
+         for scheduling and binding       
+         After running this Pass, the information will be stored in
+         The public variables of the Pass pointer.                 
+         such as function latencies, loop tripcounts and etc.  
 
 
 ### Further development
