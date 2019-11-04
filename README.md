@@ -40,7 +40,7 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 ## [Installation of Light-HLS](https://github.com/zslwyuan/Light-HLS#installation-of-light-hls)
 
 1. Download LLVM-9.0.0, make and install it. If you want to support arbitary precision integer, please apply **[the batch](https://github.com/zslwyuan/Light-HLS/tree/master/Patch_for_LLVM)** to Clang before make and build. 
-If you have problems in building the LLVM package or applying the patch, we provide **[a source code repository](https://github.com/zslwyuan/LLVM-9-for-Light-HLS)** with the patch applied. Y
+If you have problems in building the LLVM package or applying the patch, we provide **[a source code repository](https://github.com/zslwyuan/LLVM-9-for-Light-HLS)** with the patch applied. 
 
  
 ## [Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)
