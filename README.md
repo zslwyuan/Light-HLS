@@ -17,6 +17,8 @@ The back-end of Light-HLS is developed to schedule and bind for the optimized IR
 
 Let's first see what we can do with Light-HLS in the research about HLS.
 
+1. HLS design can be set with various configurations, leading to different results of performance and resource. To find the optmial solution, designers can determine the configuration and call Light-HLS to predict the result in tens milliseconds, which will be close to the result in VivadoHLS.
+
 ## Category:
 
 **[Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)**
