@@ -68,7 +68,9 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
          python LibGen.py -n 12 -p xc7z020clg484-1
 
-8. Light-HLS supports HLS directives for the design, including loop unrolling, loop pipelining, array partitioning, static array setting, dataflow and clock settings, which can be set in a configuration file. An example is shown in **[config_2mm.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_2mm.txt)** and **[config_conv.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_conv.txt)**.
+8. Light-HLS supports HLS directives for the design, including loop unrolling, loop pipelining, array partitioning, static array setting, dataflow and clock settings, which can be set in a configuration file. An example is shown in **[config_2mm.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_2mm.txt)** and **[config_conv.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_conv.txt)**. If you want to check the loops' labels, please run Light-HLS with loop configurations first and the source code with labels for loop, "tmp_loopLabeled.cc", will be generated in the directory.
+
+9. As you can notice in the usage examples, Light-HLS can run with DEBUG flag and lots of information during the HLS procedure will be dumped for analysis.
 
 
 ***
