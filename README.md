@@ -1,4 +1,4 @@
-# Light-HLS
+# Light-HLS: Fast, Accurate and Convenient Light-Weight HLS Framework for Academic Exploration and Evaluation.
 
 Light-HLS is a light weight high-level synthesis (HLS) framework for academic exploration and evaluation, which can be called to perform various design space exploration (DSE) for FPGA-based HLS design. It covers the abilities of previous works, overcomes the existing limitations and brings more practical features. Light-HLS is modularized and portable so designers can use the components of Light-HLS to conduct various DSE procedures.  Light-HLS gets rid of RTL code generation so it will not suffer from the time-consuming synthesis of commercial HLS tools like VivadoHLS, which involves many detailed operations in both its frond-end and back-end.
 
@@ -17,7 +17,7 @@ The back-end of Light-HLS is developed to schedule and bind for the optimized IR
 
 Let's first see what we can do with Light-HLS in the research about HLS.
 
-1. HLS design can be set with various configurations, leading to different results of performance and resource. To find the optmial solution, designers can determine the configuration and call Light-HLS to predict the result in tens milliseconds, which will be close to the result in VivadoHLS.
+1. HLS design can be set with various configurations, leading to different results of performance and resource. To find the optmial solution, designers can determine the configuration and call Light-HLS to predict the result in tens milliseconds, which will be close to the result in VivadoHLS. An example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**, a tool which searches for the configuration of clock settings and HLS directives for the multi-clock dataflow.
 
 ## Category:
 
