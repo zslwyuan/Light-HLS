@@ -15,8 +15,7 @@ The back-end of Light-HLS is developed to schedule and bind for the optimized IR
 
 ## Category:
 
-
-**[How to use this blog](https://github.com/zslwyuan/Light-HLS#how-to-use-this-blog)**
+**[Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)**
 
 **[List of Experiments I conducted](https://github.com/zslwyuan/Light-HLS#list-of-experiments-i-conducted)**
 
@@ -25,8 +24,9 @@ The back-end of Light-HLS is developed to schedule and bind for the optimized IR
 
 ***
 
+
  
-## [How to use this blog](https://github.com/zslwyuan/Light-HLS#how-to-use-this-blog)
+## [Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)
 
 1. download the blog (entire project)
 2. basic functiones and passes are implemented in the directory **["Implementations"](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations)**. Nearly all the directories have their own README file to explain the directory.
