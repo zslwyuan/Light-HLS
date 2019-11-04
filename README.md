@@ -98,8 +98,8 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
 1. Clang part for Front-End Processing: 
 
-      extract the information of arrays in the source code   
-      set labels for each loop in the source code   
+         extract the information of arrays in the source code   
+         set labels for each loop in the source code   
 
 
 ### Further development
