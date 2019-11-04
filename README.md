@@ -1,6 +1,6 @@
 # Light-HLS: Fast, Accurate and Convenient 
 
-_Let's try to make HLS developemnt easier for everyone~ ^\_^. 
+*Let's try to make HLS developemnt easier for everyone~ ^\_^.*
      
 
 
