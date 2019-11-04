@@ -1,4 +1,4 @@
-#include "LLVM_exp15_HI_HighAccurateFastEvaluationWithPragma.h"
+#include "Light_HLS_Top.h"
 #include "ConfigParse.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 
@@ -296,6 +296,10 @@ int main(int argc, const char **argv)
         PM3.run(*Mod_tmp);
 
 
+        /////////////////////////////////////////////////////////////
+        // Front-end Passes running just before back-end analysis. //
+        /////////////////////////////////////////////////////////////
+
 
         auto loopinfowrapperpass = new LoopInfoWrapperPass();
         PM4.add(loopinfowrapperpass);
@@ -337,6 +341,13 @@ int main(int argc, const char **argv)
             OSPM2.flush();
         }
 
+
+        ////////////////////////////////////////////////////////////////
+        // Backend-end Pass running for scheduling and binding        //
+        // After running this Pass, the information will be stored in //
+        // The public variables of the Pass pointer.                  //
+        // such as function latencies, loop tripcounts and etc.       //
+        ////////////////////////////////////////////////////////////////
 
         std::string logName_evaluation = "HI_WithDirectiveTimingResourceEvaluation__forCheck_"+cntStr ;
         std::string logName_array = "ArrayLog__forCheck_"+cntStr ;

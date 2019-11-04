@@ -1,6 +1,6 @@
-project(LLVM_exp15_HI_HighAccurateFastEvaluationWithPragma) 
+project(Light_HLS_Top) 
 
-set(Outputname "LLVM_exp15_HI_HighAccurateFastEvaluationWithPragma")
+set(Outputname "Light_HLS_Top")
 
 cmake_minimum_required(VERSION 3.10) 
 
@@ -64,7 +64,7 @@ execute_process(COMMAND ${MAKE_CMD}
 add_definitions(${LLVM_DEFINITIONS}) 
 add_definitions(${Polly_DEFINITIONS}) 
 
-add_executable(${Outputname} LLVM_exp15_HI_HighAccurateFastEvaluationWithPragma.cc ConfigParse.cc Pre_Process.cc) 
+add_executable(${Outputname} Light_HLS_Top.cc ConfigParse.cc Pre_Process.cc) 
 
 llvm_map_components_to_libnames(llvm_libs support core irreader engine nativecodegen) 
 
