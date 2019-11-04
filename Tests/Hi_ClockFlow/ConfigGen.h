@@ -8,7 +8,7 @@
 #include <iostream>
 #include <assert.h>
 #include <map>
-#include "LLVM_exp18_HI_HLSDirectiveDSE_clock.h"
+#include "Hi_ClockFlow.h"
 
 #define accumulateResource(A,B) \
     A.DSP += B.DSP;         \

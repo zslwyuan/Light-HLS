@@ -1,4 +1,4 @@
-#include "LLVM_exp18_HI_HLSDirectiveDSE_clock.h"
+#include "Hi_ClockFlow.h"
 #include "ConfigParse.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 #include "ConfigGen.h"

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <assert.h>
 #include <map>
-#include "LLVM_exp18_HI_HLSDirectiveDSE_clock.h"
+#include "Hi_ClockFlow.h"
 
 extern std:: string clock_period_str;
 extern std:: string  HLS_lib_path;

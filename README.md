@@ -76,6 +76,7 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
       When built, most test executables can be used like below but please check the source code for confirmation.
       (1) ./Light_HLS_Top  <C/C++ FILE> <top\_function\_name>  <configuration\_file> [DEBUG]
+      or
       (2) ./LLVM\_expXXXXX  <C/C++ FILE> <top\_function\_name>   
       or
       (3) ./LLVM\_expXXXXX  <IR FILE>
@@ -88,6 +89,12 @@ If you have problems in building the LLVM package or applying the patch, we prov
 ***
 
 ## [Implementation of Light-HLS and Further development](https://github.com/zslwyuan/Light-HLS#implementation-of-light-hls-and-further-development)
+
+### The Implementation of Light-HLS
+
+editing...
+
+### Further development
 
 If you want to do your own works based on this project, following hints might be useful.
 

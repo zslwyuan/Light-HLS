@@ -1,6 +1,6 @@
-project(LLVM_exp18_HI_HLSDirectiveDSE_clock) 
+project(Hi_ClockFlow) 
 
-set(Outputname "LLVM_exp18_HI_HLSDirectiveDSE_clock")
+set(Outputname "Hi_ClockFlow")
 
 cmake_minimum_required(VERSION 3.10) 
 
@@ -58,7 +58,7 @@ execute_process(COMMAND ${MAKE_CMD}
 add_definitions(${LLVM_DEFINITIONS}) 
 #add_definitions(${Polly_DEFINITIONS}) 
 
-add_executable(${Outputname} LLVM_exp18_HI_HLSDirectiveDSE_clock.cc ConfigParse.cc ConfigGen.cc Pre_Process.cc) 
+add_executable(${Outputname} Hi_ClockFlow.cc ConfigParse.cc ConfigGen.cc Pre_Process.cc) 
 
 #llvm_map_components_to_libnames(llvm_libs support core irreader engine nativecodegen) 
 

@@ -26,6 +26,13 @@ int main(int argc, const char **argv)
     std::string configFile_str = std::string(argv[3]);    
     bool debugFlag = (argc == 5 && std::string(argv[4])=="DEBUG");
 
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    // Clang part for Front-End Processing                                             //
+    //    extract the information of arrays in the source code                         //
+    //    set labels for each loop in the source code                                  //
+    /////////////////////////////////////////////////////////////////////////////////////
+
     // create a new Clang Tool instance (a LibTooling environment)
     std::map<std::string, int> FuncParamLine2OutermostSize;
     clangPreProcess(argv, top_str, FuncParamLine2OutermostSize);
@@ -99,6 +106,17 @@ int main(int argc, const char **argv)
 
 
 
+        /////////////////////////////////////////////////////////////////////////////////////
+        // Front-end Passes running for optimizations, including                           //
+        // Loop Extraction                                                                 //
+        // Loop Simplification                                                             //
+        // Loop Stregnth Reducation                                                        //
+        // Duplicated Instruction Removal                                                  //
+        // Function Initiation                                                             //
+        // Instruction Optimization: Multiplication / Instruction Hoisting /               //
+        //                          Redundant Access Removal / Bitwidth Reduction/ etc..   //
+        /////////////////////////////////////////////////////////////////////////////////////
+
 
 
         auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
@@ -125,11 +143,6 @@ int main(int argc, const char **argv)
             WriteBitcodeToFile(*Mod_tmp, OS3);
             OS3.flush();
         }
-
-
-
-
-
 
         Triple ModuleTriple(Mod_tmp->getTargetTriple());
         TargetLibraryInfoImpl TLII(ModuleTriple);
@@ -187,10 +200,6 @@ int main(int argc, const char **argv)
           OSPM0.flush();
         }
 
-
-
-
-
         // don't remove chained operations
         auto hi_hlsduplicateinstrm = new HI_HLSDuplicateInstRm("HLSrmInsts", debugFlag);
         PM1.add(hi_hlsduplicateinstrm);
@@ -229,12 +238,6 @@ int main(int argc, const char **argv)
           WriteBitcodeToFile(*Mod_tmp, OS111);
           OS111.flush();
         }
-
-
-
-
-
-
 
 
         std::string logName_varwidthreduce = "VarWidth__forCheck_"+cntStr ;
@@ -282,9 +285,11 @@ int main(int argc, const char **argv)
 
 
 
-        
-
-
+        /////////////////////////////////////////////////////////////
+        // Front-end Passes running just before back-end analysis. //
+        // map the IR loops to the loop labels in the source code  //
+        // for the configurations of loops.                        //
+        /////////////////////////////////////////////////////////////
 
 
 
@@ -298,6 +303,8 @@ int main(int argc, const char **argv)
 
         /////////////////////////////////////////////////////////////
         // Front-end Passes running just before back-end analysis. //
+        // mainly account for inserting MUX for the accesses to    //
+        // array partitions.                                       //
         /////////////////////////////////////////////////////////////
 
 
@@ -347,6 +354,8 @@ int main(int argc, const char **argv)
         // After running this Pass, the information will be stored in //
         // The public variables of the Pass pointer.                  //
         // such as function latencies, loop tripcounts and etc.       //
+        // The information variables are declared in:                 //
+        //         HI_WithDirectiveTimingResourceEvaluation.h         //
         ////////////////////////////////////////////////////////////////
 
         std::string logName_evaluation = "HI_WithDirectiveTimingResourceEvaluation__forCheck_"+cntStr ;
