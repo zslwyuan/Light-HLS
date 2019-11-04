@@ -66,7 +66,7 @@ If you have problems in building the LLVM package or applying the patch, we prov
 6. looking into the source code with detailed comments, reader can trace the headers and functions to understand how the experiment work.
 7. in the directory **[HLS_Data_Lib](https://github.com/zslwyuan/Light-HLS/tree/master/HLS_Data_Lib)**, there is the library of the IR instructions on FPGA. Currently, the library is built for Zedboard (Xilinx Platform ID: xc7z020clg484-1). If you want to use Light-HLS for another platform, you can regenerate the library by using the **[LibGen.py](https://github.com/zslwyuan/Light-HLS/blob/master/HLS_Lib_Generator/LibGen.py)**, which will collect the information from VivadoHLS and designers can overwrite the library in HLS_Data_Lib with the new one. The LibGen.py supports multiple processes to acceleration the procedure. An example is shown below. 
 
-    python LibGen.py -n 12 -p xc7z020clg484-1
+         python LibGen.py -n 12 -p xc7z020clg484-1
 
 
 
@@ -98,9 +98,9 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
 1. Clang part for Front-End Processing: 
 
-    extract the information of arrays in the source code   
-    set labels for each loop in the source code   
-    
+      extract the information of arrays in the source code   
+      set labels for each loop in the source code   
+
 
 ### Further development
 
