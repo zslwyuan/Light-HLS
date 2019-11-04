@@ -1,6 +1,14 @@
 # Light-HLS: Fast, Accurate and Convenient 
 
+    Let's try to make HLS developemnt easier for everyone~ ^\_^. 
+     
+
+
 Light-HLS is a light weight high-level synthesis (HLS) framework for academic exploration and evaluation, which can be called to perform various design space exploration (DSE) for FPGA-based HLS design. It covers the abilities of previous works, overcomes the existing limitations and brings more practical features. Light-HLS is modularized and portable so designers can use the components of Light-HLS to conduct various DSE procedures.  Light-HLS gets rid of RTL code generation so it will not suffer from the time-consuming synthesis of commercial HLS tools like VivadoHLS, which involves many detailed operations in both its frond-end and back-end.
+
+If Light-HLS helps for your works, please cite our paper in ICCAD 2019 ^_^: 
+
+    Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis. IEEE/ACM 2019 International Conference On Computer Aided Design (ICCAD) 
 
 
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/Light-HLS-Overview.png" width="800"> 
@@ -41,7 +49,7 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 
 1. Install LLVM-9.0.0: Download LLVM-9.0.0, make and install it. If you want to support arbitary precision integer, please apply **[the batch](https://github.com/zslwyuan/Light-HLS/tree/master/Patch_for_LLVM)** to Clang before make and build. 
 If you have problems in building the LLVM package or applying the patch, we provide **[a source code repository](https://github.com/zslwyuan/LLVM-9-for-Light-HLS)** with the patch applied. 
-2. 
+2. In the directory **[/Tests](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**, a series of experiments are conducted during development. The standard Light-HLS is implemented in **[Light_HLS_Top](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/Light_HLS_Top)**
  
 ## [Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)
 
