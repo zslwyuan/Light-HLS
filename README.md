@@ -58,17 +58,14 @@ If you have problems in building the LLVM package or applying the patch, we prov
  
 ## [Usage of Light-HLS](https://github.com/zslwyuan/Light-HLS#usage-of-light-hls)
 
-1. download the blog (entire project)
-2. basic functiones and passes are implemented in the directory **["Implementations"](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations)**. Nearly all the directories have their own README file to explain the directory.
-3. experiments are tested in the directory **["Test"](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**.
-4. by making a "build" directory and using CMake in each experiment directory (e.g. **[this one](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp5_SimpleTimingAnalysis/)**), executable can be generated and tried. (hint: cmake .. & make) 
-5. for user's convenience, we prepare some scripts for example, **BuildAllFiles.sh**, which will build all the projects, **CleanBuiltFiles.sh**, which will clean all the built files to shrink the size of the directories, and **Build.sh** in test directory, which will just build one test project. All these scripts can be run directly.
-6. looking into the source code with detailed comments, reader can trace the headers and functions to understand how the experiment work.
-7. in the directory **[HLS_Data_Lib](https://github.com/zslwyuan/Light-HLS/tree/master/HLS_Data_Lib)**, there is the library of the IR instructions on FPGA. Currently, the library is built for Zedboard (Xilinx Platform ID: xc7z020clg484-1). If you want to use Light-HLS for another platform, you can regenerate the library by using the **[LibGen.py](https://github.com/zslwyuan/Light-HLS/blob/master/HLS_Lib_Generator/LibGen.py)**, which will collect the information from VivadoHLS and designers can overwrite the library in HLS_Data_Lib with the new one. The LibGen.py supports multiple processes to acceleration the procedure. An example is shown below. 
+1. download the repository (entire project)
+2. the organization of this repository is: (1) basic functiones and passes are implemented in the directory **["Implementations"](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations)**. Nearly all the directories have their own README file to explain the directory. (2) experiments are tested in the directory **["Test"](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**. (3) by making a "build" directory and using CMake in each experiment directory (e.g. **[this one](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp5_SimpleTimingAnalysis/)**), executable can be generated and tried. (hint: cmake .. & make)  (4) for user's convenience, we prepare some scripts for example, **BuildAllFiles.sh**, which will build all the projects, **CleanBuiltFiles.sh**, which will clean all the built files to shrink the size of the directories, and **Build.sh** in test directory, which will just build one test project. All these scripts can be run directly.
+3. looking into the source code with detailed comments, reader can trace the headers and functions to understand how the experiment work.
+4. in the directory **[HLS_Data_Lib](https://github.com/zslwyuan/Light-HLS/tree/master/HLS_Data_Lib)**, there is the library of the IR instructions on FPGA. Currently, the library is built for Zedboard (Xilinx Platform ID: xc7z020clg484-1). If you want to use Light-HLS for another platform, you can regenerate the library by using the **[LibGen.py](https://github.com/zslwyuan/Light-HLS/blob/master/HLS_Lib_Generator/LibGen.py)**, which will collect the information from VivadoHLS and designers can overwrite the library in HLS_Data_Lib with the new one. The LibGen.py supports multiple processes to accelerate the procedure. An example is shown below. 
 
          python LibGen.py -n 12 -p xc7z020clg484-1
 
-8. Light-HLS supports HLS directives for the design, including loop unrolling, loop pipelining, array partitioning, static array setting, dataflow and clock settings, which can be set in a configuration file. An example is shown in **[config_2mm.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_2mm.txt)** and **[config_conv.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_conv.txt)**. If you want to check the loops' labels, please run Light-HLS with loop configurations first and the source code with labels for loop, "tmp_loopLabeled.cc", will be generated in the directory.
+8. Light-HLS supports HLS directives for the design, including loop unrolling, loop pipelining, array partitioning, static array setting, dataflow and clock settings, which can be set in a configuration file. An example is shown in **[config_2mm.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_2mm.txt)** and **[config_conv.txt](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/config_conv.txt)**. If you want to check the loops' labels, please run Light-HLS with loop configurations first and the source code with labels for loop, "tmp_loopLabeled.cc", will be generated in the directory. If you need to set array partition for the arrays, please note that in Light-HLS, the definition of the order of dimentsion is shown like   \[...\]\[second dimension\]\[first dimension\].
 
 9. As you can notice in the usage examples, Light-HLS can run with DEBUG flag and lots of information during the HLS procedure will be dumped for analysis.
 
@@ -95,7 +92,7 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 ## [Implementation of Light-HLS and Further development](https://github.com/zslwyuan/Light-HLS#implementation-of-light-hls-and-further-development)
 
-### The Implementation of Light-HLS
+### The Overview of Light-HLS Implementation
 
 As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Light_HLS_Top.cc)**, the procedure of Light-HLS contains mainly four steps:
 
@@ -125,6 +122,14 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
          The public variables of the Pass pointer.                 
          such as function latencies, loop tripcounts and etc.  
 
+### 1. Clang part for Front-End Processing
+
+In this part, we need to extract the information of arrays in the source code, which might be lost in the IR code after the Clang processing. For example, if declared in the interface of functions, the information of the arrays' first dimension might be removed in the IR code. This may lead to the situation that we cannot apply the partitioning to specific dimensions properly. In the processing at Clang level, we can [extract such informantion from the Abstract Syntax Tree (AST) with HI_FunctionInterfaceInfo](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInterfaceInfo).
+
+From another perspective, the loops in IR codes are named according to LLVM rules, which might not be easy to map them to the original source code. Therefore, we need to [set label for each loop with Hi_LoopLabeler](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopLabeler), so designers can easier specify the loops for configurations.
+    
+
+### The Overview of Light-HLS Implementation
 
 ### Further development
 

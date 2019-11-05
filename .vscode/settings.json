@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstring": "cpp",
+        "functional": "cpp",
+        "iostream": "cpp",
+        "memory": "cpp",
+        "system_error": "cpp",
+        "utility": "cpp"
+    }
+}
