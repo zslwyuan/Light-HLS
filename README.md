@@ -134,11 +134,11 @@ From another perspective, the loops in IR codes are named according to LLVM rule
 
 In this part, Light-HLS will transform the IR code according to the FPGA characteristics for optimization. 
 
-A. Function Level: 
+**A. Function Level:** 
 
 (A.1) Function Instantiation: In C/C++ source code, a function might be reused to process different data. For CPU, the function can be consistent for different data source during compilation. However, for FPGA, if the function processes data with different structures, e.g. they are partitioned with different factors, [the function needs to be instantiated by Light-HLS for different data](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInstantiation), for different analysis and optimizations.
 
-B. Loop Level: 
+**B. Loop Level:**
 
 (B.1) Loop Extraction: This is an optimization for loop level optimization. In HLS, the functions processing independent objects can be run concurrently. Therefore, extracting the loops into functions can help to raise the parallelism among loops. In LLVM-9.0.0, [LoopExtractor Pass](https://llvm.org/doxygen/LoopExtractor_8cpp.html) has been implemented.
 
@@ -148,11 +148,11 @@ B. Loop Level:
 
 (B.4) Loop Unrolling: Unrolling a loop could be benificial to FPGA parallelism, since after unrolling, those independent instructions can be executed concurrently. LLVM provides [Loop Unrolling Pass](https://llvm.org/doxygen/LoopUnroll_8cpp.html) which targets at CPU-like devices and unrolls loops according to specific criterias. However, for FPGA, we want to enforce loop unrolling for some loops and therefore, referring to the LLVM Pass, Light-HLS provides [a loop unroller](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopUnroll) which will unroll loop according to the configuration file, which specifies the unrolling factor and the label of the loops should be unrolled.
 
-C. General Instruction Level:
+**C. General Instruction Level:**
 
 (C.1) Duplicated Instruction Removal: Duplicated instructions are those instructions with the same opcode and the same operands in the IR code. This kind of situations may usually occur after loop unrolling and GER lowering, since there could be the similar instructions in different iterations or the calculation of different addresses. Light-HLS will [remove those duplicated ones to reduce the cost for FPGA implementation](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_HLSDuplicateInstRm).
 
-D. Memory Access Level:
+**D. Memory Access Level:**
 
 (D.1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
