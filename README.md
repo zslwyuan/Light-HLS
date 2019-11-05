@@ -103,13 +103,12 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
 2. [Front-End Passes for FPGA-Oriented Optimizations and Transformation](https://github.com/zslwyuan/Light-HLS#2-front-end-passes-for-fpga-oriented-optimizations-and-transformation):     
 
-         GEPLowering      
-         Loop Extraction                                                               
-         Loop Simplification                                                           
-         Loop Stregnth Reducation                                                      
-         Duplicated Instruction Removal                                                
-         Function Instantiation                                                              
-         Instruction Optimization: Multiplication / Instruction Hoisting / Redundant Access Removal / Bitwidth Reduction/ etc.. 
+         
+         Function Level: Function Instantiation     
+         Loop Level: Loop Extraction / Loop Simplification / Loop Stregnth Reducation                                     
+         General Instruction Level: GEPLowering / Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
+         Memory Access Level:  Redundant Access Removal / Access Reordering
+
 
 3. Front-End Passes just before Back-End Analysis:
 
