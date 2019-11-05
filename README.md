@@ -135,6 +135,10 @@ In this part, Light-HLS will transform the IR code according to the FPGA charact
 
 (1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
+(2) Loop Extraction: This is an optimization for loop level optimization. In HLS, the functions processing independent objects can be run concurrently. Therefore, extracting the loops into functions can help to raise the parallelism among loops. In LLVM-9.0.0, [LoopExtractor Pass](https://llvm.org/doxygen/LoopExtractor_8cpp.html) has been implemented.
+
+(3) Loop Simplification: For further analysis of loops, Light-HLS needs to canonicalize natural loops.
+
 ### Further development
 
 If you want to do your own works based on this project, following hints might be useful.
