@@ -105,9 +105,9 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
          
          Function Level: Function Instantiation     
-         Loop Level: Loop Extraction / Loop Simplification / Loop Stregnth Reducation / Index Variable Simplify                                 
-         General Instruction Level: GEPLowering / Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
-         Memory Access Level:  Redundant Access Removal / Access Reordering
+         Loop Level: Loop Extraction / Loop Simplification / Index Variable Simplify / Loop Stregnth Reducation                                 
+         General Instruction Level:  Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
+         Memory Access Level:  GEPLowering / Redundant Access Removal / Access Reordering
 
 
 3. Front-End Passes just before Back-End Analysis:
@@ -128,19 +128,25 @@ In this part, we need to extract the information of arrays in the source code, w
 
 From another perspective, the loops in IR codes are named according to LLVM rules, which might not be easy to map them to the original source code. Therefore, we need to [set label for each loop with Hi_LoopLabeler](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopLabeler), so designers can easier specify the loops for configurations.
     
+*WARNING: Currently, Light-HLS cannot process the type of struct/class in C/C++. We are working on them!*
+
 ### 2. Front-End Passes for FPGA-Oriented Optimizations and Transformation
 
 In this part, Light-HLS will transform the IR code according to the FPGA characteristics for optimization. 
 
 A. Function Level: 
 
-(A.1)Function Instantiation: In C/C++ source code, a function might be reused to process different data. For CPU, the function can be consistent for different data source during compilation. However, for FPGA, if the function processes data with different structures, e.g. they are partitioned with different factors, [the function needs to be instantiated by Light-HLS for different data](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInstantiation), for different analysis and optimizations.
+(A.1) Function Instantiation: In C/C++ source code, a function might be reused to process different data. For CPU, the function can be consistent for different data source during compilation. However, for FPGA, if the function processes data with different structures, e.g. they are partitioned with different factors, [the function needs to be instantiated by Light-HLS for different data](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInstantiation), for different analysis and optimizations.
+
+B. Loop Level: 
+
+(B.1) Loop Extraction: This is an optimization for loop level optimization. In HLS, the functions processing independent objects can be run concurrently. Therefore, extracting the loops into functions can help to raise the parallelism among loops. In LLVM-9.0.0, [LoopExtractor Pass](https://llvm.org/doxygen/LoopExtractor_8cpp.html) has been implemented.
+
+(B.2) Loop Simplification / Index Variable Simplify: For further analysis of loops, e.g. tripcount evaluation and header/exit detection, Light-HLS needs to canonicalize natural loops. [What is canpnical loops?](https://en.wikipedia.org/wiki/Normalized_loop) *WARNING: Currently, Light-HLS cannot process non-canpnical loop, for which we are dealing with.*
 
 (1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
-(2) Loop Extraction: This is an optimization for loop level optimization. In HLS, the functions processing independent objects can be run concurrently. Therefore, extracting the loops into functions can help to raise the parallelism among loops. In LLVM-9.0.0, [LoopExtractor Pass](https://llvm.org/doxygen/LoopExtractor_8cpp.html) has been implemented.
 
-(3) Loop Simplification: For further analysis of loops, Light-HLS needs to canonicalize natural loops.
 
 ### Further development
 
