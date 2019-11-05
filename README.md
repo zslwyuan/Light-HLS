@@ -101,14 +101,14 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
          extract the information of arrays in the source code   
          set labels for each loop in the source code   
 
-2. Front-End Passes for FPGA-Oriented Optimizations and Transformation:     
+2. [Front-End Passes for FPGA-Oriented Optimizations and Transformation](https://github.com/zslwyuan/Light-HLS#2-front-end-passes-for-fpga-oriented-optimizations-and-transformation):     
 
+         GEPLowering      
          Loop Extraction                                                               
          Loop Simplification                                                           
          Loop Stregnth Reducation                                                      
          Duplicated Instruction Removal                                                
-         Function Instantiation  
-         GEPLowering                                                         
+         Function Instantiation                                                              
          Instruction Optimization: Multiplication / Instruction Hoisting / Redundant Access Removal / Bitwidth Reduction/ etc.. 
 
 3. Front-End Passes just before Back-End Analysis:
@@ -132,6 +132,8 @@ From another perspective, the loops in IR codes are named according to LLVM rule
 ### 2. Front-End Passes for FPGA-Oriented Optimizations and Transformation
 
 In this part, Light-HLS will transform the IR code according to the FPGA characteristics for optimization. 
+
+(1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
 ### Further development
 
