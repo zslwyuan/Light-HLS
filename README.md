@@ -105,7 +105,7 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
          
          Function Level: Function Instantiation     
-         Loop Level: Loop Extraction / Loop Simplification / Loop Stregnth Reducation                                     
+         Loop Level: Loop Extraction / Loop Simplification / Loop Stregnth Reducation / Index Variable Simplify                                 
          General Instruction Level: GEPLowering / Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
          Memory Access Level:  Redundant Access Removal / Access Reordering
 
