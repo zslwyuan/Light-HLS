@@ -124,7 +124,11 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
 ### 1. Clang part for Front-End Processing
 
+**For Arrays**
+
 In this part, we need to extract the information of arrays in the source code, which might be lost in the IR code after the Clang processing. For example, if declared in the interface of functions, the information of the arrays' first dimension might be removed in the IR code. This may lead to the situation that we cannot apply the partitioning to specific dimensions properly. In the processing at Clang level, we can [extract such informantion from the Abstract Syntax Tree (AST) with HI_FunctionInterfaceInfo](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInterfaceInfo).
+
+**For Loops**
 
 From another perspective, the loops in IR codes are named according to LLVM rules, which might not be easy to map them to the original source code. Therefore, we need to [set label for each loop with Hi_LoopLabeler](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopLabeler), so designers can easier specify the loops for configurations.
     
