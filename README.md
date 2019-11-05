@@ -105,7 +105,7 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
          
          Function Level: Function Instantiation     
-         Loop Level: Loop Extraction / Loop Simplification / Index Variable Simplify / Loop Stregnth Reducation                                 
+         Loop Level: Loop Extraction / Loop Simplification / Index Variable Simplify / Loop Stregnth Reducation / Loop Unrolling                               
          General Instruction Level:  Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
          Memory Access Level:  GEPLowering / Redundant Access Removal / Access Reordering
 
@@ -144,7 +144,17 @@ B. Loop Level:
 
 (B.2) Loop Simplification / Index Variable Simplify: For further analysis of loops, e.g. tripcount evaluation and header/exit detection, Light-HLS needs to canonicalize natural loops. [What is canpnical loops?](https://en.wikipedia.org/wiki/Normalized_loop) *WARNING: Currently, Light-HLS cannot process non-canpnical loop, for which we are dealing with.*
 
-(1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
+(B.3) Loop Strength Reduction (LSR): In the loops, there could be some expressions involving the index variables of the loops. Loop strength reduction will try to transform those operations into more efficient operations, e.g. from multiplication to addition, (A = i*30  =>  A = A + 30 (i is a index of loop)). LLVM provides [LSR Pass](https://llvm.org/doxygen/LoopStrengthReduce_8cpp.html) but some multiplications, used in address calculation, may stay after loop strength reduction, if the target machine has scaled index addressing mode. However, FPGA is not one of the target machine of official LLVM. In order to enforce the LSR for HLS, Light-HLS includes [its own LSR Pass](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_AggressiveLSR_MUL).
+
+(B.4) Loop Unrolling: Unrolling a loop could be benificial to FPGA parallelism, since after unrolling, those independent instructions can be executed concurrently. LLVM provides [Loop Unrolling Pass](https://llvm.org/doxygen/LoopUnroll_8cpp.html) which targets at CPU-like devices and unrolls loops according to specific criterias. However, for FPGA, we want to enforce loop unrolling for some loops and therefore, referring to the LLVM Pass, Light-HLS provides [a loop unroller](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopUnroll) which will unroll loop according to the configuration file, which specifies the unrolling factor and the label of the loops should be unrolled.
+
+C. General Instruction Level:
+
+(C.1) Duplicated Instruction Removal: Duplicated instructions are those instructions with the same opcode and the same operands in the IR code. This kind of situations may usually occur after loop unrolling and GER lowering, since there could be the similar instructions in different iterations or the calculation of different addresses. Light-HLS will [remove those duplicated ones to reduce the cost for FPGA implementation](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_HLSDuplicateInstRm).
+
+D. Memory Access Level:
+
+(D.1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
 
 
