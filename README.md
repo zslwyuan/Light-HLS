@@ -96,21 +96,22 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Light_HLS_Top/Light_HLS_Top.cc)**, the procedure of Light-HLS contains mainly four steps:
 
-1. Clang part for Front-End Processing: 
+1. [Clang part for Front-End Processing](https://github.com/zslwyuan/Light-HLS#1-clang-part-for-front-end-processing): 
 
          extract the information of arrays in the source code   
          set labels for each loop in the source code   
 
-2. Front-end Passes running for optimizations:     
+2. Front-End Passes for FPGA-Oriented Optimizations and Transformation:     
 
          Loop Extraction                                                               
          Loop Simplification                                                           
          Loop Stregnth Reducation                                                      
          Duplicated Instruction Removal                                                
-         Function Initiation                                                           
+         Function Instantiation  
+         GEPLowering                                                         
          Instruction Optimization: Multiplication / Instruction Hoisting / Redundant Access Removal / Bitwidth Reduction/ etc.. 
 
-3. Front-end Passes running just before back-end analysis:
+3. Front-End Passes just before Back-End Analysis:
 
          map the IR loops to the loop labels in the source code for the configurations of loops. 
          mainly account for inserting MUX for the accesses to array partitions.   
@@ -128,8 +129,9 @@ In this part, we need to extract the information of arrays in the source code, w
 
 From another perspective, the loops in IR codes are named according to LLVM rules, which might not be easy to map them to the original source code. Therefore, we need to [set label for each loop with Hi_LoopLabeler](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopLabeler), so designers can easier specify the loops for configurations.
     
+### 2. Front-End Passes for FPGA-Oriented Optimizations and Transformation
 
-### The Overview of Light-HLS Implementation
+In this part, Light-HLS will transform the IR code according to the FPGA characteristics for optimization. 
 
 ### Further development
 
