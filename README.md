@@ -72,8 +72,6 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 ***
 
-
-
 **usage example**
 
       When built, most test executables can be used like below but please check the source code for confirmation.
@@ -106,7 +104,7 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
          
          Function Level: Function Instantiation     
          Loop Level: Loop Extraction / Loop Simplification / Index Variable Simplify / Loop Stregnth Reducation / Loop Unrolling                               
-         General Instruction Level:  Duplicated Instruction Removal / Multiplication / Instruction Hoisting / Bitwidth Reduction / etc..      
+         General Instruction Level:  Duplicated Instruction Removal / Multiplication Optimization / Reduction Optimization / Instruction Hoisting / Bitwidth Reduction / etc..      
          Memory Access Level:  GEPLowering / Redundant Access Removal / Access Reordering
 
 
@@ -155,6 +153,10 @@ In this part, Light-HLS will transform the IR code according to the FPGA charact
 **C. General Instruction Level:**
 
 (C.1) Duplicated Instruction Removal: Duplicated instructions are those instructions with the same opcode and the same operands in the IR code. This kind of situations may usually occur after loop unrolling and GER lowering, since there could be the similar instructions in different iterations or the calculation of different addresses. Light-HLS will [remove those duplicated ones to reduce the cost for FPGA implementation](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_HLSDuplicateInstRm).
+
+(C.2) Multiplication Optimization: A series of multiplication operations (reduction) can be transformed into a multiplier tree to reduce computation latency. Moreover, some multiplication with constant can be transformed into shift operation to reduce overhead.
+
+(C.3) Addition Optimization: A series of addition operations (reduction) can be transformed into a adder tree to reduce computation latency.
 
 **D. Memory Access Level:**
 
