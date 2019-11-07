@@ -180,11 +180,11 @@ For array partitioning, some accesses might fail to be mapped to certain partiti
 
 ### 4. Backend-end Pass
 
-**A. Scheduling:** 
+**A. [Scheduling](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_WithDirectiveTimingResourceEvaluation):** 
 
 During scheduling, Light-HLS map the instructions to exact cycle in the runtime so they can be controlled by the FSM in FPGA implementation. The scheduling is processed at different levels, including functions, loops, basic blokcs and individual instructions. The loop pipelining and the instruction chaining are considered during scheduling.
 
-**B. Binding:**
+**B. [Binding](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_WithDirectiveTimingResourceEvaluation):**
 
 Each operation is realized on FPGA with certain resource. Light-HLS can help designers collect the information of each type of operation from VivadoHLS. Then, during resource binding, Light-HLS will map the operation to specifc resource cost, accoring to the requirement of timing and the type and bitwidth of operands. In the binding, the resource reuse and the operation chaining are considered.
 
