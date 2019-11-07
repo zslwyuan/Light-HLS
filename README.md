@@ -108,12 +108,12 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
          Memory Access Level:  GEPLowering / Redundant Access Removal
 
 
-3. Front-End Passes just before Back-End Analysis:
+3. [Front-End Passes just before Back-End Analysis](https://github.com/zslwyuan/Light-HLS#3-front-end-passes-just-before-back-end-analysis):
 
          map the IR loops to the loop labels in the source code for the configurations of loops. 
          mainly account for inserting MUX for the accesses to array partitions.   
 
-4. Backend-end Pass
+4. [Backend-end Pass](https://github.com/zslwyuan/Light-HLS#4-backend-end-pass)
 
          for scheduling and binding       
          After running this Pass, the information will be stored in
@@ -187,6 +187,11 @@ During scheduling, Light-HLS map the instructions to exact cycle in the runtime 
 **B. Binding:**
 
 Each operation is realized on FPGA with certain resource. Light-HLS can help designers collect the information of each type of operation from VivadoHLS. Then, during resource binding, Light-HLS will map the operation to specifc resource cost, accoring to the requirement of timing and the type and bitwidth of operands. In the binding, the resource reuse and the operation chaining are considered.
+
+
+
+***
+
 
 ### Further development
 
