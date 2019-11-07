@@ -122,11 +122,11 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
 
 ### 1. Clang part for Front-End Processing
 
-**For Arrays**
+**A. For Arrays**
 
 In this part, we need to extract the information of arrays in the source code, which might be lost in the IR code after the Clang processing. For example, if declared in the interface of functions, the information of the arrays' first dimension might be removed in the IR code. This may lead to the situation that we cannot apply the partitioning to specific dimensions properly. In the processing at Clang level, we can [extract such informantion from the Abstract Syntax Tree (AST) with HI_FunctionInterfaceInfo](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_FunctionInterfaceInfo).
 
-**For Loops**
+**B. For Loops**
 
 From another perspective, the loops in IR codes are named according to LLVM rules, which might not be easy to map them to the original source code. Therefore, we need to [set label for each loop with Hi_LoopLabeler](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_LoopLabeler), so designers can easier specify the loops for configurations.
     
@@ -167,6 +167,26 @@ In this part, Light-HLS will transform the IR code according to the FPGA charact
 (D.1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
 (D.2) Redundant Access Removal: There could be many redundant memory accesses in IR code, especially after loop unrolling. Here, [Light-HLS removes those some of accesses](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_RemoveRedundantAccess), assuming that FPGA is the only one device processing those data. 
+
+### 3. Front-End Passes just before Back-End Analysis
+
+**A. For the Loops:**
+
+Since during HLS, Light-HLS needs to map the configuration of loops to the IR code, such as pipeline II and unroll factor, for scheduling. Therefore, Light-HLS uses a Pass [to extract related information from the debug metadata](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_IR2SourceCode).
+
+**B. For the Arrays:**
+
+For array partitioning, some accesses might fail to be mapped to certain partition during compilation. Therefore, Light-HLS need to [insert MUX for them](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_MuxInsertionArrayPartition) to support runtime selection and introduce MUX delay in scheduling.
+
+### 4. Backend-end Pass
+
+**A. Scheduling:** 
+
+During scheduling, Light-HLS map the instructions to exact cycle in the runtime so they can be controlled by the FSM in FPGA implementation. The scheduling is processed at different levels, including functions, loops, basic blokcs and individual instructions. The loop pipelining and the instruction chaining are considered during scheduling.
+
+**B. Binding:**
+
+Each operation is realized on FPGA with certain resource. Light-HLS can help designers collect the information of each type of operation from VivadoHLS. Then, during resource binding, Light-HLS will map the operation to specifc resource cost, accoring to the requirement of timing and the type and bitwidth of operands. In the binding, the resource reuse and the operation chaining are considered.
 
 ### Further development
 
