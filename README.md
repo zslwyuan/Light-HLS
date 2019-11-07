@@ -105,7 +105,7 @@ As shown in **[Light_HLS_Top.cc](https://github.com/zslwyuan/Light-HLS/blob/mast
          Function Level: Function Instantiation     
          Loop Level: Loop Extraction / Loop Simplification / Index Variable Simplify / Loop Stregnth Reducation / Loop Unrolling                               
          General Instruction Level:  Duplicated Instruction Removal / Multiplication Optimization / Reduction Optimization / Instruction Hoisting / Bitwidth Reduction / etc..      
-         Memory Access Level:  GEPLowering / Redundant Access Removal / Access Reordering
+         Memory Access Level:  GEPLowering / Redundant Access Removal
 
 
 3. Front-End Passes just before Back-End Analysis:
@@ -154,15 +154,19 @@ In this part, Light-HLS will transform the IR code according to the FPGA charact
 
 (C.1) Duplicated Instruction Removal: Duplicated instructions are those instructions with the same opcode and the same operands in the IR code. This kind of situations may usually occur after loop unrolling and GER lowering, since there could be the similar instructions in different iterations or the calculation of different addresses. Light-HLS will [remove those duplicated ones to reduce the cost for FPGA implementation](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_HLSDuplicateInstRm).
 
-(C.2) Multiplication Optimization: A series of multiplication operations (reduction) can be transformed into a multiplier tree to reduce computation latency. Moreover, some multiplication with constant can be transformed into shift operation to reduce overhead.
+(C.2) Multiplication Optimization: A series of multiplication operations (reduction) can be [transformed into a multiplier tree]((https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_MulOrderOpt)) or [just ordered them to postpone the accesses](https://github.com/zslwyuan/Light-HLS/blob/master/Implementations/HI_LoadALAP/HI_LoadALAP.cc) to reduce computation latency. Moreover, some multiplication with constant can be [transformed into shift operation](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_Mul2Shl) to reduce overhead.
 
-(C.3) Addition Optimization: A series of addition operations (reduction) can be transformed into a adder tree to reduce computation latency.
+(C.3) Addition Optimization: A series of addition operations (reduction) can be [ordered them to postpone the accesses](https://github.com/zslwyuan/Light-HLS/blob/master/Implementations/HI_LoadALAP/HI_LoadALAP.cc).
+
+(C.4) Instruction Hoisting: There could be instructions in branches: some of them are actually independent with the branch PHI operations or some of them are shared among branches. For these situations, [the instructions might be hoisted from the branches to their dominant nodes](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_IntstructionMoveBackward), so the instructions could be executed in advance or in parallel with other previous operations, to lower the latency.
+
+(C.5) Bitwidth Optimization: On FPGA, the arbitrary precision integers are supported and the overhead of the operations are sensitive to the bitwidth of the operations. Therefore, [bitwidth optimization is important for FPGA HLS, which is implemented by Light-HLS](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_VarWidthReduce).
 
 **D. Memory Access Level:**
 
 (D.1) GEPLowering: GEP is an operation in LLVM to get the element pointer for the accesses to arrays. An array could have multiple dimensions and GEP helps to map the accesses to array to the exact memory address. However, the on-chip memory of FPGA are mainly BRAMs, which are actually "single-dimension". In order to ensure that the instructions can get data from BRAMs, Light-HLS lowers the GEP to those exact operations of address calculation. For example, for the access B\[i\]\[j\] to the array B\[70\]\[20\], Light-HLS will [transform the GEP operation into the multiplication and addition](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_SeparateConstOffsetFromGEP), e.g. i*20+j.
 
-
+(D.2) Redundant Access Removal: There could be many redundant memory accesses in IR code, especially after loop unrolling. Here, [Light-HLS removes those some of accesses](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_RemoveRedundantAccess), assuming that FPGA is the only one device processing those data. 
 
 ### Further development
 
