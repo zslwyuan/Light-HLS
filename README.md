@@ -11,7 +11,7 @@ If Light-HLS helps for your works, please cite our paper in ICCAD 2019 ^_^:
     Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis. IEEE/ACM 2019 International Conference On Computer Aided Design (ICCAD) 
 
 
-A well-organzied Wiki can be find **[here](https://github.com/zslwyuan/Light-HLS/wiki)**
+A well-organzied Wiki can be find **[here](https://github.com/zslwyuan/Light-HLS/wiki)**. If you have any further problems, please feel free to let us know: tliang@connect.ust.hk
 
 
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/Light-HLS-Overview.png" width="800"> 
@@ -63,7 +63,7 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 1. download the repository (entire project)
 2. the organization of this repository is: (1) basic functiones and passes are implemented in the directory **["Implementations"](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations)**. Nearly all the directories have their own README file to explain the directory. (2) experiments are tested in the directory **["Test"](https://github.com/zslwyuan/Light-HLS/tree/master/Tests)**. (3) by making a "build" directory and using CMake in each experiment directory (e.g. **[this one](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp5_SimpleTimingAnalysis/)**), executable can be generated and tried. (hint: cmake .. & make)  (4) for user's convenience, we prepare some scripts for example, **BuildAllFiles.sh**, which will build all the projects, **CleanBuiltFiles.sh**, which will clean all the built files to shrink the size of the directories, and **Build.sh** in test directory, which will just build one test project. All these scripts can be run directly.
-3. looking into the source code with detailed comments, reader can trace the headers and functions to understand how the experiment work.
+3. looking into the source codes which we have provided detailed comments, reader can trace the headers and functions to understand how the experiment work. Moreover, the README file in each directory will give you an overall understanding what the code is implemented for.
 4. in the directory **[HLS_Data_Lib](https://github.com/zslwyuan/Light-HLS/tree/master/HLS_Data_Lib)**, there is the library of the IR instructions on FPGA. Currently, the library is built for Zedboard (Xilinx Platform ID: xc7z020clg484-1). If you want to use Light-HLS for another platform, you can regenerate the library by using the **[LibGen.py](https://github.com/zslwyuan/Light-HLS/blob/master/HLS_Lib_Generator/LibGen.py)**, which will collect the information from VivadoHLS and designers can overwrite the library in HLS_Data_Lib with the new one. The LibGen.py supports multiple processes to accelerate the procedure. An example is shown below. 
 
          python LibGen.py -n 12 -p xc7z020clg484-1
