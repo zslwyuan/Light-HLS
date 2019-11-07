@@ -11,6 +11,9 @@ If Light-HLS helps for your works, please cite our paper in ICCAD 2019 ^_^:
     Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis. IEEE/ACM 2019 International Conference On Computer Aided Design (ICCAD) 
 
 
+A well-organzied Wiki can be find **[here](https://github.com/zslwyuan/Light-HLS/wiki)**
+
+
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/Light-HLS-Overview.png" width="800"> 
 
 ## Light-HLS Frond-End
