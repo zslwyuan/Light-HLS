@@ -11,7 +11,7 @@ If Light-HLS helps for your works, please cite our paper in ICCAD 2019 ^_^:
     Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis. IEEE/ACM 2019 International Conference On Computer Aided Design (ICCAD) 
 
 
-A well-organzied Wiki can be find **[here](https://github.com/zslwyuan/Light-HLS/wiki)**. If you have any further problems, please feel free to let us know: tliang@connect.ust.hk
+**[A well-organzied Wiki can be find here](https://github.com/zslwyuan/Light-HLS/wiki)**. If you have any further problems, please feel free to let us know: tliang@connect.ust.hk
 
 
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/Light-HLS-Overview.png" width="800"> 
@@ -82,7 +82,7 @@ In Light-HLS, many useful hints or informations are provided in runtime public v
 
 2. For timing optimization, Light-HLS records the information of scheduling. Following are the examples: (1) The basic scheduling information, such as the timing of loops/functions/basic blocks and the scheduling of each instruction. (2) The log file presenting the iterative search procedure for different pipeline initiation intervals with the information of conflicts of BRAM access and the dependences among different accesses.
 
-3. For resource optimization, more than indicating the resource cost of each instruction, Light-HLS 
+3. For resource optimization, more than indicating the resource cost of each instruction, Light-HLS provide the information of instruction chaining and reusing.
 
 ***
 
