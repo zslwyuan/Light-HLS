@@ -93,11 +93,13 @@ Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**,
 **usage example**
 
       When built, most test executables can be used like below but please check the source code for confirmation.
-      (1) ./Light_HLS_Top  <C/C++ FILE> <top\_function\_name>  <configuration\_file> [DEBUG]
+      (1) ./Light_HLS_Top  <C/C++ FILE> <top_function_name>  <configuration_file> [DEBUG]
       or
-      (2) ./LLVM\_expXXXXX  <C/C++ FILE> <top\_function\_name>   
+      (2) ./LLVM_expXXXXX  <C/C++ FILE> <top_function_name>  <configuration_file> [DEBUG]
       or
-      (3) ./LLVM\_expXXXXX  <IR FILE>
+      (3) ./LLVM_expXXXXX  <C/C++ FILE> <top_function_name>   
+      or
+      (4) ./LLVM_expXXXXX  <IR FILE>
 
 
 ***
