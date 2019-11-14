@@ -76,13 +76,17 @@ If you have problems in building the LLVM package or applying the patch, we prov
 
 **For optimization:**
 
-In Light-HLS, many useful hints or informations are provided in runtime public variables or dumped log files for further optimization.
+In Light-HLS, many useful hints or informations are provided in runtime public variables or dumped log files for further optimization. 
 
 1. For design configuration optimization, Light-HLS provides users with the information of loops and arrays. For examples: (1) Light-HLS can [detect thost targets, e.g. loops and arrays, which can be set HLS directives](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_PragmaTargetExtraction). (2) Light-HLS will [indicate whether an array partitioning is useful to improve performance](https://github.com/zslwyuan/Light-HLS/blob/master/Implementations/HI_WithDirectiveTimingResourceEvaluation/HI_WithDirectiveTimingResourceEvaluation_BramInfo.cc#L2518-L2545).(3) Light-HLS can [evaluate the parallelism relationship between arrays and loops, which helps designer to proper partition arrays or unroll loops, e.g. some arrays should be partitioned when a specific loop is unrolled](https://github.com/zslwyuan/Light-HLS/blob/master/Implementations/HI_ArraySensitiveToLoopLevel/HI_ArraySensitiveToLoopLevel_BramAccessTracer.cc#L881-L1012).
 
 2. For timing optimization, Light-HLS records the information of scheduling. Following are the examples: (1) The basic scheduling information, such as the timing of loops/functions/basic blocks and the scheduling of each instruction. (2) The log file presenting the iterative search procedure for different pipeline initiation intervals with the information of conflicts of BRAM access and the dependences among different accesses.
 
 3. For resource optimization, more than indicating the resource cost of each instruction, Light-HLS provide the information of instruction chaining and reusing.
+
+An example of Light-HLS for general HLS design space exploration is implememnted **[here](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE)**.
+
+Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**, a tool which searches for the configuration of clock settings and HLS directives for the multi-clock dataflow.
 
 ***
 
