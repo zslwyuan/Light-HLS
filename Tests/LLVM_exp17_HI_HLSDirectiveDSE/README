@@ -1,3 +1,7 @@
 This example of Light-HLS is to show how to implement a design space exploration with Light-HLS.
 
 Here, We mainly consider the parameters of array partitioning, loop pipelining and loop unrolling.
+
+run with the command: 
+
+       ./LLVM_expXXXXX  <C/C++ FILE> <top_function_name>  <configuration_file> [DEBUG]
