@@ -1,5 +1,12 @@
 This example of Light-HLS is used to evaluate the timing and resource of the application, considering the effect of HLS directives.
 
+
+
+run with the command: 
+
+       ./Light_HLS_Top  <C/C++ FILE> <top_function_name>  <configuration_file> [DEBUG]
+
+
 Here, We mainly consider dataflow, array partitioning, loop pipelining and loop unrolling.
 
 Basic implementation idea:
