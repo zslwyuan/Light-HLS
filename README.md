@@ -84,7 +84,7 @@ In Light-HLS, many useful hints or informations are provided in runtime public v
 
 3. For resource optimization, more than indicating the resource cost of each instruction, Light-HLS provide the information of instruction chaining and reusing.
 
-An example of Light-HLS for general HLS design space exploration is implememnted **[here](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE)**.
+An example of Light-HLS for general HLS design space exploration for optimal HLS directive settings is implememnted **[here](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE)**.
 
 Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**, a tool which searches for the configuration of clock settings and HLS directives for the multi-clock dataflow.
 
