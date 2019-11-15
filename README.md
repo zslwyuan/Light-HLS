@@ -84,9 +84,9 @@ In Light-HLS, many useful hints or informations are provided in runtime public v
 
 3. For resource optimization, more than indicating the resource cost of each instruction, Light-HLS provide the information of instruction chaining and reusing.
 
-An example of Light-HLS for general HLS design space exploration for optimal HLS directive settings is implememnted **[here](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE)**.
+An example of Light-HLS for general HLS design space exploration for optimal HLS directive settings is implememnted **[here](https://github.com/zslwyuan/Light-HLS/tree/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE)**. With initial parameters and constraints given in configuration file ([example](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/LLVM_exp17_HI_HLSDirectiveDSE/conv_settings/conv_config.txt)), the DSE flow will heuristically search for the optimal HLS directive setting for the application.
 
-Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**, a tool which searches for the configuration of clock settings and HLS directives for the multi-clock dataflow.
+Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**, a tool which searches for the configuration of clock settings and HLS directives for the multi-clock dataflow. With initial parameters and constraints given in configuration file ([example](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/convs_settings/conv_config.txt)), the DSE flow will heuristically search for the optimal HLS directive setting and the clock settings for the modules in the application.
 
 ***
 
