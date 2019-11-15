@@ -99,7 +99,7 @@ Another example is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow)**,
       or
       (3) ./LLVM_expXXXXX  <C/C++ FILE> <top_function_name>   
       or
-      (4) ./LLVM_expXXXXX  <IR FILE>
+      (4) ./LLVM_expXXXXX  <C/C++ FILE>
 
 
 ***

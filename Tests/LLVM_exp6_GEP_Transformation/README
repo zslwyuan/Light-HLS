@@ -9,3 +9,8 @@ Therefore, we need to improve the pass to adpapt to the HLS design.
 Note that:
 
 addRequiredTranstive means that one pass relies on the other one in its lifetime. It is a very strict constraint and we should use it carefully.
+
+
+The test can be run with the following command:
+
+      ./LLVM_expXXXXX  <C/C++ FILE> <top_function_name>   
