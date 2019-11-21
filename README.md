@@ -180,7 +180,7 @@ In this part, Light-HLS will transform the IR code according to the FPGA charact
 
 (C.4) Instruction Hoisting: There could be instructions in branches: some of them are actually independent with the branch PHI operations or some of them are shared among branches. For these situations, [the instructions might be hoisted from the branches to their dominant nodes](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_IntstructionMoveBackward), so the instructions could be executed in advance or in parallel with other previous operations, to lower the latency.
 
-(C.5) Bitwidth Optimization: On FPGA, the arbitrary precision integers are supported and the overhead of the operations are sensitive to the bitwidth of the operations. Therefore, [bitwidth optimization is important for FPGA HLS, which is implemented by Light-HLS](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_VarWidthReduce).
+(C.5) Bitwidth Optimization: On FPGA, the arbitrary precision integers are supported (example of arbitrary precision integer is shown [here](https://github.com/zslwyuan/Light-HLS/tree/master/App/2dloop2darray_pl_apint)) and the overhead of the operations are sensitive to the bitwidth of the operations. Therefore, [bitwidth optimization is important for FPGA HLS, which is implemented by Light-HLS](https://github.com/zslwyuan/Light-HLS/tree/master/Implementations/HI_VarWidthReduce).
 
 **D. Memory Access Level:**
 
