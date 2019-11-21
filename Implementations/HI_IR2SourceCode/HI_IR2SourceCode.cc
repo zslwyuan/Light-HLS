@@ -95,6 +95,10 @@ void HI_IR2SourceCode::traceInstructionSourceCode(Function &F)
                     if (DEBUG) *IR2Src_Log << " ==>  Details: " << *N;
                     if (auto DILoc = dyn_cast<DILocation>(N) )
                     {
+                        while (DILoc->getInlinedAt() != nullptr)
+                        {
+                            DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
+                        }                        
                         if (DEBUG) *IR2Src_Log << " ==>  SourceRange: " << DILoc->getDirectory() << "/" << DILoc->getFilename() << ":" <<DILoc->getLine();
                     }
                 }
@@ -123,6 +127,10 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
                 {
                     if (auto DILoc = dyn_cast<DILocation>(N) )
                     {
+                        while (DILoc->getInlinedAt() != nullptr)
+                        {
+                            DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
+                        }   
                         if (path == "")
                         {
                             path = DILoc->getDirectory().str() + "/" + DILoc->getFilename().str();
