@@ -144,7 +144,7 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F, DISu
         int end_line = 1;
         for(auto &I : B) 
         {
-            if (I.getOpcode() == Instruction::Br)
+            if (I.getOpcode() != Instruction::ICmp)
                 continue;
             SmallVector<std::pair<unsigned, MDNode *>, 4> I_MDs;
             I.getAllMetadata(I_MDs);
@@ -270,21 +270,30 @@ void HI_IR2SourceCode::traceFunctionSourceCode(Function &F, DISubprogram* subpro
     std::string path = "";
     int begin_line = 1000000;
     int end_line = 1;
+    
     for (auto &B : F)
     {
-        if (DEBUG) *IR2Src_Log << B.getName() << ", ";
-        if (path == "")
+        for(auto &I : B) 
         {
-            path = Block2Path[&B];
-        }
+            SmallVector<std::pair<unsigned, MDNode *>, 4> I_MDs;
+            I.getAllMetadata(I_MDs);
+            for (auto &MD : I_MDs) 
+            {
+                if (MDNode *N = MD.second) 
+                {
+                    if (auto DILoc = dyn_cast<DILocation>(N) )
+                    {
+                        if (DILoc->getLine() > end_line)
+                            end_line = DILoc->getLine();
 
-        if (Block2Line[&B].second > end_line)
-            end_line = Block2Line[&B].second;
-
-        if (Block2Line[&B].first < begin_line)
-            begin_line = Block2Line[&B].first;
+                        if (DILoc->getLine() < begin_line && DILoc->getLine()>0)
+                            begin_line = DILoc->getLine();
+                    }
+                }
+            }
+            if (DEBUG) *IR2Src_Log << "\n";
+        } 
     }
-
 
     F.getAllMetadata(MDs);
     for (auto &MD : MDs) 
