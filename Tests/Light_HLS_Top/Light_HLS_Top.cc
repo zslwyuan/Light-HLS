@@ -118,10 +118,23 @@ int main(int argc, const char **argv)
         /////////////////////////////////////////////////////////////////////////////////////
 
 
+        // print_info("Enable LoopSimplify Pass");
+        // auto loopsimplifypass_pre = createLoopSimplifyPass();
+        // PM_pre.add(loopsimplifypass_pre);
+
+        // auto indvarsimplifypass_pre = createIndVarSimplifyPass();
+        // PM_pre.add(indvarsimplifypass_pre);
+        // print_info("Enable IndVarSimplifyPass Pass");
+
+        // auto CFGSimplification_pass22_pre = createCFGSimplificationPass();
+        // PM_pre.add(CFGSimplification_pass22_pre);        
+        // print_info("Enable CFGSimplificationPass Pass");
 
         auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
         PM_pre.add(loopextract);
         print_info("Enable LoopExtractor Pass");
+
+
 
         std::map<std::string, std::vector<int>> IRFunc2BeginLine;
         auto hi_ir2sourcecode = new HI_IR2SourceCode("HI_IR2SourceCode",IRLoop2LoopLabel, IRFunc2BeginLine, IRLoop2OriginTripCount, debugFlag);

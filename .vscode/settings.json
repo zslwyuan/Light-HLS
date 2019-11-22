@@ -74,6 +74,7 @@
         "locale": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "*.tpp": "cpp"
+        "*.tpp": "cpp",
+        "*.inc": "cpp"
     }
 }

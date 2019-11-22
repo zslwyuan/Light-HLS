@@ -21,49 +21,73 @@ bool HI_IR2SourceCode::runOnModule(Module &M) // The runOnModule declaration wil
 {
     if (DEBUG) *IR2Src_Log << M;
     if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+
+    auto subprogramSet = getAllSubprogram(M);
     for (auto &F : M)
     {
         if (F.getName().find("llvm.")!=std::string::npos)
             continue;
-        if (DEBUG) *IR2Src_Log << "\n\n============================================================\n";
-        if (DEBUG) *IR2Src_Log << "============================================================\n";
-        if (DEBUG) *IR2Src_Log << "============================================================\n";
-
         if (DEBUG) *IR2Src_Log << "processing IR code of Function : [" << F.getName() << "]\n";
-
-        if (DEBUG) *IR2Src_Log << "============================================================\n";
-        if (DEBUG) *IR2Src_Log << "============================================================\n";
-        if (DEBUG) *IR2Src_Log << "============================================================\n";
-
         auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();
         auto &SE = getAnalysis<ScalarEvolutionWrapperPass>(F).getSE();
-
         traceInstructionSourceCode(F);
+    }
+    for (auto subprogram : subprogramSet)
+    {
+        if (DEBUG) *IR2Src_Log << "     Processing SubProgram: " << subprogram->getName() << " \n";
+        for (auto &F : M)
+        {
+            if (F.getName().find("llvm.")!=std::string::npos)
+                continue;
+            if (DEBUG) *IR2Src_Log << "\n\n============================================================\n";
+            if (DEBUG) *IR2Src_Log << "============================================================\n";
+            if (DEBUG) *IR2Src_Log << "============================================================\n";
+
+            if (DEBUG) *IR2Src_Log << "processing IR code of Function : [" << F.getName() << "]\n";
+
+            if (DEBUG) *IR2Src_Log << "============================================================\n";
+            if (DEBUG) *IR2Src_Log << "============================================================\n";
+            if (DEBUG) *IR2Src_Log << "============================================================\n";
+
+            auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();
+            auto &SE = getAnalysis<ScalarEvolutionWrapperPass>(F).getSE();
+            Block2Line.clear();
+            traceBasicBlockSourceCode(LI, F, subprogram);
+            if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+
+            traceLoopSourceCode(LI, SE, F, subprogram);   
+            if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+
+            traceFunctionSourceCode(F, subprogram);
+            if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+        }
+
+        if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+        if (DEBUG) *IR2Src_Log << "mappingLoopIR2LoopLabel\n\n============================================================\n\n\n";
+        mappingLoopIR2LoopLabel(subprogramSet);
         if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
 
-        traceBasicBlockSourceCode(LI, F);
-        if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
-
-        traceLoopSourceCode(LI, SE, F);   
-        if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
-
-        traceFunctionSourceCode(F);
-        if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
+        for (auto funcName2beginline_pair : IRFunc2BeginLine)
+        {
+            if (DEBUG) *IR2Src_Log << "printing function: [" << funcName2beginline_pair.first << "] 's possible beginlines:\n";
+            for (auto line : funcName2beginline_pair.second)
+            {
+                if (DEBUG) *IR2Src_Log << "      line--->" << line << "\n";
+            }
+            if (DEBUG) *IR2Src_Log << "\n";
+        }
+        IR2Src_Log->flush();
     }
 
-    if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
-    if (DEBUG) *IR2Src_Log << "mappingLoopIR2LoopLabel\n\n============================================================\n\n\n";
-    mappingLoopIR2LoopLabel(M);
-    if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
-
-    for (auto funcName2beginline_pair : IRFunc2BeginLine)
+    for (auto itLine : Loop2Line)
     {
-        if (DEBUG) *IR2Src_Log << "printing function: [" << funcName2beginline_pair.first << "] 's possible beginlines:\n";
-        for (auto line : funcName2beginline_pair.second)
+        std::string tmp_loop_name = itLine.first->getParent()->getName();
+        tmp_loop_name += "-";
+        tmp_loop_name += itLine.first->getName();
+        if (IRLoop2LoopLabel.find(tmp_loop_name) == IRLoop2LoopLabel.end())
         {
-            if (DEBUG) *IR2Src_Log << "      line--->" << line << "\n";
+            print_warning(tmp_loop_name + " is not mapped to loop label in source code.\n");
         }
-        if (DEBUG) *IR2Src_Log << "\n";
     }
     IR2Src_Log->flush();
     return false;
@@ -95,10 +119,11 @@ void HI_IR2SourceCode::traceInstructionSourceCode(Function &F)
                     if (DEBUG) *IR2Src_Log << " ==>  Details: " << *N;
                     if (auto DILoc = dyn_cast<DILocation>(N) )
                     {
-                        while (DILoc->getInlinedAt() != nullptr)
-                        {
-                            DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
-                        }                        
+                        // if  (DILoc->getInlinedAt() != nullptr)
+                        // {
+                        //     continue;
+                        //     DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
+                        // }                        
                         if (DEBUG) *IR2Src_Log << " ==>  SourceRange: " << DILoc->getDirectory() << "/" << DILoc->getFilename() << ":" <<DILoc->getLine();
                     }
                 }
@@ -109,7 +134,7 @@ void HI_IR2SourceCode::traceInstructionSourceCode(Function &F)
 }
 
 
-void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
+void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F, DISubprogram* subprog)
 {
     for (auto &B : F)
     {
@@ -119,6 +144,8 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
         int end_line = 1;
         for(auto &I : B) 
         {
+            if (I.getOpcode() == Instruction::Br)
+                continue;
             SmallVector<std::pair<unsigned, MDNode *>, 4> I_MDs;
             I.getAllMetadata(I_MDs);
             for (auto &MD : I_MDs) 
@@ -127,10 +154,22 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
                 {
                     if (auto DILoc = dyn_cast<DILocation>(N) )
                     {
-                        while (DILoc->getInlinedAt() != nullptr)
-                        {
-                            DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
-                        }   
+
+                        if (subprog != DILoc->getScope()->getSubprogram())
+                            continue;
+                        // if (DILoc->getInlinedAt() != nullptr)
+                        // {
+                        //     while (DILoc->getInlinedAt() != nullptr)
+                        //     {
+                        //         if (DILoc->getScope()->getSubprogram()==subprog)
+                        //             break;
+                        //         DILoc = dyn_cast<DILocation>(DILoc->getInlinedAt());
+                        //     }
+                        // }   
+
+                        // if (subprog != DILoc->getScope()->getSubprogram())
+                        //     continue;
+
                         if (path == "")
                         {
                             path = DILoc->getDirectory().str() + "/" + DILoc->getFilename().str();
@@ -143,6 +182,8 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
                                 break;
                             }
                         }
+
+
 
                         if (DILoc->getLine() > end_line)
                             end_line = DILoc->getLine();
@@ -169,7 +210,10 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
                 {
                     if (auto DILoc = dyn_cast<DILocation>(N) )
                     {
+
                         if (DEBUG) *IR2Src_Log << DILoc->getLine();
+                        auto scopeFuncName = DILoc->getScope()->getSubprogram()->getName();
+                        if (DEBUG) *IR2Src_Log << "  scopeFuncName:" << scopeFuncName;               
                     }                    
                 }
             }
@@ -179,7 +223,7 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F)
     }   
 }
 
-void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Function &F)
+void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Function &F, DISubprogram* subprog)
 {
     for (auto cur_Loop : LI.getLoopsInPreorder())
     {
@@ -189,7 +233,9 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
         int end_line = 1;
         for (auto B : cur_Loop->getBlocks())
         {
-            if (DEBUG) *IR2Src_Log << B->getName() << ", ";
+            if (cur_Loop != LI.getLoopFor(B))
+                continue;
+            if (DEBUG) *IR2Src_Log << B->getName() << ": " << Block2Line[B].first << "--" << Block2Line[B].second << "\n";
             if (path == "")
             {
                 path = Block2Path[B];
@@ -216,7 +262,7 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
 }
 
 
-void HI_IR2SourceCode::traceFunctionSourceCode(Function &F)
+void HI_IR2SourceCode::traceFunctionSourceCode(Function &F, DISubprogram* subprog)
 {
     SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
 
@@ -292,53 +338,87 @@ void HI_IR2SourceCode::traceModuleMetadata(Module &M)
     // }
 }
 
-void HI_IR2SourceCode::mappingLoopIR2LoopLabel(llvm::Module &M)
+void HI_IR2SourceCode::mappingLoopIR2LoopLabel(std::set<DISubprogram*> &subprogramSet)
 {
-    for (auto &F : M)
+    for (auto DFLoc : subprogramSet)
     {
-        SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
-        F.getAllMetadata(MDs);
-        for (auto &MD : MDs) 
+        if (DEBUG) *IR2Src_Log << "     DebugInfo: : " << DFLoc->getDirectory() << "/" << DFLoc->getFilename() << ":" << DFLoc->getLine() << "\n";
+        for (auto RMD : DFLoc->getRetainedNodes())
         {
-            if (MDNode *N = MD.second) 
+            if (DEBUG) *IR2Src_Log << "     retained #" << *RMD << " : \n";
+                
+            if (auto DLLoc = dyn_cast<DILabel>(RMD))
             {
-                if (DEBUG) *IR2Src_Log << "Total instructions in function " << F.getName() << " - " << *N << "\n";
-                if (auto DFLoc = dyn_cast<DISubprogram>(N) )
+                if (DEBUG) *IR2Src_Log << "           LoopLable: " << DLLoc->getName() <<" : " << DLLoc->getFile()->getDirectory() << "/" << DLLoc->getFile()->getName() << ":" << DLLoc->getLine() << "\n";
+                std::string tmp_path(DFLoc->getDirectory());
+                tmp_path +=  "/";
+                tmp_path += DFLoc->getFilename();
+                bool find = 0;
+                for (auto itLine : Loop2Line)
                 {
-                    if (DEBUG) *IR2Src_Log << "     DebugInfo: : " << DFLoc->getDirectory() << "/" << DFLoc->getFilename() << ":" << DFLoc->getLine() << "\n";
-                    for (auto RMD : DFLoc->getRetainedNodes())
+                    if (itLine.second.first == DLLoc->getLine() && Loop2Path[itLine.first] == tmp_path)
                     {
-                        if (DEBUG) *IR2Src_Log << "     retained #" << *RMD << " : \n";
-                            
-                        if (auto DLLoc = dyn_cast<DILabel>(RMD))
-                        {
-                            if (DEBUG) *IR2Src_Log << "           LoopLable: " << DLLoc->getName() <<" : " << DLLoc->getFile()->getDirectory() << "/" << DLLoc->getFile()->getName() << ":" << DLLoc->getLine() << "\n";
-                            std::string tmp_path(DFLoc->getDirectory());
-                            tmp_path +=  "/";
-                            tmp_path += DFLoc->getFilename();
-                            bool find = 0;
-                            for (auto itLine : Loop2Line)
-                            {
-                                if (itLine.second.first == DLLoc->getLine() && Loop2Path[itLine.first] == tmp_path)
-                                {
-                                    if (DEBUG) *IR2Src_Log << "           mapping to IR loop: " << itLine.first->getName() << "in Function : " << itLine.first->getParent()->getName() << "\n";
-                                    std::string tmp_loop_name = itLine.first->getParent()->getName();
-                                    tmp_loop_name += "-";
-                                    tmp_loop_name += itLine.first->getName();
-                                    IRLoop2LoopLabel[tmp_loop_name] = DLLoc->getName();
-                                    find = 1;
-                                }
-                            }
-                            IR2Src_Log->flush();
-                            // assert(find && "mapping for each loop label should be found!!!");
-                        }
-                        
+                        if (DEBUG) *IR2Src_Log << "           mapping to IR loop: " << itLine.first->getName() << "in Function : " << itLine.first->getParent()->getName() << "\n";
+                        std::string tmp_loop_name = itLine.first->getParent()->getName();
+                        tmp_loop_name += "-";
+                        tmp_loop_name += itLine.first->getName();
+                        IRLoop2LoopLabel[tmp_loop_name] = DLLoc->getName();
+                        find = 1;
                     }
-                    
                 }
-            }
-        }
-        if (DEBUG) *IR2Src_Log << "\n";
+                IR2Src_Log->flush();
+                // assert(find && "mapping for each loop label should be found!!!");
+            }                        
+        }                    
     }
 
+
+
+}
+
+std::set<DISubprogram*> HI_IR2SourceCode::getAllSubprogram(llvm::Module &M)
+{
+    std::set<DISubprogram*> res;
+    for (auto &F : M)
+    {
+        if (F.getName().find("llvm.")!=std::string::npos)
+            continue;
+
+        auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();
+        auto &SE = getAnalysis<ScalarEvolutionWrapperPass>(F).getSE();
+
+        for (auto &B : F)
+        {
+            for(auto &I : B) 
+            {
+                SmallVector<std::pair<unsigned, MDNode *>, 4> I_MDs;
+                I.getAllMetadata(I_MDs);
+                for (auto &MD : I_MDs) 
+                {
+                    if (MDNode *N = MD.second) 
+                    {
+                        if (auto DILoc = dyn_cast<DILocation>(N) )
+                        {
+                            if (DILoc->getScope())
+                            {
+                                if (DILoc->getScope()->getSubprogram())
+                                {
+                                    if (DILoc->getScope()->getSubprogram()->getName() != "")
+                                    {
+                                        if (res.find(DILoc->getScope()->getSubprogram())==res.end())
+                                        {
+                                            if (DEBUG) *IR2Src_Log << "     find (sub) function in original source code: " << DILoc->getScope()->getSubprogram()->getName() << " \n";
+                                            res.insert(DILoc->getScope()->getSubprogram());
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            } 
+        }
+    }
+    return res;
 }
