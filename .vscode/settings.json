@@ -75,6 +75,7 @@
         "queue": "cpp",
         "stack": "cpp",
         "*.tpp": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "*.def": "cpp"
     }
 }
