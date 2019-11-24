@@ -1169,6 +1169,11 @@ HI_WithDirectiveTimingResourceEvaluation::HI_ArrayInfo HI_WithDirectiveTimingRes
     if (Target2ArrayInfo.find(target)!=Target2ArrayInfo.end())
         return Target2ArrayInfo[target];
     PointerType* ptr_type = dyn_cast<PointerType>(target->getType());
+    if (!ptr_type)
+    {
+        llvm::errs() << "  " << "target:" << *target << " is not pointer type.\n";
+        assert(false && "wrong type for array target.");
+    }
     if (DEBUG) *ArrayLog << "\n\nchecking type : " << *ptr_type << " and its ElementType is: [" << *ptr_type->getElementType()  << "]\n";
     Type* tmp_type = ptr_type->getElementType();
     int total_ele = 1;
@@ -1220,7 +1225,19 @@ HI_WithDirectiveTimingResourceEvaluation::HI_ArrayInfo HI_WithDirectiveTimingRes
         res_array_info.num_dims ++;
         res_array_info.isArgument = 1;
     }
-
+    else
+    {
+        if (auto global_v = dyn_cast<GlobalVariable>(target))
+        {
+            if (num_dims==0)
+            {
+                res_array_info.sub_element_num[num_dims] = 1;               
+                res_array_info.dim_size[num_dims] = 1; // set to nearly infinite
+                res_array_info.num_dims = 1;
+            }
+        }
+    }
+    
     res_array_info.elementType = tmp_type;
     res_array_info.target = target;
 
@@ -1798,13 +1815,18 @@ bool HI_WithDirectiveTimingResourceEvaluation::processNaiveAccess(Instruction *L
         {
             AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
-            // ArrayLog->flush();
+            if (DEBUG) ArrayLog->flush();
         }
         else if (auto alloc_pointer = dyn_cast<AllocaInst>(target))
         {
             AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
-            // ArrayLog->flush();
+            if (DEBUG) ArrayLog->flush();
+        }
+        else if (auto GV = dyn_cast<GlobalVariable>(target))
+        {
+            AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+            if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
         }
     }
 

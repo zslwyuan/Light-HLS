@@ -589,7 +589,18 @@ HI_MuxInsertionArrayPartition::HI_ArrayInfo HI_MuxInsertionArrayPartition::getAr
         res_array_info.num_dims ++;
         res_array_info.isArgument = 1;
     }
-
+    else
+    {
+        if (auto global_v = dyn_cast<GlobalVariable>(target))
+        {
+            if (num_dims==0)
+            {
+                res_array_info.sub_element_num[num_dims] = 1;               
+                res_array_info.dim_size[num_dims] = 1; // set to nearly infinite
+                res_array_info.num_dims = 1;
+            }
+        }
+    }
     res_array_info.elementType = tmp_type;
     res_array_info.target = target;
 
@@ -831,57 +842,6 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
     if (Load_or_Store->getOpcode()!=Instruction::Load && Load_or_Store->getOpcode()!=Instruction::Store)
         return false;
 
-    if (Load_or_Store->getParent()->getParent()->getName()=="Z10kernel_2mmiiiiiiPA18_iPA22_iS0_PA24_iS4_.for.cond31.preheader")
-    {
-        Instruction *pointer_I = nullptr;
-        Value *pointer_V = nullptr;
-        if (Load_or_Store->getOpcode()==Instruction::Load)
-        {
-            pointer_I = dyn_cast<Instruction>(Load_or_Store->getOperand(0));
-            pointer_V = (Load_or_Store->getOperand(0));
-        }
-        else
-        {
-            pointer_I = dyn_cast<Instruction>(Load_or_Store->getOperand(1));
-            pointer_V = (Load_or_Store->getOperand(1));
-        }
-        Value *address_addI = nullptr;
-        if (!pointer_I && pointer_V)
-        {
-            Value *target = pointer_V;
-            if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
-            {
-                if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get its original array declaration
-                {
-                    target = Alias2Target[target];
-                }
-                else
-                {
-                    llvm::errs() << "ERRORS: cannot find target [" << *target << "] in Target2ArrayInfo and its address=" 
-                                    << target << "\n";
-                    assert(Target2ArrayInfo.find(target) != Target2ArrayInfo.end() 
-                                && Alias2Target.find(target) != Alias2Target.end()
-                                && "Fail to find the array inforamtion for the target.");
-                }
-            }
-            if (target->getName() == "C")
-            {
-                int u=0;
-            }
-            if (auto arg_pointer = dyn_cast<Argument>(target))
-            {
-                AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
-                if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
-                // ArrayLog->flush();
-            }
-            else if (auto alloc_pointer = dyn_cast<AllocaInst>(target))
-            {
-                AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
-                if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
-                // ArrayLog->flush();
-            }
-        }
-    }
     Instruction *pointer_I = nullptr;
     Value *pointer_V = nullptr;
     if (Load_or_Store->getOpcode()==Instruction::Load)
@@ -924,6 +884,11 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
             AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
             // ArrayLog->flush();
+        }
+        else if (auto GV = dyn_cast<GlobalVariable>(target))
+        {
+            AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+            if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
         }
     }
 
