@@ -244,6 +244,9 @@ HI_WithDirectiveTimingResourceEvaluation::scheduleBRAMAccess(Instruction *access
 
     
     if (DEBUG) *BRAM_log << "\n\n\n sceduling access instruction: " << *access << " for the target [" << target->getName() << "]" << " of Block:" << cur_block->getName() <<"\n";
+
+    // if the target is partitioned completely as registers, the delay of accesses might be ignored.
+    // (implict: there won't be access contension to the target, since each element has its own register)
     if (Target2ArrayInfo[target].completePartition)
     {
         timingBase targetTiming = cur_Timing;  
@@ -1225,8 +1228,11 @@ HI_WithDirectiveTimingResourceEvaluation::HI_ArrayInfo HI_WithDirectiveTimingRes
 
     int totalPartitionNum = getTotalPartitionNum(res_array_info);
 
-    if (res_array_info.sub_element_num[num_dims-1] * res_array_info.dim_size[num_dims-1] == totalPartitionNum)
-        res_array_info.completePartition = 1;
+    if (!res_array_info.completePartition)
+    {
+        if (res_array_info.sub_element_num[num_dims-1] * res_array_info.dim_size[num_dims-1] == totalPartitionNum)
+            res_array_info.completePartition = 1;
+    }
 
     return res_array_info;
 }
