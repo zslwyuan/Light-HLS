@@ -1494,6 +1494,7 @@ public:
             bool cyclic[10];
             int num_dims;
             bool isArgument = 0;
+            bool completePartition = 0;
             llvm::Type* elementType;
             Value* target;
             int port_num = -1;
@@ -1517,6 +1518,7 @@ public:
                 target = input.target;
                 isArgument = input.isArgument;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
                 for (int i=0;i<num_dims;i++)
                     dim_size[i] = input.dim_size[i];
                 for (int i=0;i<num_dims;i++)
@@ -1533,6 +1535,7 @@ public:
                 target = input.target;
                 isArgument = input.isArgument;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
                 for (int i=0;i<num_dims;i++)
                     dim_size[i] = input.dim_size[i];
                 for (int i=0;i<num_dims;i++)
@@ -1555,6 +1558,7 @@ public:
             int partition_id[10];
             bool cyclic[10];
 
+            bool completePartition = 0;
 
             int num_dims;
             int partition = -1;
@@ -1596,6 +1600,7 @@ public:
                 initial_offset = input.initial_offset;
                 unpredictable = input.unpredictable;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
                 for (int i=0;i<10;i++)
                 {
                     dim_size[i] = -1;
@@ -1628,6 +1633,7 @@ public:
                 target = input.target;
                 isArgument = input.isArgument;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
                 for (int i=0;i<10;i++)
                 {
                     dim_size[i] = -1;
@@ -1655,6 +1661,7 @@ public:
                 initial_offset = input.initial_offset;
                 unpredictable = input.unpredictable;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
 
                 for (int i=0;i<10;i++)
                 {
@@ -1688,6 +1695,7 @@ public:
                 target = input.target;
                 isArgument = input.isArgument;
                 port_num = input.port_num;
+                completePartition = input.completePartition;
 
                 for (int i=0;i<10;i++)
                 {
