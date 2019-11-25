@@ -871,10 +871,20 @@ void HI_WithDirectiveTimingResourceEvaluation::TryArrayAccessProcess(Instruction
 
     if (DEBUG) *ArrayLog << *I << " --> SCEV: " << *tmp_S << "\n";  
 
+
     // const SCEV *tryCleanS = tryGetPureAddOrAddRecSCEV(tmp_S, 0);
     // if (tryCleanS)
     //     *ArrayLog << *I << " --> tryGetPureAddOrAddRecSCEV SCEV: " << *tryCleanS << "\n";
     ArrayLog->flush();
+
+    if (getUnknownNum(tmp_S)>1)
+    {
+        // it is a complex SCEV and hard to predict the access pattern, we assume that it could access all possible elements.
+        // in the array
+        if (DEBUG) *ArrayLog << *I << " --> SCEV: " << *tmp_S << " has multiple unknown values in expression. It will be a complex access.\n";
+        handleComplexSCEVAccess(I, tmp_S);
+        return;
+    }
 
     const SCEVAddExpr *SAE = dyn_cast<SCEVAddExpr>(bypassExtTruntSCEV(tmp_S));
 
@@ -900,16 +910,13 @@ void HI_WithDirectiveTimingResourceEvaluation::TryArrayAccessProcess(Instruction
         handleSAREAccess(I, SARE);
         return;
     }
-    else // it is a complex SCEV and hard to predict the access pattern, we assume that it could access all possible elements.
-            // in the array
-    {
-        
+    else
+    {        
         const SCEVAddRecExpr *SAREtmp = dyn_cast<SCEVAddRecExpr>(bypassExtTruntSCEV(SAE->getOperand(0)));
         const SCEVUnknown *SU = dyn_cast<SCEVUnknown>(findUnknown(tmp_S));
         const PtrToIntInst *PTI_I = dyn_cast<PtrToIntInst>(SU->getValue());
         if (SAE && SAREtmp && SU && PTI_I)
-        {
-            
+        {            
             // example :   ({{100,+,1}<nuw><nsw><%for.cond1.preheader>,+,200}<nuw><%for.body4> + %0)
             if (DEBUG) *ArrayLog << *I << " --> is a transformed SCEV\n";
             handleUnstandardSCEVAccess(I, tmp_S);
@@ -917,6 +924,9 @@ void HI_WithDirectiveTimingResourceEvaluation::TryArrayAccessProcess(Instruction
         }       
         
     }
+
+    // it is a complex SCEV and hard to predict the access pattern, we assume that it could access all possible elements.
+    // in the array
     handleComplexSCEVAccess(I, tmp_S);
     return;
 }
