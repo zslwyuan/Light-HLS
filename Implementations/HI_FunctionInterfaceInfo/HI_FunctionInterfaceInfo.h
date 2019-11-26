@@ -92,8 +92,8 @@ public:
             // Add comment before 
             SourceLocation ST = f->getSourceRange().getBegin(); 
             FullSourceLoc FSL(ST, CI.getSourceManager());
-            if (FuncName != topFunctioName)
-                TheRewriter.InsertText(f->getBeginLoc(), "inline __attribute__((always_inline)) ", false, true); 
+            // if (FuncName != topFunctioName)
+            //     TheRewriter.InsertText(f->getBeginLoc(), "inline __attribute__((always_inline)) ", false, true); 
                 
             if(f->getNumParams() > 0)
             {

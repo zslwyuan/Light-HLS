@@ -170,6 +170,11 @@ HI_WithDirectiveTimingResourceEvaluation::timingBase HI_WithDirectiveTimingResou
     cur_Loop = getInnerUnevaluatedLoop(outerL);
     while (cur_Loop!=NULL) 
     {
+
+        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName();
+        tmp_loop_name += "-";
+        tmp_loop_name += cur_Loop->getHeader()->getName();
+
         if (DEBUG) *Evaluating_log << "-- Handling the inner Loop " << cur_Loop->getName() <<":\n";
         BasicBlock *tmp_LoopHeader = cur_Loop->getHeader(); //get the header of the loop
         if (DEBUG) *Evaluating_log << "---- its header: " << tmp_LoopHeader->getName() <<":\n";
@@ -178,7 +183,13 @@ HI_WithDirectiveTimingResourceEvaluation::timingBase HI_WithDirectiveTimingResou
         if (tmp_ExitingBlocks.size() != 1)
         {
             assert(tmp_ExitingBlocks.size() > 0);
-            print_warning("the loop could be better to have only one exiting block for the accuracy of latency evaluation.");
+            print_warning("the loop could be better to have only one exiting block for the accuracy of latency evaluation, but the following loop has multiple exits:");
+            llvm::errs() << "loop: " << cur_Loop->getName() << " (label=" << IRLoop2LoopLabel[tmp_loop_name] << ") has multiple exits and they are:\n";
+            for (auto B_it:tmp_ExitingBlocks)
+            {
+                llvm::errs() << " ==================\n " << *B_it << "\n";
+            }  
+            llvm::errs() << "please have a check\n";
         }
         for (auto B_it:tmp_ExitingBlocks)
         {
@@ -186,9 +197,7 @@ HI_WithDirectiveTimingResourceEvaluation::timingBase HI_WithDirectiveTimingResou
         }        
         if (DEBUG) *Evaluating_log << "\n";
 
-        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName();
-        tmp_loop_name += "-";
-        tmp_loop_name += cur_Loop->getHeader()->getName();
+
         
         // (2) traverse the block in loop by DFS to find the longest path
         timingBase max_critial_path_in_curLoop(0,0,1,clock_period);

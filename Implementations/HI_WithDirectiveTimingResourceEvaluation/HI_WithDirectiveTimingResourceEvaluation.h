@@ -622,7 +622,7 @@ public:
         InstructionEvaluated.clear();
         BlockVisited.clear();
         Func_BlockVisited.clear();
-        Instruction_FFAssigned.clear();
+        Value_FFAssigned.clear();
         Function2OuterLoops.clear();
         Block2EvaluatedLoop.clear();
         BlockCriticalPath_inLoop.clear();
@@ -719,7 +719,7 @@ public:
     std::set<BasicBlock*> LoopEvaluated;
     std::set<Function*> FunctionEvaluated;
     std::set<Instruction*> InstructionEvaluated;
-    std::set<Instruction*> Instruction_FFAssigned;
+    std::set<Value*> Value_FFAssigned;
     std::set<BasicBlock*> BlockVisited;
     std::set<BasicBlock*> Func_BlockVisited;
     std::set<Value*> ValueVisited;
@@ -1281,7 +1281,7 @@ public:
     resourceBase FF_Evaluate(std::map<Instruction*, timingBase> &cur_InstructionCriticalPath, Instruction* cur_I);
 
     // trace back to find the original operator, bypassing SExt and ZExt operations
-    Instruction* byPassUnregisterOp(Instruction* cur_I);
+    Value* byPassUnregisterOp(Instruction* cur_I);
 
     Value* byPassBitcastOp(Instruction* cur_I);
 

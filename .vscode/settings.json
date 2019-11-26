@@ -76,6 +76,7 @@
         "stack": "cpp",
         "*.tpp": "cpp",
         "*.inc": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "__functional_03": "cpp"
     }
 }

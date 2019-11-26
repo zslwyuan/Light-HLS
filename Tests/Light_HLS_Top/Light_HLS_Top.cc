@@ -118,17 +118,17 @@ int main(int argc, const char **argv)
         /////////////////////////////////////////////////////////////////////////////////////
 
 
-        // print_info("Enable LoopSimplify Pass");
-        // auto loopsimplifypass_pre = createLoopSimplifyPass();
-        // PM_pre.add(loopsimplifypass_pre);
+        print_info("Enable LoopSimplify Pass");
+        auto loopsimplifypass_pre = createLoopSimplifyPass();
+        PM_pre.add(loopsimplifypass_pre);
 
-        // auto indvarsimplifypass_pre = createIndVarSimplifyPass();
-        // PM_pre.add(indvarsimplifypass_pre);
-        // print_info("Enable IndVarSimplifyPass Pass");
+        auto indvarsimplifypass_pre = createIndVarSimplifyPass();
+        PM_pre.add(indvarsimplifypass_pre);
+        print_info("Enable IndVarSimplifyPass Pass");
 
-        // auto CFGSimplification_pass22_pre = createCFGSimplificationPass();
-        // PM_pre.add(CFGSimplification_pass22_pre);        
-        // print_info("Enable CFGSimplificationPass Pass");
+        auto CFGSimplification_pass22_pre = createCFGSimplificationPass();
+        PM_pre.add(CFGSimplification_pass22_pre);        
+        print_info("Enable CFGSimplificationPass Pass");
 
         auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
         PM_pre.add(loopextract);

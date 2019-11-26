@@ -1246,6 +1246,15 @@ HI_WithDirectiveTimingResourceEvaluation::HI_ArrayInfo HI_WithDirectiveTimingRes
                 res_array_info.num_dims = 1;
             }
         }
+        else if ( auto alloc_I = dyn_cast<AllocaInst>(target))
+        {
+            if (num_dims==0)
+            {
+                res_array_info.sub_element_num[num_dims] = 1;               
+                res_array_info.dim_size[num_dims] = 1; // set to nearly infinite
+                res_array_info.num_dims = 1;
+            }
+        }
     }
     
     res_array_info.elementType = tmp_type;
