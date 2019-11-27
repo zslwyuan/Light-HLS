@@ -20,4 +20,12 @@ void parseLoopUnroll(std::stringstream &iss, std::map<std::string, int> &LoopLab
 
 void parseLoopPipeline(std::stringstream &iss, std::map<std::string, int> &LoopLabel2II);
 
+void parseArrayPortNum(std::stringstream &iss);
+
+void parseFuncDataflow(std::stringstream &iss);
+
+void parseLocalArray(std::stringstream &iss);
+
+void parseResourceLimit(std::stringstream &iss);
+
 #endif

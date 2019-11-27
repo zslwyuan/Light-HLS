@@ -1244,7 +1244,9 @@ bool tryUpdateHLSDirectives(
                 directUnroll = 1;
             }
         }
-        if (!directUnroll && entire_design_eval_result.LoopLabel2AchievedII.find(opt_LoopLabel) == entire_design_eval_result.LoopLabel2AchievedII.end())
+        if (!directUnroll 
+                && entire_design_eval_result.LoopLabel2AchievedII.find(opt_LoopLabel) == entire_design_eval_result.LoopLabel2AchievedII.end()
+                && entire_design_eval_result.LoopLabel2SmallestII[opt_LoopLabel] <= entire_design_eval_result.LoopLabel2IterationLatency[opt_LoopLabel] )
         {
             llvm::errs() << "for config#" << config_id+1 << " suggested start loop pipeline II for it is :" << entire_design_eval_result.LoopLabel2IterationLatency[opt_LoopLabel]-1 << "\n";
 
@@ -1259,7 +1261,7 @@ bool tryUpdateHLSDirectives(
         }
         else
         {
-            if (!directUnroll && entire_design_eval_result.LoopLabel2AchievedII[opt_LoopLabel] != entire_design_eval_result.LoopLabel2SmallestII[opt_LoopLabel])
+            if (!directUnroll && entire_design_eval_result.LoopLabel2AchievedII[opt_LoopLabel] > entire_design_eval_result.LoopLabel2SmallestII[opt_LoopLabel])
             {
                 llvm::errs()  << "LoopLabel2AchievedII=" << entire_design_eval_result.LoopLabel2AchievedII[opt_LoopLabel] 
                             << " LoopLabel2SmallestII=" << entire_design_eval_result.LoopLabel2SmallestII[opt_LoopLabel] << "\n";

@@ -1,4 +1,12 @@
 #include "ConfigParse.h"
+#include "llvm/Support/raw_ostream.h"
+
+extern double DSP_limit;
+extern double FF_limit;
+extern double LUT_limit;
+extern double BRAM_limit;
+extern int ClockNum_limit;
+extern bool all_sub_function_inline;
 
 void Parse_Config(const char* config_file_name, std::map<std::string, int> &LoopLabel2UnrollFactor, std::map<std::string, int> &LoopLabel2II)
 {
@@ -35,6 +43,26 @@ void Parse_Config(const char* config_file_name, std::map<std::string, int> &Loop
 
             case hash_compile_time("loop_pipeline"):
                 parseLoopPipeline(iss, LoopLabel2II);
+                break;
+
+            case hash_compile_time("array_port"):
+                parseArrayPortNum(iss);
+                break;
+
+            case hash_compile_time("func_dataflow"):
+                parseFuncDataflow(iss);
+                break;
+
+            case hash_compile_time("local_array"):
+                parseLocalArray(iss);
+                break;
+
+            case hash_compile_time("resource_limit"):
+                parseResourceLimit(iss);
+                break;
+
+            case hash_compile_time("all_sub_function_inline"):
+                all_sub_function_inline = 1;
                 break;
 
             default:
@@ -165,4 +193,170 @@ void parseLoopPipeline(std::stringstream &iss, std::map<std::string, int> &LoopL
     }
     assert(loopLabel != "" && factor > -1);
     LoopLabel2II[loopLabel] = factor;
+}
+
+
+
+// parse the argument for array port num setting
+void parseArrayPortNum(std::stringstream &iss)
+{
+    std::string targetStr,scopeStr;
+    int port_num;
+    while (!iss.eof())
+    {
+        std::string arg_name;
+        std::string tmp_val;
+        iss >> arg_name ; //  get the name of parameter
+        switch (hash_(arg_name.c_str()))
+        {
+            case hash_compile_time("variable"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                targetStr = (tmp_val);
+                break;
+
+            case hash_compile_time("scope"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                scopeStr = (tmp_val);
+                break;
+
+            case hash_compile_time("port_num"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                port_num = std::stoi(tmp_val);  // count from dim="0" to match the storage format
+                break;
+
+            default:
+                llvm::errs() << "wrong argument: " << arg_name << "\n";
+                print_error("Wrong argument for array port num setting.");
+                break;
+        }
+    }  
+}
+
+// parse the argument for function dataflow setting
+void parseFuncDataflow(std::stringstream &iss)
+{
+    std::string targetStr,scopeStr;
+    int port_num;
+    bool enable=false;
+    while (!iss.eof())
+    {
+        std::string arg_name;
+        std::string tmp_val;
+        iss >> arg_name ; //  get the name of parameter
+        switch (hash_(arg_name.c_str()))
+        {
+
+            case hash_compile_time("scope"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                scopeStr = (tmp_val);
+                break;
+
+            case hash_compile_time("enable"):
+                enable = true;  
+                break;
+
+            case hash_compile_time("disable"):
+                 enable = false;  
+                break;
+
+            default:
+                llvm::errs() << "wrong argument: " << arg_name << "\n";
+                print_error("Wrong argument for array port num setting.");
+                break;
+        }
+    }   
+}
+
+// parse the argument for local array setting
+void parseLocalArray(std::stringstream &iss)
+{
+    std::string targetStr,scopeStr;
+    bool enable = false;
+    while (!iss.eof())
+    {
+        std::string arg_name;
+        std::string tmp_val;
+        
+        iss >> arg_name ; //  get the name of parameter
+        switch (hash_(arg_name.c_str()))
+        {
+            case hash_compile_time("variable"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                targetStr = (tmp_val);
+                break;
+
+            case hash_compile_time("scope"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                scopeStr = (tmp_val);
+                break;
+
+            case hash_compile_time("enable"):
+                enable = true;
+                break;
+
+            case hash_compile_time("disable"):
+                enable = false;
+                break;
+
+            default:
+                llvm::errs() << "wrong argument: " << arg_name << "\n";
+                print_error("Wrong argument for local array setting.");
+                break;
+        }
+    }
+}
+
+// parse the argument for resource limitation
+void parseResourceLimit(std::stringstream &iss)
+{
+    int factor = -1;
+    std::string loopLabel("");
+    while (!iss.eof())
+    {
+        std::string arg_name;
+        std::string tmp_val;
+        iss >> arg_name ; //  get the name of parameter
+        switch (hash_(arg_name.c_str()))
+        {
+            case hash_compile_time("DSP"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                DSP_limit = std::stoi(tmp_val);
+                break;
+
+            case hash_compile_time("FF"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                FF_limit = std::stoi(tmp_val);
+                break;
+
+            case hash_compile_time("LUT"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                LUT_limit = std::stoi(tmp_val);
+                break;
+
+            case hash_compile_time("BRAM"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                BRAM_limit = std::stoi(tmp_val);
+                break;
+
+            case hash_compile_time("clock_num"):
+                consumeEqual(iss);
+                iss >> tmp_val;
+                ClockNum_limit = std::stoi(tmp_val);
+                break;
+
+            default:
+                print_error("Wrong argument for resource limitation.");
+                break;
+        }
+    }
 }

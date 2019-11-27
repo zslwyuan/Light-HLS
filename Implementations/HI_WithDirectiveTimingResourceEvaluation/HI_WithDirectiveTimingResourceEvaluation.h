@@ -791,7 +791,7 @@ public:
     std::set<Instruction*> I_RegReused;   
 
     // Instruction related to target
-    std::map<Value*, std::vector<Value*>> Instruction2Target;
+    std::map<Value*, std::set<Value*>> Value2Target;
 
     // record the accesses to the partitions are done at which cycle in which basic block
     std::map<std::pair<Value*, partition_info>, std::vector<std::pair<BasicBlock*, int>>> targetPartition2BlockCycleAccessCnt;
@@ -818,7 +818,7 @@ public:
     bool hasSameTargets(Instruction *I0, Instruction *I1);
 
     // among the scheduled instructions, find the latest access to the specific target
-    Instruction* findLatestPointerAccess(Instruction *curI, std::vector<Value*> targets , std::map<Instruction*, timingBase> &cur_InstructionCriticalPath);
+    Instruction* findLatestPointerAccess(Instruction *curI, std::set<Value*> targets , std::map<Instruction*, timingBase> &cur_InstructionCriticalPath);
 
     // // demangle the name of functions
     // std::string demangleFunctionName(std::string mangled_name);

@@ -56,7 +56,7 @@ int main(int argc, const char **argv) {
     // run the Clang Tool, creating a new FrontendAction, which will run the AST consumer 
     Tool.run(HI_LoopLabeler_rewrite_newFrontendActionFactory<HI_LoopLabeler_FrontendAction>("PLog",TheRewriter0,"tmp.cc").get());
     std::map<std::string, int> FuncParamLine2OutermostSize;
-    Tool.run(HI_FunctionInterfaceInfo_rewrite_newFrontendActionFactory<HI_FunctionInterfaceInfo_FrontendAction>("PLog1",TheRewriter1,"tmp1.cc",FuncParamLine2OutermostSize, top_str).get());
+    Tool.run(HI_FunctionInterfaceInfo_rewrite_newFrontendActionFactory<HI_FunctionInterfaceInfo_FrontendAction>("PLog1",TheRewriter1,"tmp1.cc",FuncParamLine2OutermostSize, top_str, true /*inline all the sub-function*/).get());
 
     LLVMInitializeX86TargetInfo();
     LLVMInitializeX86Target();
@@ -375,14 +375,16 @@ int main(int argc, const char **argv) {
 
                 bool directUnroll = hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel]-1  == 0;
 
-                if (!directUnroll && hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII.find(opt_LoopLabel) == hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII.end())
+                if (!directUnroll 
+                        && hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII.find(opt_LoopLabel) == hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII.end() 
+                        && hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel] >= hi_withdirectivetimingresourceevaluation->LoopLabel2SmallestII[opt_LoopLabel])
                 {
-                    llvm::errs() << "for config#" << i+1 << " suggested start loop pipeline II for it is :" << hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel]-1 << "\n";
-                    desginconfig_0.insertLoopPipeline(opt_LoopLabel, hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel]-1);
+                    llvm::errs() << "for config#" << i+1 << " suggested start loop pipeline II for it is :" << hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel] << "\n";
+                    desginconfig_0.insertLoopPipeline(opt_LoopLabel, hi_withdirectivetimingresourceevaluation->LoopLabel2IterationLatency[opt_LoopLabel]);
                 }
                 else
                 {
-                    if (!directUnroll && hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII[opt_LoopLabel] != hi_withdirectivetimingresourceevaluation->LoopLabel2SmallestII[opt_LoopLabel])
+                    if (!directUnroll && hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII[opt_LoopLabel] > hi_withdirectivetimingresourceevaluation->LoopLabel2SmallestII[opt_LoopLabel])
                     {
                         llvm::errs()  << "LoopLabel2AchievedII=" << hi_withdirectivetimingresourceevaluation->LoopLabel2AchievedII[opt_LoopLabel] 
                                     << " LoopLabel2SmallestII=" << hi_withdirectivetimingresourceevaluation->LoopLabel2SmallestII[opt_LoopLabel] << "\n";

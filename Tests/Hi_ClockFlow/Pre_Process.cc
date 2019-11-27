@@ -24,7 +24,7 @@ void clangPreProcess(const char **argv, std::string top_str, std::map<std::strin
 
     // run the Clang Tool, creating a new FrontendAction, which will run the AST consumer 
     Tool.run(HI_LoopLabeler_rewrite_newFrontendActionFactory<HI_LoopLabeler_FrontendAction>("PLog",TheRewriter0,"tmp.cc").get());
-    Tool.run(HI_FunctionInterfaceInfo_rewrite_newFrontendActionFactory<HI_FunctionInterfaceInfo_FrontendAction>("PLog1",TheRewriter1,"tmp_loopLabeled.cc",FuncParamLine2OutermostSize, top_str).get());
+    Tool.run(HI_FunctionInterfaceInfo_rewrite_newFrontendActionFactory<HI_FunctionInterfaceInfo_FrontendAction>("PLog1",TheRewriter1,"tmp_loopLabeled.cc",FuncParamLine2OutermostSize, top_str, true /*inline all the sub-function*/).get());
 
 }
 

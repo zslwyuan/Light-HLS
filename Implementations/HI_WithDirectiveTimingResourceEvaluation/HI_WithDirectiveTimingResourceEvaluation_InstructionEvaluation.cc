@@ -667,32 +667,35 @@ HI_WithDirectiveTimingResourceEvaluation::resourceBase HI_WithDirectiveTimingRes
 
         for (int i=0;i<CI->getNumArgOperands();i++)
         {
-            auto target = CI->getArgOperand(i);
-            assert(false && "fixing");
-            if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get its original array declaration
-            {
-                target = Alias2Target[target];
-            }
+            auto it = CI->getArgOperand(i);
+
             if (it->getType()->isPointerTy())
             {
-                PointerType *tmp_PtrType = dyn_cast<PointerType>(it->getType());
+                Value* target = *(Value2Target[it].begin());
+                if (Value2Target[it].size()>1)
+                {
+                    print_warning("The value below leads to multiple target");
+                    llvm::errs() << *it << "\n";
+                }
+                PointerType *tmp_PtrType = dyn_cast<PointerType>(target->getType());
                 
                 if (tmp_PtrType->getElementType()->isArrayTy())
                 {
-                    if (DEBUG) *Evaluating_log << "  get array information of [" << it->getName() << "] from argument and its address=" << it << "\n";
-                    assert(Target2ArrayInfo.find(it)!=Target2ArrayInfo.end());
-                    if (DEBUG) *Evaluating_log << Target2ArrayInfo[it] << "\n";
-                    int partitionNum = getTotalPartitionNum(Target2ArrayInfo[it]);
+                    if (DEBUG) *Evaluating_log << "  get array information of [" << target->getName() << "] from argument and its address=" << target << "\n";
+                    if (DEBUG) Evaluating_log->flush();
+                    assert(Target2ArrayInfo.find(target)!=Target2ArrayInfo.end());
+                    if (DEBUG) *Evaluating_log << Target2ArrayInfo[target] << "\n";
+                    int partitionNum = getTotalPartitionNum(Target2ArrayInfo[target]);
                     if (DEBUG) *Evaluating_log << " it has " << partitionNum << " partitions may need a mux cost " << partitionNum*10 << " LUT\n";
                     result.LUT += partitionNum*10;
                 }
                 else if (tmp_PtrType->getElementType()->isIntegerTy() || tmp_PtrType->getElementType()->isFloatingPointTy() ||tmp_PtrType->getElementType()->isDoubleTy() )
                 {
-                    if (DEBUG) *Evaluating_log << "  get array information of [" << it->getName() << "] from argument and its address=" << it << "\n";
+                    if (DEBUG) *Evaluating_log << "  get array information of [" << target->getName() << "] from argument and its address=" << target << "\n";
                     if (DEBUG) Evaluating_log->flush();
-                    assert(Target2ArrayInfo.find(it)!=Target2ArrayInfo.end());
-                    if (DEBUG) *Evaluating_log << Target2ArrayInfo[it] << "\n";
-                    int partitionNum = getTotalPartitionNum(Target2ArrayInfo[it]);
+                    assert(Target2ArrayInfo.find(target)!=Target2ArrayInfo.end());
+                    if (DEBUG) *Evaluating_log << Target2ArrayInfo[target] << "\n";
+                    int partitionNum = getTotalPartitionNum(Target2ArrayInfo[target]);
                     if (DEBUG) *Evaluating_log << " it has " << partitionNum << " partitions may need a mux cost " << partitionNum*10 << " LUT\n";
                     result.LUT += partitionNum*10;
                 }

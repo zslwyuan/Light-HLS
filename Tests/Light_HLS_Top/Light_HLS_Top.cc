@@ -11,7 +11,12 @@ using namespace clang::tooling;
 
 std::string HLS_lib_path;
 std:: string clock_period_str;
-
+double DSP_limit;
+double FF_limit;
+double LUT_limit;
+double BRAM_limit;
+int ClockNum_limit;
+bool all_sub_function_inline;
 
 int main(int argc, const char **argv) 
 {
@@ -35,6 +40,11 @@ int main(int argc, const char **argv)
 
     // create a new Clang Tool instance (a LibTooling environment)
     std::map<std::string, int> FuncParamLine2OutermostSize;
+    std::map<std::string, int> LoopLabel2UnrollFactor;
+    std::map<std::string, int> LoopLabel2II;
+
+    all_sub_function_inline = 0;
+    Parse_Config(configFile_str.c_str(), LoopLabel2UnrollFactor, LoopLabel2II);
     clangPreProcess(argv, top_str, FuncParamLine2OutermostSize);
 
     // Compile the source code into IR and Parse the input LLVM IR file into a module

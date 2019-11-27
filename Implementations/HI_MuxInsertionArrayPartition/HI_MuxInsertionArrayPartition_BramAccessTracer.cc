@@ -769,18 +769,22 @@ HI_MuxInsertionArrayPartition::HI_AccessInfo HI_MuxInsertionArrayPartition::getA
         pointer_V = (Load_or_Store->getOperand(1));
     }
     Value *address_addI = nullptr;
-
-    if (Alias2Target.find(pointer_V) != Alias2Target.end()) // it could be argument. We need to trace back to get its original array declaration
-    {
-        pointer_V = Alias2Target[pointer_V];
-    }
-
     if (pointer_I)
-        address_addI = (pointer_I->getOperand(0));
+    {
+        if (pointer_I->getOpcode() == Instruction::IntToPtr)
+            address_addI = (pointer_I->getOperand(0));
+        else
+            address_addI = pointer_I;
+    }
     else
+    {
         address_addI = pointer_V; // the access may not need the calculation of address, take the pointer directly
+        if (Alias2Target.find(address_addI) != Alias2Target.end()) // it could be argument. We need to trace back to get its original array declaration
+        {
+            address_addI = Alias2Target[address_addI];
+        }  
+    }
         
-
     // if (auto PTI = dyn_cast<PtrToIntInst>(address_addI))
     // {
     //     address_addI = PTI->getOperand(0);
@@ -987,6 +991,12 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
                 }
             }
         }
+        else if (auto alloc_pointer = dyn_cast<AllocaInst>(pointer_I))
+        {
+            AddressInst2AccessInfo[pointer_I] = getAccessInfoFor(pointer_I, Load_or_Store, 0, nullptr, nullptr);
+            if (DEBUG) *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[pointer_I] << "\n\n\n";
+            if (DEBUG) ArrayLog->flush();
+        }
     }
         
     return false;
@@ -1044,9 +1054,6 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
                                     << " bw=[" << start_V->getAPInt().getBitWidth() << "]" <<"\n";
                         initial_const = (initial_const)&((1<<start_V->getAPInt().getZExtValue())-1);
                     }
-                
-                    
-             
                 }
                 else
                 {
