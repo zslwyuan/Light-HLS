@@ -996,6 +996,10 @@ void HI_WithDirectiveTimingResourceEvaluation::matchArrayAndConfiguration(Value*
                 {   
                     continue;
                 }
+                if (resArrayInfo.num_dims <= pragma.dim )
+                {   
+                    continue;
+                }
                 pragma.targetArray = target;
                 pragma.ScopeFunc = F;
                 arrayDirectives[target].push_back(pragma);
@@ -1018,6 +1022,10 @@ void HI_WithDirectiveTimingResourceEvaluation::matchArrayAndConfiguration(Value*
                 std::string nameOfFunction = demangleFunctionName(F->getName());
                 assert(F && "the parent function of the value should be found.");
                 if (nameOfFunction != pragma.scopeStr )
+                {   
+                    continue;
+                }
+                if (resArrayInfo.num_dims <= pragma.dim )
                 {   
                     continue;
                 }
