@@ -1265,11 +1265,8 @@ HI_WithDirectiveTimingResourceEvaluation::HI_ArrayInfo HI_WithDirectiveTimingRes
 
     int totalPartitionNum = getTotalPartitionNum(res_array_info);
 
-    if (!res_array_info.completePartition)
-    {
-        if (res_array_info.sub_element_num[num_dims-1] * res_array_info.dim_size[num_dims-1] == totalPartitionNum)
-            res_array_info.completePartition = 1;
-    }
+    if (res_array_info.sub_element_num[num_dims-1] * res_array_info.dim_size[num_dims-1] == totalPartitionNum)
+        res_array_info.completePartition = 1;
 
     return res_array_info;
 }

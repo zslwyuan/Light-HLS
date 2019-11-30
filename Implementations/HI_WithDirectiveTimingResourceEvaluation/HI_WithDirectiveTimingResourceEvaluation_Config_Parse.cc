@@ -1004,14 +1004,33 @@ void HI_WithDirectiveTimingResourceEvaluation::matchArrayAndConfiguration(Value*
                 pragma.ScopeFunc = F;
                 arrayDirectives[target].push_back(pragma);
                 FuncArray2PartitionBenefit[std::pair<std::string, std::string>(nameOfFunction,pragma.targetStr )] = false;
-                resArrayInfo.cyclic[pragma.dim] = pragma.cyclic;
-                if (pragma.complete)
+
+                if (pragma.dim < 0)
                 {
-                    resArrayInfo.partition_size[pragma.dim] = resArrayInfo.dim_size[pragma.dim];
-                    resArrayInfo.completePartition = 1;
+                    assert(pragma.dim == -1); //partition all the dimension
+                    for (int cur_dim = 0; cur_dim < resArrayInfo.num_dims; cur_dim++)
+                    {
+                        resArrayInfo.cyclic[cur_dim] = pragma.cyclic;
+                        if (pragma.complete)
+                        {
+                            resArrayInfo.partition_size[cur_dim] = resArrayInfo.dim_size[cur_dim];
+                            //resArrayInfo.completePartition = 1;
+                        }
+                        else
+                            resArrayInfo.partition_size[cur_dim] = pragma.partition_factor;
+                    }
                 }
                 else
-                    resArrayInfo.partition_size[pragma.dim] = pragma.partition_factor;
+                {
+                    resArrayInfo.cyclic[pragma.dim] = pragma.cyclic;
+                    if (pragma.complete)
+                    {
+                        resArrayInfo.partition_size[pragma.dim] = resArrayInfo.dim_size[pragma.dim];
+                        //resArrayInfo.completePartition = 1;
+                    }
+                    else
+                        resArrayInfo.partition_size[pragma.dim] = pragma.partition_factor;
+                }          
             }
         }
         else if (pragma.HI_PragmaInfoType == HI_PragmaInfo::arrayPortNum_Pragma)
