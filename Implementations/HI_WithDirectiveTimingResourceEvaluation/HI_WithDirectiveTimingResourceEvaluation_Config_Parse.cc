@@ -1014,7 +1014,6 @@ void HI_WithDirectiveTimingResourceEvaluation::matchArrayAndConfiguration(Value*
                         if (pragma.complete)
                         {
                             resArrayInfo.partition_size[cur_dim] = resArrayInfo.dim_size[cur_dim];
-                            //resArrayInfo.completePartition = 1;
                         }
                         else
                             resArrayInfo.partition_size[cur_dim] = pragma.partition_factor;
@@ -1026,7 +1025,6 @@ void HI_WithDirectiveTimingResourceEvaluation::matchArrayAndConfiguration(Value*
                     if (pragma.complete)
                     {
                         resArrayInfo.partition_size[pragma.dim] = resArrayInfo.dim_size[pragma.dim];
-                        //resArrayInfo.completePartition = 1;
                     }
                     else
                         resArrayInfo.partition_size[pragma.dim] = pragma.partition_factor;
