@@ -21,7 +21,7 @@ bool HI_IR2SourceCode::runOnModule(Module &M) // The runOnModule declaration wil
 {
     if (DEBUG) *IR2Src_Log << M;
     if (DEBUG) *IR2Src_Log << "\n\n============================================================\n\n\n";
-
+    print_info("Running HI_IR2SourceCode\n");
     auto subprogramSet = getAllSubprogram(M);
     for (auto &F : M)
     {

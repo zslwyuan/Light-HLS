@@ -17,11 +17,12 @@ using namespace llvm;
 
 bool HI_PragmaTargetExtraction::runOnModule(Module &M) // The runOnFunction declaration will overide the virtual one in ModulePass, which will be executed for each Function.
 {    
+    print_info("Running HI_PragmaTargetExtraction\n");
     gettimeofday (&tv_begin, NULL);
     if (DEBUG) *loopTarget_log << " ======================= the module begin =======================\n";
     if (DEBUG) *loopTarget_log << M;
     if (DEBUG) *loopTarget_log << " ======================= the module end =======================\n";
-
+    if (DEBUG) loopTarget_log->flush();
     // analyze BRAM accesses in the module before any other analysis
     bool changed = TraceMemoryDeclarationAndAnalyzeAccessinModule(M);
 

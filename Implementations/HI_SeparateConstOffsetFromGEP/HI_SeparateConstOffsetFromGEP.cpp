@@ -909,6 +909,81 @@ bool HI_SeparateConstOffsetFromGEP::runOnFunction(Function &F) {
   LI = &getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
   TLI = &getAnalysis<TargetLibraryInfoWrapperPass>().getTLI();
   bool Changed = false;
+
+
+  for (BasicBlock &B : F) {
+    bool modified = true;
+    while (modified)
+    {
+      modified = false;
+      for (BasicBlock::iterator I = B.begin(), IE = B.end(); I != IE; I++)
+      {
+        if (LoadInst *LoadI = dyn_cast<LoadInst>(I))
+        {
+          if (auto addI = dyn_cast<Instruction>(LoadI->getOperand(0)))
+          {}
+          else if (auto argV = dyn_cast<Argument>(LoadI->getOperand(0)))
+          {}
+          else if (auto globalV = dyn_cast<GlobalVariable>(LoadI->getOperand(0)))
+          {}
+          else 
+          {
+            if (DEBUG) *Sep_Log << "LoadInst: " << *LoadI << " should hoist the constant expr into an instuction for later address tracing.\n";
+            if (DEBUG) *Sep_Log << "OriBlock:\n " << *LoadI->getParent() << "\n";
+
+            if (DEBUG) Sep_Log->flush();
+
+            auto constE = dyn_cast<ConstantExpr>(LoadI->getOperand(0));
+            assert(constE);
+            assert(constE->getOpcode() == Instruction::GetElementPtr);
+            
+            Instruction* gepI = constE->getAsInstruction();
+            gepI->insertBefore(LoadI);
+            LoadI->setOperand(0, gepI);
+            modified = true;
+            Changed = true;
+
+            if (DEBUG) *Sep_Log << "NewBlock:\n " << *LoadI->getParent() << "\n";
+
+            break;
+          }
+        } 
+        else if (StoreInst *StoreI = dyn_cast<StoreInst>(I))
+        {
+          if (auto addI = dyn_cast<Instruction>(StoreI->getOperand(1)))
+          {}
+          else if (auto argV = dyn_cast<Argument>(StoreI->getOperand(1)))
+          {}
+          else if (auto globalV = dyn_cast<GlobalVariable>(StoreI->getOperand(1)))
+          {}
+          else 
+          {
+            if (DEBUG) *Sep_Log << "StoreInst: " << *StoreI << " should hoist the constant expr into an instuction for later address tracing.\n";
+            if (DEBUG) *Sep_Log << "OriBlock:\n " << *StoreI->getParent() << "\n";
+            if (DEBUG) Sep_Log->flush();
+
+            auto constE = dyn_cast<ConstantExpr>(StoreI->getOperand(1));
+            assert(constE);
+            assert(constE->getOpcode() == Instruction::GetElementPtr);
+            
+            Instruction* gepI = constE->getAsInstruction();
+            gepI->insertBefore(StoreI);
+            StoreI->setOperand(1, gepI);
+            modified = true;
+            Changed = true;
+
+            if (DEBUG) *Sep_Log << "NewBlock:\n " << *StoreI->getParent() << "\n";
+
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (DEBUG) *Sep_Log << "\n\n after constant hoisting, F=\n" << F << "\n================================\n" ;
+  if (DEBUG) Sep_Log->flush();
+
   for (BasicBlock &B : F) {
     for (BasicBlock::iterator I = B.begin(), IE = B.end(); I != IE;)
       if (GetElementPtrInst *GEP = dyn_cast<GetElementPtrInst>(I++))
@@ -919,6 +994,9 @@ bool HI_SeparateConstOffsetFromGEP::runOnFunction(Function &F) {
 
   Changed |= reuniteExts(F);
 
+  if (DEBUG) *Sep_Log << "\n\n after GEP lowering, F=\n" << F << "\n================================\n" ;
+  if (DEBUG) Sep_Log->flush();
+  
   return Changed;
 }
 

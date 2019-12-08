@@ -924,6 +924,35 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
             {
                 llvm::errs() << "ERRORS: cannot find target [" << *target << "] in Target2ArrayInfo and its address=" 
                                 << target << "\n";
+                if (auto targetI = dyn_cast<Instruction>(target))
+                {
+                    llvm::errs() << "Is an instruction.\n";
+                }
+                else
+                {
+                    if (auto constantV = dyn_cast<Constant>(target))
+                    {
+                        if (auto test0 = dyn_cast<ConstantInt>(target))
+                            llvm::errs() << "Is  an ConstantInt.\n";
+                        if (auto test1 = dyn_cast<ConstantAggregate>(target))
+                            llvm::errs() << "Is  an ConstantAggregateZero.\n";
+                        if (auto test2 = dyn_cast<ConstantArray>(target))
+                            llvm::errs() << "Is  an ConstantArray.\n";
+                        if (auto test3 = dyn_cast<ConstantStruct>(target))
+                            llvm::errs() << "Is  an ConstantStruct.\n";
+                        if (auto test4 = dyn_cast<ConstantDataSequential>(target))
+                            llvm::errs() << "Is  an ConstantDataSequential.\n";
+                        if (auto test5 = dyn_cast<ConstantDataVector>(target))
+                            llvm::errs() << "Is  an ConstantDataVector.\n";
+                        if (auto test6 = dyn_cast<BlockAddress>(target))
+                            llvm::errs() << "Is  an BlockAddress.\n";
+                        if (auto test7 = dyn_cast<ConstantExpr>(target))
+                            llvm::errs() << "Is  an ConstantExpr.\n";
+                        llvm::errs() << "Is  an Constant.\n";
+                    }
+                    else
+                        llvm::errs() << "Is NOT an instruction.\n";
+                }
                 assert(Target2ArrayInfo.find(target) != Target2ArrayInfo.end() 
                             && Alias2Target.find(target) != Alias2Target.end()
                             && "Fail to find the array inforamtion for the target.");

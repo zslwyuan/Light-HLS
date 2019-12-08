@@ -5,6 +5,7 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Utils/LoopSimplify.h"
+#include "llvm/Transforms/Scalar/ConstantHoisting.h"
 #include "llvm/Analysis/LoopPass.h"
 #include "llvm/Analysis/LoopAnalysisManager.h"
 #include "llvm/IR/Dominators.h"

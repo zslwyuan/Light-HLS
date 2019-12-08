@@ -140,11 +140,12 @@ int main(int argc, const char **argv)
         PM_pre.add(CFGSimplification_pass22_pre);        
         print_info("Enable CFGSimplificationPass Pass");
 
-        auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
-        PM_pre.add(loopextract);
-        print_info("Enable LoopExtractor Pass");
-
-
+        if (all_sub_function_inline)
+        {
+          auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
+          PM_pre.add(loopextract);
+          print_info("Enable LoopExtractor Pass");
+        }  
 
         std::map<std::string, std::vector<int>> IRFunc2BeginLine;
         auto hi_ir2sourcecode = new HI_IR2SourceCode("HI_IR2SourceCode",IRLoop2LoopLabel, IRFunc2BeginLine, IRLoop2OriginTripCount, debugFlag);
@@ -191,7 +192,7 @@ int main(int argc, const char **argv)
         auto CFGSimplification_pass22 = createCFGSimplificationPass();
         PM0.add(CFGSimplification_pass22);        
         print_info("Enable CFGSimplificationPass Pass");
-        
+
         auto hi_separateconstoffsetfromgep = new HI_SeparateConstOffsetFromGEP("HI_SeparateConstOffsetFromGEP",true, debugFlag);
         PM0.add(hi_separateconstoffsetfromgep);
         print_info("Enable HI_SeparateConstOffsetFromGEP Pass");

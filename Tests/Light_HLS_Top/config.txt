@@ -10,6 +10,6 @@ HLS_lib_path = ../../../HLS_Data_Lib/
   #array_partition variable=D dim=1 factor=8 scope=kernel_2mm cyclic
   #array_partition variable=C dim=2 factor=8 scope=kernel_2mm cyclic
   #loop_pipeline label=Loop_kernel_2mm_3 II=1
-loop_pipeline label=Loop_kernel_fdtd_2d_2  II=2
-loop_pipeline label=Loop_kernel_fdtd_2d_4  II=2
-loop_pipeline label=Loop_kernel_fdtd_2d_6  II=2
+  #loop_pipeline label=Loop_kernel_fdtd_2d_2  II=2
+  #loop_pipeline label=Loop_kernel_fdtd_2d_4  II=2
+  #loop_pipeline label=Loop_kernel_fdtd_2d_6  II=2

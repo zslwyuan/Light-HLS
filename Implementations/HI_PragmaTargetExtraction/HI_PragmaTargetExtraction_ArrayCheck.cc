@@ -19,6 +19,7 @@ void HI_PragmaTargetExtraction::findMemoryDeclarationAndAnalyzeAccessin(Function
 {
     if (DEBUG) *arrayTarget_Log << "checking the BRAM information in Function: " << F->getName() << "\n";
     if (DEBUG) *arrayTarget_Log << "\n\nchecking the BRAM information in Function: " << F->getName() << "\n";
+
     ValueVisited.clear();
 
     // for top function in HLS, arrays in interface may involve BRAM

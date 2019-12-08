@@ -265,6 +265,9 @@ void HI_FunctionInstantiation::BFS_checkDeadFunction(Function *startF, Module *M
                 if (F.getName().find("llvm.")!=std::string::npos)
                     continue;
 
+                if (!F.use_empty())
+                    continue;
+
                 *FuncInitiationLog << "          ---- remove dead function [" << F.getName() << "] from module\n";
                 F.eraseFromParent();
                 updated = 1;
