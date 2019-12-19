@@ -1,16 +1,16 @@
+#include "HI_PragmaTargetExtraction.h"
+#include "HI_print.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
-#include "HI_print.h"
-#include "HI_PragmaTargetExtraction.h"
 
-#include <stdio.h>
-#include <string>
 #include <ios>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string>
 
 using namespace llvm;
 
@@ -46,7 +46,9 @@ void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
             nextLoopName += "-";
             nextLoopName += sub_loop->getHeader()->getName();
             LoopIRName2NextLevelSubLoopIRNames[curLoopName].push_back(nextLoopName);
-            if (DEBUG) *loopTarget_log << "parentLoop: " << curLoopName << " ==> sonLoop: " << nextLoopName << "\n";
+            if (DEBUG)
+                *loopTarget_log << "parentLoop: " << curLoopName << " ==> sonLoop: " << nextLoopName
+                                << "\n";
         }
     }
     for (auto sub_loop : *L)
@@ -62,7 +64,6 @@ void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
             checkSubLoops(sub_loop);
         }
     }
-
 }
 
 void HI_PragmaTargetExtraction::checkArrayAccessInLoop(Loop *L)
@@ -83,11 +84,16 @@ void HI_PragmaTargetExtraction::checkArrayAccessInLoop(Loop *L)
             {
                 F = allocI->getParent()->getParent();
             }
-            LoopIRName2Array[curLoopName].push_back(std::pair<std::string, std::string>(L->getHeader()->getParent()->getName(), target->getName()));
-            TargetExtName2ArrayInfo[std::pair<std::string, std::string>(L->getHeader()->getParent()->getName(), target->getName())] = Target2ArrayInfo[target];
-            if (DEBUG) *arrayTarget_Log << "array/pointer : " << target->getName() << ", declared at function: " << demangleFunctionName(F->getName())
-                             << ", is used by loop: " << curLoopName 
-                             << " in function " << L->getHeader()->getParent()->getName() << "\n";
+            LoopIRName2Array[curLoopName].push_back(std::pair<std::string, std::string>(
+                L->getHeader()->getParent()->getName(), target->getName()));
+            TargetExtName2ArrayInfo[std::pair<std::string, std::string>(
+                L->getHeader()->getParent()->getName(), target->getName())] =
+                Target2ArrayInfo[target];
+            if (DEBUG)
+                *arrayTarget_Log << "array/pointer : " << target->getName()
+                                 << ", declared at function: " << demangleFunctionName(F->getName())
+                                 << ", is used by loop: " << curLoopName << " in function "
+                                 << L->getHeader()->getParent()->getName() << "\n";
         }
     }
 }

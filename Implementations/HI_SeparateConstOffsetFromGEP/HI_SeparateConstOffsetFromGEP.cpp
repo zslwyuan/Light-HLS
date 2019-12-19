@@ -594,11 +594,11 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(
   }
 
   // Create a GEP with the constant offset index.
-  if (AccumulativeByteOffset != 0) {
+//  if (AccumulativeByteOffset != 0) {
     Value *Offset = ConstantInt::get(IntPtrTy, AccumulativeByteOffset);
     ResultPtr =
         Builder.CreateGEP(Builder.getInt8Ty(), ResultPtr, Offset, "uglygep");
-  } else
+//  } else
     isSwapCandidate = false;
 
   // If we created a GEP with constant index, and the base is loop invariant,
@@ -612,8 +612,10 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(
   if (ResultPtr->getType() != Variadic->getType())
     ResultPtr = Builder.CreateBitCast(ResultPtr, Variadic->getType());
 
+  if (DEBUG) *Sep_Log << "\nreplcing " << *Variadic << " with " << *ResultPtr << "\n";
   Variadic->replaceAllUsesWith(ResultPtr);
   Variadic->eraseFromParent();
+  
 }
 
 void
@@ -623,6 +625,12 @@ HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic,
   Type *IntPtrTy = DL->getIntPtrType(Variadic->getType());
 
   Value *ResultPtr = Builder.CreatePtrToInt(Variadic->getOperand(0), IntPtrTy);
+  if (ConstantExpr *constE = dyn_cast<ConstantExpr>(ResultPtr))
+  {
+    Instruction *tmpI = constE->getAsInstruction();
+    tmpI->insertBefore(Variadic);
+    ResultPtr = tmpI;
+  }
   Value *tmp_ResultPtr = nullptr;
   gep_type_iterator GTI = gep_type_begin(*Variadic);
   // Create ADD/SHL/MUL arithmetic operations for each sequential indices. We
@@ -684,18 +692,27 @@ HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic,
   }
 
   if (DEBUG) *Sep_Log << "  Builder.CreateAdd(ResultPtr, tmp_ResultPtr) ResultPtr=" << ResultPtr << "  tmp_ResultPtr="<<tmp_ResultPtr <<"\n";
+  if (tmp_ResultPtr)
+    if (DEBUG) *Sep_Log << "  Builder.CreateAdd(ResultPtr, tmp_ResultPtr) Result=" << *ResultPtr << "  tmp_Result="<< *tmp_ResultPtr <<"\n";
   if (DEBUG) Sep_Log->flush();
 
   if (!tmp_ResultPtr)
   {
-    tmp_ResultPtr = ConstantInt::get(ResultPtr->getType(), 0, true);
+    //tmp_ResultPtr = ConstantInt::get(ResultPtr->getType(), 0, true);
   }
+  else
+    ResultPtr = Builder.CreateAdd(ResultPtr, tmp_ResultPtr);
 
-  ResultPtr = Builder.CreateAdd(ResultPtr, tmp_ResultPtr);
   // Create an ADD for the constant offset index.
-
+  if (DEBUG) *Sep_Log << "\ncreated adder " << *ResultPtr << "\n";
 
   ResultPtr = Builder.CreateIntToPtr(ResultPtr, Variadic->getType());
+  
+  //ResultPtr = Builder.Insert(CastInst::Create(Instruction::IntToPtr, ResultPtr, Variadic->getType()), "");
+
+  if (DEBUG) *Sep_Log << "\ncreated ITP " << *ResultPtr << "\n";
+
+  if (DEBUG) *Sep_Log << "\nreplcing " << *Variadic << " with " << *ResultPtr << "\n";
   Variadic->replaceAllUsesWith(ResultPtr);
   Variadic->eraseFromParent();
 }
@@ -918,65 +935,44 @@ bool HI_SeparateConstOffsetFromGEP::runOnFunction(Function &F) {
       modified = false;
       for (BasicBlock::iterator I = B.begin(), IE = B.end(); I != IE; I++)
       {
-        if (LoadInst *LoadI = dyn_cast<LoadInst>(I))
+        for (int i = 0; i<I->getNumOperands(); i++)
         {
-          if (auto addI = dyn_cast<Instruction>(LoadI->getOperand(0)))
-          {}
-          else if (auto argV = dyn_cast<Argument>(LoadI->getOperand(0)))
-          {}
-          else if (auto globalV = dyn_cast<GlobalVariable>(LoadI->getOperand(0)))
-          {}
-          else 
+          Instruction *tmpI  = dyn_cast<Instruction>(I);
+          if (auto constE = dyn_cast<ConstantExpr>(I->getOperand(i)))
           {
-            if (DEBUG) *Sep_Log << "LoadInst: " << *LoadI << " should hoist the constant expr into an instuction for later address tracing.\n";
-            if (DEBUG) *Sep_Log << "OriBlock:\n " << *LoadI->getParent() << "\n";
+            if (constE->getOpcode() == Instruction::GetElementPtr)
+            {
+              if (DEBUG) *Sep_Log << "Inst: " << *tmpI << " should hoist the constant expr into an instuction for later address tracing.\n";
+              if (DEBUG) *Sep_Log << "OriBlock:\n " << *tmpI->getParent() << "\n";
 
-            if (DEBUG) Sep_Log->flush();
+              if (DEBUG) Sep_Log->flush();
 
-            auto constE = dyn_cast<ConstantExpr>(LoadI->getOperand(0));
-            assert(constE);
-            assert(constE->getOpcode() == Instruction::GetElementPtr);
-            
-            Instruction* gepI = constE->getAsInstruction();
-            gepI->insertBefore(LoadI);
-            LoadI->setOperand(0, gepI);
-            modified = true;
-            Changed = true;
+              assert(constE);
+              assert(constE->getOpcode() == Instruction::GetElementPtr);
+              
+              Instruction* gepI = constE->getAsInstruction();
+              if (auto PHI_I = dyn_cast<llvm::PHINode>(tmpI))
+              {
+                gepI->insertBefore(PHI_I->getIncomingBlock(i)->getTerminator());
+              }
+              else
+              {
+                gepI->insertBefore(tmpI);
+              }
+              
+              
+              tmpI->setOperand(i, gepI);
+              modified = true;
+              Changed = true;
 
-            if (DEBUG) *Sep_Log << "NewBlock:\n " << *LoadI->getParent() << "\n";
+              if (DEBUG) *Sep_Log << "NewBlock:\n " << *I->getParent() << "\n";
 
-            break;
-          }
-        } 
-        else if (StoreInst *StoreI = dyn_cast<StoreInst>(I))
-        {
-          if (auto addI = dyn_cast<Instruction>(StoreI->getOperand(1)))
-          {}
-          else if (auto argV = dyn_cast<Argument>(StoreI->getOperand(1)))
-          {}
-          else if (auto globalV = dyn_cast<GlobalVariable>(StoreI->getOperand(1)))
-          {}
-          else 
-          {
-            if (DEBUG) *Sep_Log << "StoreInst: " << *StoreI << " should hoist the constant expr into an instuction for later address tracing.\n";
-            if (DEBUG) *Sep_Log << "OriBlock:\n " << *StoreI->getParent() << "\n";
-            if (DEBUG) Sep_Log->flush();
-
-            auto constE = dyn_cast<ConstantExpr>(StoreI->getOperand(1));
-            assert(constE);
-            assert(constE->getOpcode() == Instruction::GetElementPtr);
-            
-            Instruction* gepI = constE->getAsInstruction();
-            gepI->insertBefore(StoreI);
-            StoreI->setOperand(1, gepI);
-            modified = true;
-            Changed = true;
-
-            if (DEBUG) *Sep_Log << "NewBlock:\n " << *StoreI->getParent() << "\n";
-
-            break;
+              break;
+            }
           }
         }
+        if (modified)
+          break;
       }
     }
   }
