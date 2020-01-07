@@ -599,7 +599,7 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(
     ResultPtr =
         Builder.CreateGEP(Builder.getInt8Ty(), ResultPtr, Offset, "uglygep");
 //  } else
-    isSwapCandidate = false;
+//    isSwapCandidate = false;
 
   // If we created a GEP with constant index, and the base is loop invariant,
   // then we swap the first one with it, so LICM can move constant GEP out
@@ -688,7 +688,6 @@ HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic,
     {
       tmp_ResultPtr = ConstantInt::get(IntPtrTy, AccumulativeByteOffset, true);
     }
-    
   }
 
   if (DEBUG) *Sep_Log << "  Builder.CreateAdd(ResultPtr, tmp_ResultPtr) ResultPtr=" << ResultPtr << "  tmp_ResultPtr="<<tmp_ResultPtr <<"\n";
@@ -696,11 +695,7 @@ HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic,
     if (DEBUG) *Sep_Log << "  Builder.CreateAdd(ResultPtr, tmp_ResultPtr) Result=" << *ResultPtr << "  tmp_Result="<< *tmp_ResultPtr <<"\n";
   if (DEBUG) Sep_Log->flush();
 
-  if (!tmp_ResultPtr)
-  {
-    //tmp_ResultPtr = ConstantInt::get(ResultPtr->getType(), 0, true);
-  }
-  else
+  if (tmp_ResultPtr)
     ResultPtr = Builder.CreateAdd(ResultPtr, tmp_ResultPtr);
 
   // Create an ADD for the constant offset index.
