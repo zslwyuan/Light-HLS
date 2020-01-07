@@ -22,6 +22,11 @@ If Hi-ClockFlow helps for your works, please cite [our paper in ICCAD 2019](http
 
     T. Liang, J. Zhao, L. Feng, S. Sinha and W. Zhang, "Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis," 2019 IEEE/ACM International Conference on Computer-Aided Design (ICCAD), Westminster, CO, USA, 2019, pp. 1-6. doi: 10.1109/ICCAD45719.2019.8942136
 
+
+
+<img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/hi-clockflow-overview.png" width="800"> 
+
+
 ***
 
 ## 1. Multi-Clock Dataflow DSE formulation
