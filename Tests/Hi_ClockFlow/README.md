@@ -51,7 +51,7 @@ The **PUSH** operation is implemented with function [tryUpdateHLSDirectives()](h
 
 The **RELAX** operation is implemented with function [justTryUpdateSlowestFuncClock_withoutHLSDSE()](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/ConfigGen.cc#L1384-L1474), in which Hi-ClockFlow uses function [findNextPossibleClockCombination()](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/ConfigGen.cc#L1476-L1584) to get next combination of clocks for the dataflow design.
 
-We keep updating the strategy of this heuristic algorithm for the setting of directives and clocks, ^_^/.
+We will keep updating the strategy of this heuristic algorithm for the setting of directives and clocks to achieve better performance.
 
 ***
 
