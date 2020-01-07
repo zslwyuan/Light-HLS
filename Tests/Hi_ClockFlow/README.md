@@ -47,7 +47,7 @@ Hi-ClockFlow solves this problem based on pushing-relaxation heuristic algorithm
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/pushrelax_fig.png" width="800"> 
 <img src="https://github.com/zslwyuan/Light-HLS/blob/master/Images/pushrelax_code.png" width="400"> 
 
-The detailed codes are provided in **[here](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc)**
+The detailed codes are provided in **[here](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/)**
 Compared to common usage of Light-HLS, in the configuration file of Hi-ClockFlow, as **[an example](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/convs_settings/conv_config.txt)**, users need to specify the resource constraints and the initial clock for the modules in dataflow. The trace of this heuristic algorithm will be recorded in a log file "pushing\_relaxtion_log.txt".
 
 The main flow of Hi-ClockFlow is implememnted in [Hi_ClockFlow.cc](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc). After [pre-processing of source code](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc#L45) and [analysis of the IR code](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc#L76-#100), Hi-ClockFlow begins [its PUSH-RELAX flow](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc#L133-#404), where it tries to PUSH the HLS directives and when PUSH trial failed, it will update the clock combination by RELAX. Please note that these decision is made by these [lines](https://github.com/zslwyuan/Light-HLS/blob/master/Tests/Hi_ClockFlow/Hi_ClockFlow.cc#L262-#402).
