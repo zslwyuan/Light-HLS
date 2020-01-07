@@ -6,9 +6,9 @@
 
 Light-HLS is a light weight high-level synthesis (HLS) framework for academic exploration and evaluation, which can be called to perform various design space exploration (DSE) for FPGA-based HLS design. It covers the abilities of previous works, overcomes the existing limitations and brings more practical features. Light-HLS is modularized and portable so designers can use the components of Light-HLS to conduct various DSE procedures.  Light-HLS gets rid of RTL code generation so it will not suffer from the time-consuming synthesis of commercial HLS tools like VivadoHLS, which involves many detailed operations in both its frond-end and back-end, but can accurately estimate timing, resource and some other results of commercial tools for applications.
 
-If Light-HLS helps for your works, please cite our paper in ICCAD 2019 ^_^: 
+If Light-HLS helps for your works, please cite [our paper in ICCAD 2019](https://ieeexplore.ieee.org/document/8942136) ^_^: 
 
-    Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis. IEEE/ACM 2019 International Conference On Computer Aided Design (ICCAD) 
+    T. Liang, J. Zhao, L. Feng, S. Sinha and W. Zhang, "Hi-ClockFlow: Multi-Clock Dataflow Automation and Throughput Optimization in High-Level Synthesis," 2019 IEEE/ACM International Conference on Computer-Aided Design (ICCAD), Westminster, CO, USA, 2019, pp. 1-6. doi: 10.1109/ICCAD45719.2019.8942136
 
 
 **[A well-organzied Wiki can be find here](https://github.com/zslwyuan/Light-HLS/wiki)**. Since we are still developing this project and there could be some bugs and issues, if you have any problems, PLEASE feel free to let us know: ( tliang@connect.ust.hk ), for which we will sincerely appreciate ^\_^. We strongly recommand to you send us an email so we can add you into our maillist for the latest information of Light-HLS, because Light-HLS is a young tool and continuously updated to add features and fix bugs. This is a young project and if you want to join us, we are happy to make it a better one togather! \\^_^/ Here are some [known issues](https://github.com/zslwyuan/Light-HLS/wiki/Known-Issues) raised by our users, which we are handling one by one.
