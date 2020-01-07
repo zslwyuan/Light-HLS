@@ -46,6 +46,7 @@ Let's first see what we can do with Light-HLS in the research about HLS.
 
 **[Implementation of Light-HLS and Further development](https://github.com/zslwyuan/Light-HLS/wiki/Implementation-of-Light-HLS-and-Further-Development)**
 
+**[Notes for You to Create Your Own HLS Tools with LLVM](https://github.com/zslwyuan/LLVM-9.0-Learner-Tutorial)**
 
 
 ## Good Good Study Day Day Up \(^o^)/~
