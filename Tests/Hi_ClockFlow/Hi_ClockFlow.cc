@@ -196,7 +196,7 @@ int main(int argc, const char **argv)
         checkedConfigs_tryUpdateHLSDirectives.flush();
         checkedConfigs_tryUpdateHLSDirectives.close();
 
-        ////////////////// try to push clock ///////////////////
+        ////////////////// try to push clock and relax all the HLS directives ///////////////////
 
         std::string optClock = "";
         HI_DesignConfigInfo desginconfig_optClock;
