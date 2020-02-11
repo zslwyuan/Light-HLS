@@ -1,4 +1,4 @@
-This example of Light-HLS is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow/)**, to show how to implement a design space exploration with Light-HLS
+This example of Light-HLS is **[Hi-ClockFlow](https://github.com/zslwyuan/Hi-ClockFlow/)**, to show how to implement a design space exploration with **[Light-HLS](https://github.com/zslwyuan/Light-HLS)**, detailed manual for which can be found **[here](https://github.com/zslwyuan/Light-HLS/wiki)**
 
 Here, We mainly consider the parameters of clock frequencies of each module, array partitioning, loop pipelining and loop unrolling.
 
