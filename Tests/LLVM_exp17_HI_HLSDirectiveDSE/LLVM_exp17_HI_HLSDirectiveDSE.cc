@@ -208,7 +208,7 @@ int main(int argc, const char **argv)
                     int dim = loop_array_pair.second.second;
                     // std::map<std::string, std::set<std::pair<std::string, std::pair<std::string,
                     // int>> >>
-                    desginconfig_0.increaseArrayCyclicPartition(demangeFunctionName(funcStr),
+                    desginconfig_0.increaseArrayCyclicPartition(demangleFunctionName(funcStr),
                                                                 arrayStr, dim, next_factor);
                 }
                 unrollNotChanged = 0;
@@ -407,7 +407,7 @@ int main(int argc, const char **argv)
                             // std::map<std::string, std::set<std::pair<std::string,
                             // std::pair<std::string, int>> >>
                             desginconfig_0.increaseArrayCyclicPartition(
-                                demangeFunctionName(funcStr), arrayStr, dim, next_factor);
+                                demangleFunctionName(funcStr), arrayStr, dim, next_factor);
                         }
                     }
                 }
