@@ -17,6 +17,7 @@ double LUT_limit;
 double BRAM_limit;
 int ClockNum_limit;
 bool all_sub_function_inline;
+bool dataflowApplied;
 
 int main(int argc, const char **argv)
 {
@@ -43,6 +44,7 @@ int main(int argc, const char **argv)
     std::map<std::string, int> LoopLabel2II;
 
     all_sub_function_inline = 0;
+    dataflowApplied = false;
     Parse_Config(configFile_str.c_str(), LoopLabel2UnrollFactor, LoopLabel2II);
     clangPreProcess(argv, top_str, FuncParamLine2OutermostSize);
 
@@ -134,11 +136,19 @@ int main(int argc, const char **argv)
         PM_pre.add(CFGSimplification_pass22_pre);
         print_info("Enable CFGSimplificationPass Pass");
 
-        if (all_sub_function_inline)
+        if (all_sub_function_inline || dataflowApplied)
         {
             auto loopextract = createLoopExtractorPass(); //"HI_LoopUnroll"
             PM_pre.add(loopextract);
             print_info("Enable LoopExtractor Pass");
+
+            auto indvarsimplifypass_pre_loopextract = createIndVarSimplifyPass();
+            PM_pre.add(indvarsimplifypass_pre_loopextract);
+            print_info("Enable IndVarSimplifyPass Pass");
+
+            auto CFGSimplification_pass22_pre_loopextract = createCFGSimplificationPass();
+            PM_pre.add(CFGSimplification_pass22_pre_loopextract);
+            print_info("Enable CFGSimplificationPass Pass");
         }
 
         std::map<std::string, std::vector<int>> IRFunc2BeginLine;

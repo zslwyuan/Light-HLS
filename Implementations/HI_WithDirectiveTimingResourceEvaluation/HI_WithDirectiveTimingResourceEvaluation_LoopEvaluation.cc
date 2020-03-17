@@ -645,7 +645,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
             if (CallInst *callI = dyn_cast<CallInst>(&I))
             {
                 if (callI->getCalledFunction()->getName().find("llvm.") != std::string::npos ||
-                    callI->getCalledFunction()->getName().find("checkDependenceIIForLoop") !=
+                    callI->getCalledFunction()->getName().find("HIPartitionMux") !=
                         std::string::npos)
                 {
                     continue;
@@ -655,7 +655,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
                     if (LoopLabel2II.find(label) != LoopLabel2II.end())
                     {
                         print_warning("Failed to pipeline the loop [" + label +
-                                      "] due to subfunction(s) called in it.\n");
+                                      "] due to subfunction(s) ["+ callI->getCalledFunction()->getName().str() 
+                                      +"] called in it.\n");
                         LoopLabel2SmallestII[label] = 1000000000;
                         return -1;
                     }

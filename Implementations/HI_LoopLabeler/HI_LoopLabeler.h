@@ -130,34 +130,34 @@ class HI_LoopLabeler_Visitor : public RecursiveASTVisitor<HI_LoopLabeler_Visitor
         }
     }
 
-    const FunctionDecl *getFunction(const Stmt &s)
-    {
-        // llvm::errs() << "going to find parent of: \n";
-        // s.dump(llvm::errs(), CI.getSourceManager());
-        for (auto nextNode : ctx.getParents(s))
-        {
-            // llvm::errs() << "go into nextNode: \n";
-            // nextNode.dump(llvm::errs(), CI.getSourceManager());
-            return getFunction(nextNode);
-        }
-        return nullptr;
-        assert(false && "the function contains the loop should be found.");
-    }
+    // const FunctionDecl *getFunction(const Stmt &s)
+    // {
+    //     // llvm::errs() << "going to find parent of: \n";
+    //     // s.dump(llvm::errs(), CI.getSourceManager());
+    //     for (auto nextNode : ctx.getParents(s))
+    //     {
+    //         // llvm::errs() << "go into nextNode: \n";
+    //         // nextNode.dump(llvm::errs(), CI.getSourceManager());
+    //         return getFunction(nextNode);
+    //     }
+    //     return nullptr;
+    //     assert(false && "the function contains the loop should be found.");
+    // }
 
-    const FunctionDecl *getFunction(clang::ast_type_traits::DynTypedNode &curNode)
-    {
+    // const FunctionDecl *getFunction(clang::ast_type_traits::DynTypedNode &curNode)
+    // {
 
-        for (auto nextNode : ctx.getParents(curNode))
-        {
-            // llvm::errs() << "go into deeper nextNode: \n";
-            // nextNode.dump(llvm::errs(),CI.getSourceManager());
-            const FunctionDecl *FD = nextNode.get<FunctionDecl>();
-            if (FD)
-                return FD;
-            return getFunction(nextNode);
-        }
-        return nullptr;
-    }
+    //     for (auto nextNode : ctx.getParents(curNode))
+    //     {
+    //         // llvm::errs() << "go into deeper nextNode: \n";
+    //         // nextNode.dump(llvm::errs(),CI.getSourceManager());
+    //         const FunctionDecl *FD = nextNode.get<FunctionDecl>();
+    //         if (FD)
+    //             return FD;
+    //         return getFunction(nextNode);
+    //     }
+    //     return nullptr;
+    // }
 
     // print the detailed information of the type
     void printTypeInfo(const clang::Type *T);

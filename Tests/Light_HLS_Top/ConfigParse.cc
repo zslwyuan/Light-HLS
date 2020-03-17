@@ -7,7 +7,7 @@ extern double LUT_limit;
 extern double BRAM_limit;
 extern int ClockNum_limit;
 extern bool all_sub_function_inline;
-
+extern bool dataflowApplied;
 void Parse_Config(const char *config_file_name, std::map<std::string, int> &LoopLabel2UnrollFactor,
                   std::map<std::string, int> &LoopLabel2II)
 {
@@ -65,6 +65,7 @@ void Parse_Config(const char *config_file_name, std::map<std::string, int> &Loop
         case hash_compile_time("all_sub_function_inline"):
             all_sub_function_inline = 1;
             break;
+
 
         default:
             break;
@@ -254,6 +255,7 @@ void parseFuncDataflow(std::stringstream &iss)
 
         case hash_compile_time("enable"):
             enable = true;
+            dataflowApplied = true;
             break;
 
         case hash_compile_time("disable"):

@@ -190,7 +190,7 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F, DISu
                     if (auto DILoc = dyn_cast<DILocation>(N))
                     {
 
-                        if (subprog != DILoc->getScope()->getSubprogram())
+                        if (demangleFunctionName(subprog->getName().str()) != demangleFunctionName(DILoc->getScope()->getSubprogram()->getName().str()))
                             continue;
 
                         if (path == "")
@@ -438,6 +438,10 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
             // if (Block2Line_forLoop[B].first < begin_line)
             //     begin_line = Block2Line_forLoop[B].first;
         }
+        
+        if (begin_line == 1000000 || cur_Loop->getNumBlocks()==1)
+            begin_line = cur_Loop->getStartLoc().getLine();
+
         if (DEBUG)
             *IR2Src_Log << "\n";
         if (DEBUG)

@@ -1413,24 +1413,6 @@ HI_ArraySensitiveToLoopLevel::getAccessInfoForAccessInst(Instruction *Load_or_St
     return AddressInst2AccessInfo[address_addI];
 }
 
-AliasResult HI_ArraySensitiveToLoopLevel::HI_AAResult::alias(const MemoryLocation &LocA,
-                                                             const MemoryLocation &LocB)
-{
-    //   auto PtrA = LocA.Ptr;
-    //   auto PtrB = LocB.Ptr;
-
-    //   if (PtrA != PtrA) {
-    //     return NoAlias;
-    //   }
-    // NO USE
-    // NO USE
-    // NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // Forward the query to the next analysis.
-    return AAResultBase::alias(LocA, LocB);
-}
 
 bool HI_ArraySensitiveToLoopLevel::checkAccessAlias(Instruction *I0, Instruction *I1)
 {

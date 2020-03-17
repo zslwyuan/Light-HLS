@@ -430,7 +430,7 @@ int main(int argc, const char **argv)
                 int dim = loop_array_pair.second.second;
                 // std::map<std::string, std::set<std::pair<std::string, std::pair<std::string,
                 // int>> >>
-                desginconfig_0.insertArrayCyclicPartition(demangeFunctionName(funcStr), arrayStr,
+                desginconfig_0.insertArrayCyclicPartition(demangleFunctionName(funcStr), arrayStr,
                                                           dim, next_factor);
             }
         }
@@ -539,7 +539,7 @@ int main(int argc, const char **argv)
                         int dim = loop_array_pair.second.second;
                         // std::map<std::string, std::set<std::pair<std::string,
                         // std::pair<std::string, int>> >>
-                        desginconfig_0.insertArrayCyclicPartition(demangeFunctionName(funcStr),
+                        desginconfig_0.insertArrayCyclicPartition(demangleFunctionName(funcStr),
                                                                   arrayStr, dim, next_factor);
                     }
                 }

@@ -1,5 +1,5 @@
-#ifndef _HI_InstructionFiles_HI_WithDirectiveTimingResourceEvaluation
-#define _HI_InstructionFiles_HI_WithDirectiveTimingResourceEvaluation
+#ifndef _HI_InstructionFiles
+#define _HI_InstructionFiles
 
 #include <string>
 

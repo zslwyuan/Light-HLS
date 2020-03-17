@@ -1012,18 +1012,6 @@ class HI_MuxInsertionArrayPartition : public ModulePass
     // get the array information, including the dimension, type and size
     HI_ArrayInfo getArrayInfo(Value *target);
 
-    class HI_AAResult : public AAResultBase<HI_AAResult>
-    {
-      public:
-        explicit HI_AAResult() : AAResultBase()
-        {
-        }
-        HI_AAResult(HI_AAResult &&Arg) : AAResultBase(std::move(Arg))
-        {
-        }
-
-        AliasResult alias(const MemoryLocation &LocA, const MemoryLocation &LocB);
-    };
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////// Parse the configuration for the program //////////////////////////////
