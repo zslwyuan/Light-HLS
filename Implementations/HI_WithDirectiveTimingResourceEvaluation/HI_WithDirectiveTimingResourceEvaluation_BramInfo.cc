@@ -1375,9 +1375,9 @@ HI_WithDirectiveTimingResourceEvaluation::getArrayInfo(Value *target)
                 res_array_info.sub_element_num[num_dims - 1] *
                 res_array_info.dim_size[num_dims - 1];
 
-        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName());
+        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName().str());
         std::string funcLine;
-        std::string argName(arg_v->getName());
+        std::string argName(arg_v->getName().str());
 
         for (int possibleLine : IRFunc2BeginLine[FuncName])
         {
@@ -1721,24 +1721,24 @@ HI_WithDirectiveTimingResourceEvaluation::getAccessInfoForAccessInst(Instruction
     return AddressInst2AccessInfo[address_addI];
 }
 
-AliasResult HI_WithDirectiveTimingResourceEvaluation::HI_AAResult::alias(const MemoryLocation &LocA,
-                                                                         const MemoryLocation &LocB)
-{
-    //   auto PtrA = LocA.Ptr;
-    //   auto PtrB = LocB.Ptr;
+// AliasResult HI_WithDirectiveTimingResourceEvaluation::HI_AAResult::alias(const MemoryLocation &LocA,
+//                                                                          const MemoryLocation &LocB)
+// {
+//     //   auto PtrA = LocA.Ptr;
+//     //   auto PtrB = LocB.Ptr;
 
-    //   if (PtrA != PtrA) {
-    //     return NoAlias;
-    //   }
-    // NO USE
-    // NO USE
-    // NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // Forward the query to the next analysis.
-    return AAResultBase::alias(LocA, LocB);
-}
+//     //   if (PtrA != PtrA) {
+//     //     return NoAlias;
+//     //   }
+//     // NO USE
+//     // NO USE
+//     // NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // Forward the query to the next analysis.
+//     return AAResultBase::alias(LocA, LocB);
+// }
 
 bool HI_WithDirectiveTimingResourceEvaluation::checkAccessAlias(Instruction *I0, Instruction *I1)
 {
@@ -2923,10 +2923,10 @@ void HI_WithDirectiveTimingResourceEvaluation::checkPartitionBenefit(
     {
         Target2PartitionBenefit[target_array] = true;
         Function *F = getFunctionOfValue(target_array);
-        std::string nameOfFunction = demangleFunctionName(F->getName());
+        std::string nameOfFunction = demangleFunctionName(F->getName().str());
         assert(F && "the parent function of the value should be found.");
         FuncArray2PartitionBenefit[std::pair<std::string, std::string>(
-            nameOfFunction, target_array->getName())] = true;
+            nameOfFunction, target_array->getName().str())] = true;
         if (DEBUG)
         {
             *ArrayLog << "INFO: partitioning helps to improve the parallelism for the accesses: "
@@ -3020,9 +3020,9 @@ bool HI_WithDirectiveTimingResourceEvaluation::isLocalArray(Value *target)
 {
     std::string functionDemangleName;
     if (auto allocI = dyn_cast<AllocaInst>(target))
-        functionDemangleName = demangleFunctionName(allocI->getParent()->getParent()->getName());
+        functionDemangleName = demangleFunctionName(allocI->getParent()->getParent()->getName().str());
     else if (auto argV = dyn_cast<Argument>(target))
-        functionDemangleName = demangleFunctionName(argV->getParent()->getName());
+        functionDemangleName = demangleFunctionName(argV->getParent()->getName().str());
     else
         assert(false && "should not reach here.\n");
 
@@ -3031,7 +3031,7 @@ bool HI_WithDirectiveTimingResourceEvaluation::isLocalArray(Value *target)
     {
         if (local_array_pair.first == functionDemangleName)
         {
-            if (local_array_pair.second.first == target->getName())
+            if (local_array_pair.second.first == target->getName().str())
             {
                 localArrayEnable = local_array_pair.second.second;
                 break;

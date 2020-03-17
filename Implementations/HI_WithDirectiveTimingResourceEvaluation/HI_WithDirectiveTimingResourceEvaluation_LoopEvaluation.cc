@@ -204,9 +204,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
     while (cur_Loop != NULL)
     {
 
-        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName();
+        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName().str();
         tmp_loop_name += "-";
-        tmp_loop_name += cur_Loop->getHeader()->getName();
+        tmp_loop_name += cur_Loop->getHeader()->getName().str();
 
         if (DEBUG)
             *Evaluating_log << "-- Handling the inner Loop " << cur_Loop->getName() << ":\n";
@@ -282,7 +282,7 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
                     LoopLabel2AchievedII[opt_LoopLabel] = max_critial_path_in_curLoop.latency;
                     Loop2AchievedII[cur_Loop->getHeader()] = max_critial_path_in_curLoop.latency;
                 }
-                print_warning("Loop  " + std::string(cur_Loop->getName()) +
+                print_warning("Loop  " + std::string(cur_Loop->getName().str()) +
                               " is pipelined with II=" + std::to_string(II_for_loop) +
                               " which means it is not worthy to pipeline the loop.");
             }
@@ -630,9 +630,9 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (curLoop->getSubLoops().size() != 0)
         return -1;
     BasicBlock *Header = curLoop->getHeader();
-    std::string tmp_loop_name = Header->getParent()->getName();
+    std::string tmp_loop_name = Header->getParent()->getName().str();
     tmp_loop_name += "-";
-    tmp_loop_name += Header->getName();
+    tmp_loop_name += Header->getName().str();
     if (IRLoop2LoopLabel.find(tmp_loop_name) == IRLoop2LoopLabel.end())
         return -1;
 
@@ -645,7 +645,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
             if (CallInst *callI = dyn_cast<CallInst>(&I))
             {
                 if (callI->getCalledFunction()->getName().find("llvm.") != std::string::npos ||
-                    callI->getCalledFunction()->getName().find("checkDependenceIIForLoop") !=
+                    callI->getCalledFunction()->getName().find("HIPartitionMux") !=
                         std::string::npos)
                 {
                     continue;
@@ -655,7 +655,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
                     if (LoopLabel2II.find(label) != LoopLabel2II.end())
                     {
                         print_warning("Failed to pipeline the loop [" + label +
-                                      "] due to subfunction(s) called in it.\n");
+                                      "] due to subfunction(s) ["+ callI->getCalledFunction()->getName().str() +"] called in it.\n");
                         LoopLabel2SmallestII[label] = 1000000000;
                         return -1;
                     }
@@ -674,7 +674,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
 
     if (II_BRAM != II_BRAM_enum)
     {
-        print_warning("Loop II of " + std::string(curLoop->getName()) +
+        print_warning("Loop II of " + std::string(curLoop->getName().str()) +
                       " has conflict prediction: ideal=" + std::to_string(II_BRAM) +
                       " enum=" + std::to_string(II_BRAM_enum));
         if (II_BRAM_enum < 0)
@@ -715,7 +715,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     // When pipelined, the loop should not have any sub-loop inside
     if (curLoop->getSubLoops().size() > 0)
     {
-        std::string loopName = curLoop->getName();
+        std::string loopName = curLoop->getName().str();
         print_warning(loopName + " should not be pipelined with subloops.");
         return -1;
     }
@@ -734,7 +734,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (II_BRAM > min_II)
     {
         min_II = II_BRAM;
-        print_warning(std::string(curLoop->getName()) +
+        print_warning(std::string(curLoop->getName().str()) +
                       " has hit the limitation of BRAM port, min_II is updated to " +
                       std::to_string(min_II));
         if (DEBUG)
@@ -745,7 +745,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (II_dependence > min_II)
     {
         min_II = II_dependence;
-        print_warning(std::string(curLoop->getName()) +
+        print_warning(std::string(curLoop->getName().str()) +
                       " has loop carried dependence, min_II is updated to " +
                       std::to_string(min_II));
         if (DEBUG)
@@ -962,9 +962,9 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
 {
 
     BasicBlock *Header = curLoop->getHeader();
-    std::string tmp_loop_name = Header->getParent()->getName();
+    std::string tmp_loop_name = Header->getParent()->getName().str();
     tmp_loop_name += "-";
-    tmp_loop_name += Header->getName();
+    tmp_loop_name += Header->getName().str();
     assert(IRLoop2LoopLabel.find(tmp_loop_name) != IRLoop2LoopLabel.end());
     std::string label = IRLoop2LoopLabel[tmp_loop_name];
 

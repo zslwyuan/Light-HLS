@@ -109,7 +109,7 @@ bool HI_IR2SourceCode::runOnModule(
 
     for (auto itLine : Loop2Line)
     {
-        std::string tmp_loop_name = itLine.first->getParent()->getName();
+        std::string tmp_loop_name = itLine.first->getParent()->getName().str();
         tmp_loop_name += "-";
         tmp_loop_name += itLine.first->getName();
         if (IRLoop2LoopLabel.find(tmp_loop_name) == IRLoop2LoopLabel.end())
@@ -190,7 +190,7 @@ void HI_IR2SourceCode::traceBasicBlockSourceCode(LoopInfo &LI, Function &F, DISu
                     if (auto DILoc = dyn_cast<DILocation>(N))
                     {
 
-                        if (subprog != DILoc->getScope()->getSubprogram())
+                        if (demangleFunctionName(subprog->getName().str()) != demangleFunctionName(DILoc->getScope()->getSubprogram()->getName().str()))
                             continue;
 
                         if (path == "")
@@ -438,16 +438,21 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
             // if (Block2Line_forLoop[B].first < begin_line)
             //     begin_line = Block2Line_forLoop[B].first;
         }
+
+        if (begin_line == 1000000 || cur_Loop->getNumBlocks()==1)
+            begin_line = cur_Loop->getStartLoc().getLine();
+
         if (DEBUG)
             *IR2Src_Log << "\n";
         if (DEBUG)
             *IR2Src_Log << "====SourceRang: " << path << ":" << begin_line << "--" << end_line
                         << "\n\n";
+
         Loop2Line[cur_Loop->getHeader()] = std::pair<int, int>(begin_line, end_line);
         Loop2Path[cur_Loop->getHeader()] = path;
 
         bool duplicated = 0;
-        for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName())])
+        for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName().str())])
         {
             if (tmp_line == begin_line)
             {
@@ -457,9 +462,9 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
         }
 
         if (!duplicated)
-            IRFunc2BeginLine[demangleFunctionName(F.getName())].push_back(begin_line);
+            IRFunc2BeginLine[demangleFunctionName(F.getName().str())].push_back(begin_line);
 
-        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName();
+        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName().str();
         tmp_loop_name += "-";
         tmp_loop_name += cur_Loop->getHeader()->getName();
 
@@ -513,7 +518,7 @@ void HI_IR2SourceCode::traceFunctionSourceCode(Function &F)
             if (auto DFLoc = dyn_cast<DISubprogram>(N))
             {
                 bool duplicated = 0;
-                for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName())])
+                for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName().str())])
                 {
                     if (tmp_line == DFLoc->getLine())
                     {
@@ -524,7 +529,7 @@ void HI_IR2SourceCode::traceFunctionSourceCode(Function &F)
                 if (duplicated)
                     continue;
 
-                IRFunc2BeginLine[demangleFunctionName(F.getName())].push_back(DFLoc->getLine());
+                IRFunc2BeginLine[demangleFunctionName(F.getName().str())].push_back(DFLoc->getLine());
                 if (begin_line > DFLoc->getLine() && DFLoc->getLine() > 0)
                     begin_line = DFLoc->getLine();
             }
@@ -539,7 +544,7 @@ void HI_IR2SourceCode::traceFunctionSourceCode(Function &F)
     Function2Line[&F] = std::pair<int, int>(begin_line, end_line);
 
     bool duplicated = 0;
-    for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName())])
+    for (auto tmp_line : IRFunc2BeginLine[demangleFunctionName(F.getName().str())])
     {
         if (tmp_line == begin_line)
         {
@@ -549,7 +554,7 @@ void HI_IR2SourceCode::traceFunctionSourceCode(Function &F)
     }
 
     if (!duplicated)
-        IRFunc2BeginLine[demangleFunctionName(F.getName())].push_back(begin_line);
+        IRFunc2BeginLine[demangleFunctionName(F.getName().str())].push_back(begin_line);
 
     Function2Path[&F] = path;
 }
@@ -584,6 +589,21 @@ void HI_IR2SourceCode::mappingLoopIR2LoopLabel(DISubprogram *subprogram)
     if (DEBUG)
         *IR2Src_Log << "     DebugInfo: : " << DFLoc->getDirectory() << "/" << DFLoc->getFilename()
                     << ":" << DFLoc->getLine() << "\n";
+
+
+    for (auto itLine : Loop2Line)
+    {
+        {
+            std::string tmp_loop_name = itLine.first->getParent()->getName().str();
+            tmp_loop_name += "-";
+            tmp_loop_name += itLine.first->getName();
+            if (DEBUG)
+                *IR2Src_Log
+                    << "               tmp_loop_name: " << tmp_loop_name
+                    << "in Function : " << itLine.first->getParent()->getName() 
+                    << " start at line: " << itLine.second.first << "\n";
+        }
+    }
     for (auto RMD : DFLoc->getRetainedNodes())
     {
         if (auto DLLoc = dyn_cast<DILabel>(RMD))
@@ -595,27 +615,39 @@ void HI_IR2SourceCode::mappingLoopIR2LoopLabel(DISubprogram *subprogram)
             std::string tmp_path(DFLoc->getDirectory());
             tmp_path += "/";
             tmp_path += DFLoc->getFilename();
-            std::string tmp_label = DLLoc->getName();
+            std::string tmp_label = DLLoc->getName().str();
             bool find = 0;
             for (auto itLine : Loop2Line)
             {
+                if (DEBUG)
+                {
+                    std::string tmp_loop_name = itLine.first->getParent()->getName().str();
+                    tmp_loop_name += "-";
+                    tmp_loop_name += itLine.first->getName();
+                    *IR2Src_Log
+                        << "               tmp_loop_name: " << tmp_loop_name
+                        << "in Function : " << itLine.first->getParent()->getName() 
+                        << " start at line: " << itLine.second.first << " looppath:" << Loop2Path[itLine.first] 
+                        << " labelpath:" << tmp_path << "\n";
+                }
                 if (itLine.second.first == DLLoc->getLine() && Loop2Path[itLine.first] == tmp_path)
                 {
+
                     if (!find)
                     {
                         if (DEBUG)
                             *IR2Src_Log
                                 << "               mapping to IR loop: " << itLine.first->getName()
                                 << "in Function : " << itLine.first->getParent()->getName() << "\n";
-                        std::string tmp_loop_name = itLine.first->getParent()->getName();
+                        std::string tmp_loop_name = itLine.first->getParent()->getName().str();
                         tmp_loop_name += "-";
                         tmp_loop_name += itLine.first->getName();
-                        IRLoop2LoopLabel[tmp_loop_name] = DLLoc->getName();
+                        IRLoop2LoopLabel[tmp_loop_name] = DLLoc->getName().str();
                         find = 1;
                     }
                     else
                     {
-                        std::string tmp_loop_name = itLine.first->getParent()->getName();
+                        std::string tmp_loop_name = itLine.first->getParent()->getName().str();
                         tmp_loop_name += "-";
                         tmp_loop_name += itLine.first->getName();
                         llvm::errs() << "Loop 1 (now): " << tmp_loop_name << "\n";

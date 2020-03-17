@@ -568,20 +568,20 @@ HI_NoDirectiveTimingResourceEvaluation::get_BRAM_Num_For(int width, int depth)
     return res;
 }
 
-AliasResult HI_NoDirectiveTimingResourceEvaluation::HI_AAResult::alias(const MemoryLocation &LocA,
-                                                                       const MemoryLocation &LocB)
-{
-    auto PtrA = LocA.Ptr;
-    auto PtrB = LocB.Ptr;
+// AliasResult HI_NoDirectiveTimingResourceEvaluation::HI_AAResult::alias(const MemoryLocation &LocA,
+//                                                                        const MemoryLocation &LocB)
+// {
+//     auto PtrA = LocA.Ptr;
+//     auto PtrB = LocB.Ptr;
 
-    if (PtrA != PtrA)
-    {
-        return NoAlias;
-    }
+//     if (PtrA != PtrA)
+//     {
+//         return NoAlias;
+//     }
 
-    // Forward the query to the next analysis.
-    return AAResultBase::alias(LocA, LocB);
-}
+//     // Forward the query to the next analysis.
+//     return AAResultBase::alias(LocA, LocB);
+// }
 
 bool HI_NoDirectiveTimingResourceEvaluation::hasRAWHazard(Instruction *loadI, int cycle)
 {

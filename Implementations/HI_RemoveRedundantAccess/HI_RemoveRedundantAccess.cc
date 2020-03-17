@@ -46,7 +46,7 @@ bool HI_RemoveRedundantAccess::runOnModule(
     {
         if (F.getName().find("llvm.") != std::string::npos) // bypass the "llvm.xxx" functions..
             continue;
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         findMemoryDeclarationin(&F, demangled_name == top_function_name &&
@@ -62,7 +62,7 @@ bool HI_RemoveRedundantAccess::runOnModule(
 
         SE = &getAnalysis<ScalarEvolutionWrapperPass>(F).getSE();
 
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
 

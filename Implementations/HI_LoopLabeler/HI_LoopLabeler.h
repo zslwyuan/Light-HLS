@@ -130,34 +130,34 @@ class HI_LoopLabeler_Visitor : public RecursiveASTVisitor<HI_LoopLabeler_Visitor
         }
     }
 
-    const FunctionDecl *getFunction(const Stmt &s)
-    {
-        // llvm::errs() << "going to find parent of: \n";
-        // s.dump(llvm::errs(), CI.getSourceManager());
-        for (auto nextNode : ctx.getParents(s))
-        {
-            // llvm::errs() << "go into nextNode: \n";
-            // nextNode.dump(llvm::errs(), CI.getSourceManager());
-            return getFunction(nextNode);
-        }
-        return nullptr;
-        assert(false && "the function contains the loop should be found.");
-    }
+    // const FunctionDecl *getFunction(const Stmt &s)
+    // {
+    //     // llvm::errs() << "going to find parent of: \n";
+    //     // s.dump(llvm::errs(), CI.getSourceManager());
+    //     for (auto nextNode : ctx.getParents(s))
+    //     {
+    //         // llvm::errs() << "go into nextNode: \n";
+    //         // nextNode.dump(llvm::errs(), CI.getSourceManager());
+    //         return getFunction(nextNode);
+    //     }
+    //     return nullptr;
+    //     assert(false && "the function contains the loop should be found.");
+    // }
 
-    const FunctionDecl *getFunction(clang::ast_type_traits::DynTypedNode &curNode)
-    {
+    // const FunctionDecl *getFunction(clang::ast_type_traits::DynTypedNode &curNode)
+    // {
 
-        for (auto nextNode : ctx.getParents(curNode))
-        {
-            // llvm::errs() << "go into deeper nextNode: \n";
-            // nextNode.dump(llvm::errs(),CI.getSourceManager());
-            const FunctionDecl *FD = nextNode.get<FunctionDecl>();
-            if (FD)
-                return FD;
-            return getFunction(nextNode);
-        }
-        return nullptr;
-    }
+    //     for (auto nextNode : ctx.getParents(curNode))
+    //     {
+    //         // llvm::errs() << "go into deeper nextNode: \n";
+    //         // nextNode.dump(llvm::errs(),CI.getSourceManager());
+    //         const FunctionDecl *FD = nextNode.get<FunctionDecl>();
+    //         if (FD)
+    //             return FD;
+    //         return getFunction(nextNode);
+    //     }
+    //     return nullptr;
+    // }
 
     // print the detailed information of the type
     void printTypeInfo(const clang::Type *T);
@@ -241,7 +241,7 @@ class HI_LoopLabeler_FrontendAction : public ASTFrontendAction
     {
         llvm::errs() << "** Creating AST consumer for: " << file << "\n";
         TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return llvm::make_unique<HI_LoopLabeler_ASTConsumer>(CI, TheRewriter, parselog_name);
+        return std::make_unique<HI_LoopLabeler_ASTConsumer>(CI, TheRewriter, parselog_name);
     }
 
   private:
@@ -266,9 +266,10 @@ HI_LoopLabeler_rewrite_newFrontendActionFactory(const char *_parseLog_name, Rewr
             : parseLog_name(_parseLog_name), TheRewriter(R), outputCode_name(_outputCode_name)
         {
         }
-        FrontendAction *create() override
+        std::unique_ptr<FrontendAction> create() override
         {
-            return new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str());
+            std::unique_ptr<FrontendAction> frontendaction(new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str()));
+            return std::move(frontendaction);
         }
         std::string parseLog_name;
         std::string outputCode_name;

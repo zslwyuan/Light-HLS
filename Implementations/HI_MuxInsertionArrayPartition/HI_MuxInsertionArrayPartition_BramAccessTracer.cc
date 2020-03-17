@@ -658,9 +658,9 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
                 res_array_info.sub_element_num[num_dims - 1] *
                 res_array_info.dim_size[num_dims - 1];
 
-        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName());
+        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName().str());
         std::string funcLine;
-        std::string argName(arg_v->getName());
+        std::string argName(arg_v->getName().str());
 
         for (int possibleLine : IRFunc2BeginLine[FuncName])
         {
@@ -893,24 +893,24 @@ HI_MuxInsertionArrayPartition::getAccessInfoForAccessInst(Instruction *Load_or_S
     return AddressInst2AccessInfo[address_addI];
 }
 
-AliasResult HI_MuxInsertionArrayPartition::HI_AAResult::alias(const MemoryLocation &LocA,
-                                                              const MemoryLocation &LocB)
-{
-    //   auto PtrA = LocA.Ptr;
-    //   auto PtrB = LocB.Ptr;
+// AliasResult HI_MuxInsertionArrayPartition::HI_AAResult::alias(const MemoryLocation &LocA,
+//                                                               const MemoryLocation &LocB)
+// {
+//     //   auto PtrA = LocA.Ptr;
+//     //   auto PtrB = LocB.Ptr;
 
-    //   if (PtrA != PtrA) {
-    //     return NoAlias;
-    //   }
-    // NO USE
-    // NO USE
-    // NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // NO USE// NO USE// NO USE// NO USE
-    // Forward the query to the next analysis.
-    return AAResultBase::alias(LocA, LocB);
-}
+//     //   if (PtrA != PtrA) {
+//     //     return NoAlias;
+//     //   }
+//     // NO USE
+//     // NO USE
+//     // NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // NO USE// NO USE// NO USE// NO USE
+//     // Forward the query to the next analysis.
+//     return AAResultBase::alias(LocA, LocB);
+// }
 
 Value *HI_MuxInsertionArrayPartition::getTargetFromInst(Instruction *accessI)
 {

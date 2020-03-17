@@ -77,9 +77,9 @@ bool HI_MuxInsertionArrayPartition::MuxInsert(BasicBlock *B)
                         {
                             muxWithMoreThan32 = 1;
                             std::string tmp_loop_name =
-                                LI->getLoopFor(B)->getHeader()->getParent()->getName();
+                                LI->getLoopFor(B)->getHeader()->getParent()->getName().str();
                             tmp_loop_name += "-";
-                            tmp_loop_name += LI->getLoopFor(B)->getHeader()->getName();
+                            tmp_loop_name += LI->getLoopFor(B)->getHeader()->getName().str();
                             muxTooMuchLoopIRName = tmp_loop_name;
                             return true;
                         }

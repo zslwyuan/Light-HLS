@@ -261,7 +261,7 @@ class HI_FunctionInterfaceInfo_FrontendAction : public ASTFrontendAction
     {
         llvm::errs() << "** Creating AST consumer for: " << file << "\n";
         TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return llvm::make_unique<HI_FunctionInterfaceInfo_ASTConsumer>(
+        return std::make_unique<HI_FunctionInterfaceInfo_ASTConsumer>(
             CI, TheRewriter, parselog_name, FuncParamLine2OutermostSize, topFunctioName,
             functionAllInline);
     }
@@ -297,10 +297,12 @@ HI_FunctionInterfaceInfo_rewrite_newFrontendActionFactory(
               topFunctioName(topFunctioName), functionAllInline(functionAllInline)
         {
         }
-        FrontendAction *create() override
+
+        std::unique_ptr<FrontendAction>  create() override
         {
-            return new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str(),
-                         FuncParamLine2OutermostSize, topFunctioName, functionAllInline);
+            std::unique_ptr<FrontendAction> frontendaction(new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str(),
+                         FuncParamLine2OutermostSize, topFunctioName, functionAllInline));
+            return std::move(frontendaction);
         }
         std::string parseLog_name;
         std::string outputCode_name;

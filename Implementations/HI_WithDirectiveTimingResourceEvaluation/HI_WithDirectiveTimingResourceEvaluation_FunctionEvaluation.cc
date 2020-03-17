@@ -70,8 +70,8 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeFunction(Function *F)
     // (4) mark the blocks in loop with the loop latency, so later processing can regard this loop
     // as an integration
 
-    FuncName2Latency[F->getName()] = FunctionLatency[F];
-    FuncName2Resource[F->getName()] = FunctionResource[F];
+    FuncName2Latency[F->getName().str()] = FunctionLatency[F];
+    FuncName2Resource[F->getName().str()] = FunctionResource[F];
     FunctionEvaluated.insert(F);
 
     // print related information for the function when debugging
@@ -105,7 +105,7 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeFunction(Function *F)
 
     for (auto tmp_Loop : LI->getLoopsInPreorder())
     {
-        FuncName2LoopIRNames[F->getName()].push_back(tmp_Loop->getHeader()->getName());
+        FuncName2LoopIRNames[F->getName().str()].push_back(tmp_Loop->getHeader()->getName().str());
     }
 
     // casting the latency into cycles based. e.g. 3 cycles + 2.5ns  -->  4 cycles
@@ -375,7 +375,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleFPDSPOperators_forFuncti
 // for it
 void HI_WithDirectiveTimingResourceEvaluation::functionDataflowCheck(Function *F)
 {
-    std::string functionDemangleName = demangleFunctionName(F->getName());
+    std::string functionDemangleName = demangleFunctionName(F->getName().str());
 
     if (F->getName().find(".") != std::string::npos)
         return;
@@ -392,6 +392,8 @@ void HI_WithDirectiveTimingResourceEvaluation::functionDataflowCheck(Function *F
         if (isInLoop(&B))
         {
             llvm::errs() << "DATAFLOW ERROR: loop in function: [" << functionDemangleName << "]\n";
+            // print_warning("there should not be any loop in the function (original loops should "
+            //                 "be extracted into sub-functions)");
             assert(false && "there should not be any loop in the function (original loops should "
                             "be extracted into sub-functions)");
         }
@@ -593,7 +595,7 @@ void HI_WithDirectiveTimingResourceEvaluation::functionDataflowCheck(Function *F
 // check whether the function is applied with dataflow pragma
 bool HI_WithDirectiveTimingResourceEvaluation::isFunctionDataflow(Function *F)
 {
-    std::string functionDemangleName = demangleFunctionName(F->getName());
+    std::string functionDemangleName = demangleFunctionName(F->getName().str());
 
     bool dataflowEnable = false;
     for (auto func_dataflow_pair : configInfo.funcDataflowConfigs)

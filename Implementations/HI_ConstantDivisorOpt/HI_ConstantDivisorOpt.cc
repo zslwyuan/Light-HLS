@@ -152,7 +152,7 @@ Value *HI_ConstantDivisorOpt::generateUnsignedDivisionByConstant(Value *Dividend
     if (magics.a != 0 && !d[0])
     {
         unsigned s = d.countTrailingZeros();
-        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, s, false));
+        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, s));
         Q = Builder.CreateLShr(Q, Shift);
 
         // Get magic number for the shifted divisor.
@@ -161,22 +161,22 @@ Value *HI_ConstantDivisorOpt::generateUnsignedDivisionByConstant(Value *Dividend
     }
 
     // Multiply the numerator (operand 0) by the magic value
-    ConstantInt *Magics = Builder.getInt(APInt(BitWidth, magics.m.getZExtValue(), false));
+    ConstantInt *Magics = Builder.getInt(APInt(BitWidth, magics.m.getZExtValue()));
     Q = Builder.CreateMul(Q, Magics);
 
     if (magics.a == 0)
     {
         assert(magics.s < d.getBitWidth() && "We shouldn't generate an undefined shift!");
-        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, magics.s, false));
+        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, magics.s));
         Q = Builder.CreateLShr(Q, Shift);
     }
     else
     {
         Value *NPQ = Builder.CreateSub(Dividend, Q);
-        ConstantInt *One = Builder.getInt(APInt(BitWidth, 1, false));
+        ConstantInt *One = Builder.getInt(APInt(BitWidth, 1));
         NPQ = Builder.CreateLShr(NPQ, One);
         NPQ = Builder.CreateAdd(NPQ, Q);
-        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, magics.s - 1, false));
+        ConstantInt *Shift = Builder.getInt(APInt(BitWidth, magics.s - 1));
         Q = Builder.CreateLShr(NPQ, Shift);
     }
 

@@ -22,7 +22,7 @@ bool HI_ArrayAccessPattern::runOnFunction(
 {
     ScalarEvolution &SE = getAnalysis<ScalarEvolutionWrapperPass>().getSE();
 
-    std::string demangled_name = demangleFunctionName(F.getName());
+    std::string demangled_name = demangleFunctionName(F.getName().str());
     bool isTopFunction = top_function_name == demangled_name;
 
     TraceMemoryAccessinFunction(F);

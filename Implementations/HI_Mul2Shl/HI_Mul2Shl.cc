@@ -71,7 +71,7 @@ bool HI_Mul2Shl::runOnFunction(
                             if (DEBUG)
                                 *Mul2ShlLog << "\n\nbefore replacement:\n\n" << B;
                             IRBuilder<> Builder(&I);
-                            std::string oriName = I.getName();
+                            std::string oriName = I.getName().str();
                             Value *Shl0 = Builder.CreateShl(VarForMul, i - 1, oriName + ".shl.0");
                             Value *Shl1 =
                                 Builder.CreateShl(VarForMul, log2int(addVal), oriName + ".shl.1");
@@ -89,7 +89,7 @@ bool HI_Mul2Shl::runOnFunction(
                             if (DEBUG)
                                 *Mul2ShlLog << "\n\nbefore replacement:\n\n" << B;
                             IRBuilder<> Builder(&I);
-                            std::string oriName = I.getName();
+                            std::string oriName = I.getName().str();
                             Value *Shl0 = Builder.CreateShl(VarForMul, i, oriName + ".shl.0");
                             Value *Shl1 =
                                 Builder.CreateShl(VarForMul, log2int(subVal), oriName + ".shl.1");

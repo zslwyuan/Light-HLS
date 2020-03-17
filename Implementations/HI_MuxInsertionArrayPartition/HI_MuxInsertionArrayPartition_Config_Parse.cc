@@ -423,10 +423,10 @@ void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target,
     {
         if (pragma.HI_PragmaInfoType == HI_PragmaInfo::arrayPartition_Pragma)
         {
-            if (target->getName() == pragma.targetStr)
+            if (target->getName().str() == pragma.targetStr)
             {
                 Function *F = getFunctionOfValue(target);
-                std::string nameOfFunction = demangleFunctionName(F->getName());
+                std::string nameOfFunction = demangleFunctionName(F->getName().str());
                 assert(F && "the parent function of the value should be found.");
                 if (nameOfFunction != pragma.scopeStr)
                 {
@@ -447,10 +447,10 @@ void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target,
         }
         else if (pragma.HI_PragmaInfoType == HI_PragmaInfo::arrayPortNum_Pragma)
         {
-            if (target->getName() == pragma.targetStr)
+            if (target->getName().str() == pragma.targetStr)
             {
                 Function *F = getFunctionOfValue(target);
-                std::string nameOfFunction = demangleFunctionName(F->getName());
+                std::string nameOfFunction = demangleFunctionName(F->getName().str());
                 assert(F && "the parent function of the value should be found.");
                 if (nameOfFunction != pragma.scopeStr)
                 {
