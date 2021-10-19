@@ -655,7 +655,12 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
                     if (LoopLabel2II.find(label) != LoopLabel2II.end())
                     {
                         print_warning("Failed to pipeline the loop [" + label +
+<<<<<<< HEAD
                                       "] due to subfunction(s) ["+ callI->getCalledFunction()->getName().str() +"] called in it.\n");
+=======
+                                      "] due to subfunction(s) ["+ callI->getCalledFunction()->getName().str() 
+                                      +"] called in it.\n");
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
                         LoopLabel2SmallestII[label] = 1000000000;
                         return -1;
                     }

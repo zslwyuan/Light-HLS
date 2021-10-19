@@ -1413,7 +1413,10 @@ HI_ArraySensitiveToLoopLevel::getAccessInfoForAccessInst(Instruction *Load_or_St
     return AddressInst2AccessInfo[address_addI];
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 
 bool HI_ArraySensitiveToLoopLevel::checkAccessAlias(Instruction *I0, Instruction *I1)
 {

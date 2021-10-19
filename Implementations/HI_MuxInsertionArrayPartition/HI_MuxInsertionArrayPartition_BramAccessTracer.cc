@@ -893,6 +893,7 @@ HI_MuxInsertionArrayPartition::getAccessInfoForAccessInst(Instruction *Load_or_S
     return AddressInst2AccessInfo[address_addI];
 }
 
+<<<<<<< HEAD
 // AliasResult HI_MuxInsertionArrayPartition::HI_AAResult::alias(const MemoryLocation &LocA,
 //                                                               const MemoryLocation &LocB)
 // {
@@ -911,6 +912,8 @@ HI_MuxInsertionArrayPartition::getAccessInfoForAccessInst(Instruction *Load_or_S
 //     // Forward the query to the next analysis.
 //     return AAResultBase::alias(LocA, LocB);
 // }
+=======
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 
 Value *HI_MuxInsertionArrayPartition::getTargetFromInst(Instruction *accessI)
 {

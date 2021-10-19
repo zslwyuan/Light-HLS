@@ -314,6 +314,10 @@ class HI_VarWidthReduce : public FunctionPass
     // instruction, trunc/ext the operands, update the bitwidth of the instruction
     void Store_WidthCast(StoreInst *S_I);
 
+    // Forward Process of StoreOperator: check the bitwidth of operands and output of an
+    // instruction, trunc/ext the operands, update the bitwidth of the instruction
+    void Store_WidthCast(StoreInst *S_I);
+
     // Forward Process of ICmpInst: check the bitwidth of operands and output of an instruction,
     // trunc/ext the operands, update the bitwidth of the instruction
     void ICMP_WidthCast(ICmpInst *ICMP_I);

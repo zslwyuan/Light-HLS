@@ -438,7 +438,11 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
             // if (Block2Line_forLoop[B].first < begin_line)
             //     begin_line = Block2Line_forLoop[B].first;
         }
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
         if (begin_line == 1000000 || cur_Loop->getNumBlocks()==1)
             begin_line = cur_Loop->getStartLoc().getLine();
 

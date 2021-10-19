@@ -989,6 +989,10 @@ void HI_VarWidthReduce::BOI_WidthCast(llvm::BinaryOperator *BOI)
     // VarWidthChangeLog->flush();
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 // Forward Process of StoreOperator: check the bitwidth of operands and output of an instruction,
 // trunc/ext the operands, update the bitwidth of the instruction
 void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
@@ -1004,7 +1008,11 @@ void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
     // check whether an instruction involve PTI operation
     PointerType* PtrType = dyn_cast<PointerType>(S_I->getPointerOperandType());
     assert(PtrType);
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
     Instruction_BitNeeded[&I] = PtrType->getElementType()->getIntegerBitWidth();
 
     for (int i = 0; i <= 0;
@@ -1102,6 +1110,11 @@ void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
 }
 
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 // Forward Process of ICmpInst: check the bitwidth of operands and output of an instruction,
 // trunc/ext the operands, update the bitwidth of the instruction
 void HI_VarWidthReduce::ICMP_WidthCast(ICmpInst *ICMP_I)

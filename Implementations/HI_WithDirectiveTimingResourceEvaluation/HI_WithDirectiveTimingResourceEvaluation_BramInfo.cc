@@ -1721,6 +1721,7 @@ HI_WithDirectiveTimingResourceEvaluation::getAccessInfoForAccessInst(Instruction
     return AddressInst2AccessInfo[address_addI];
 }
 
+<<<<<<< HEAD
 // AliasResult HI_WithDirectiveTimingResourceEvaluation::HI_AAResult::alias(const MemoryLocation &LocA,
 //                                                                          const MemoryLocation &LocB)
 // {
@@ -1739,6 +1740,8 @@ HI_WithDirectiveTimingResourceEvaluation::getAccessInfoForAccessInst(Instruction
 //     // Forward the query to the next analysis.
 //     return AAResultBase::alias(LocA, LocB);
 // }
+=======
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 
 bool HI_WithDirectiveTimingResourceEvaluation::checkAccessAlias(Instruction *I0, Instruction *I1)
 {

@@ -1012,6 +1012,7 @@ class HI_MuxInsertionArrayPartition : public ModulePass
     // get the array information, including the dimension, type and size
     HI_ArrayInfo getArrayInfo(Value *target);
 
+<<<<<<< HEAD
     // class HI_AAResult : public AAResultBase<HI_AAResult>
     // {
     //   public:
@@ -1024,6 +1025,8 @@ class HI_MuxInsertionArrayPartition : public ModulePass
 
     //     AliasResult alias(const MemoryLocation &LocA, const MemoryLocation &LocB);
     // };
+=======
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////// Parse the configuration for the program //////////////////////////////

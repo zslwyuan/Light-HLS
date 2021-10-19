@@ -1491,6 +1491,10 @@ class HI_ArraySensitiveToLoopLevel : public ModulePass
     // get the array information, including the dimension, type and size
     HI_ArrayInfo getArrayInfo(Value *target);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
     // check whether there is MUST-alias access for the instruction in its basic block
     void checkAliasFor(Instruction *I);
 

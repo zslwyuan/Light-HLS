@@ -410,7 +410,12 @@ int main(int argc, const char **argv)
     // HI_SimpleTimingEvaluation Pass"); PM.add(hi_simpletimingevaluation);
 
     auto hi_MuxInsertionArrayPartition = new HI_MuxInsertionArrayPartition(
+<<<<<<< HEAD
         configFile_str.c_str(), top_str.c_str(), FuncParamLine2OutermostSize, IRFunc2BeginLine,
+=======
+        configFile_str.c_str(), top_str.c_str(), 
+        FuncParamLine2OutermostSize, IRFunc2BeginLine,
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
         (argc == 5 && std::string(argv[4]) == "DEBUG"));
 
     print_info("Enable HI_MuxInsertionArrayPartition Pass");

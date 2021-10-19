@@ -44,7 +44,11 @@ int main(int argc, const char **argv)
     std::map<std::string, int> LoopLabel2II;
 
     all_sub_function_inline = 0;
+<<<<<<< HEAD
     dataflowApplied = false;;
+=======
+    dataflowApplied = false;
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
     Parse_Config(configFile_str.c_str(), LoopLabel2UnrollFactor, LoopLabel2II);
     clangPreProcess(argv, top_str, FuncParamLine2OutermostSize);
 
@@ -149,7 +153,10 @@ int main(int argc, const char **argv)
             auto CFGSimplification_pass22_pre_loopextract = createCFGSimplificationPass();
             PM_pre.add(CFGSimplification_pass22_pre_loopextract);
             print_info("Enable CFGSimplificationPass Pass");
+<<<<<<< HEAD
             
+=======
+>>>>>>> 0456f98906549e8ec1f7640f12c76ab0afd256fe
         }
 
 
