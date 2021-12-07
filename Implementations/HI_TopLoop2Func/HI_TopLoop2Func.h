@@ -53,7 +53,6 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
@@ -106,7 +105,6 @@
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/ConstantRange.h"
 #include "llvm/IR/Constants.h"
@@ -165,7 +163,6 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Optional.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Intrinsics.h"
@@ -208,13 +205,11 @@ using namespace llvm;
 class HI_TopLoop2Func : public ModulePass
 {
   public:
-    HI_TopLoop2Func(const char *IR2Src_Log_Name,
-                    std::map<std::string, std::string> &TopLoopIR2FuncName,
+    HI_TopLoop2Func(const char *IR2Src_Log_Name, std::map<std::string, std::string> &TopLoopIR2FuncName,
                     std::vector<std::string> &FuncNames, std::string top_str, bool DEBUG = false)
         :
 
-          ModulePass(ID), TopLoopIR2FuncName(TopLoopIR2FuncName), FuncNames(FuncNames),
-          top_str(top_str), DEBUG(DEBUG)
+          ModulePass(ID), TopLoopIR2FuncName(TopLoopIR2FuncName), FuncNames(FuncNames), top_str(top_str), DEBUG(DEBUG)
     {
         Instruction_Counter = 0;
         Function_Counter = 0;

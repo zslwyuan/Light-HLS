@@ -202,8 +202,8 @@ using namespace llvm::PatternMatch;
 
 char HI_SeparateConstOffsetFromGEP::ID = 0;
 
-bool HI_ConstantOffsetExtractor::CanTraceInto(bool SignExtended, bool ZeroExtended,
-                                              BinaryOperator *BO, bool NonNegative)
+bool HI_ConstantOffsetExtractor::CanTraceInto(bool SignExtended, bool ZeroExtended, BinaryOperator *BO,
+                                              bool NonNegative)
 {
     // We only consider ADD, SUB and OR, because a non-zero constant found in
     // expressions composed of these operations can be easily hoisted as a
@@ -268,8 +268,7 @@ bool HI_ConstantOffsetExtractor::CanTraceInto(bool SignExtended, bool ZeroExtend
     return true;
 }
 
-APInt HI_ConstantOffsetExtractor::findInEitherOperand(BinaryOperator *BO, bool SignExtended,
-                                                      bool ZeroExtended)
+APInt HI_ConstantOffsetExtractor::findInEitherOperand(BinaryOperator *BO, bool SignExtended, bool ZeroExtended)
 {
     // BO being non-negative does not shed light on whether its operands are
     // non-negative. Clear the NonNegative flag here.
@@ -291,8 +290,7 @@ APInt HI_ConstantOffsetExtractor::findInEitherOperand(BinaryOperator *BO, bool S
     return ConstantOffset;
 }
 
-APInt HI_ConstantOffsetExtractor::find(Value *V, bool SignExtended, bool ZeroExtended,
-                                       bool NonNegative)
+APInt HI_ConstantOffsetExtractor::find(Value *V, bool SignExtended, bool ZeroExtended, bool NonNegative)
 {
     // TODO(jingyue): We could trace into integer/pointer casts, such as
     // inttoptr, ptrtoint, bitcast, and addrspacecast. We choose to handle only
@@ -318,13 +316,11 @@ APInt HI_ConstantOffsetExtractor::find(Value *V, bool SignExtended, bool ZeroExt
     }
     else if (isa<TruncInst>(V))
     {
-        ConstantOffset =
-            find(U->getOperand(0), SignExtended, ZeroExtended, NonNegative).trunc(BitWidth);
+        ConstantOffset = find(U->getOperand(0), SignExtended, ZeroExtended, NonNegative).trunc(BitWidth);
     }
     else if (isa<SExtInst>(V))
     {
-        ConstantOffset = find(U->getOperand(0), /* SignExtended */ true, ZeroExtended, NonNegative)
-                             .sext(BitWidth);
+        ConstantOffset = find(U->getOperand(0), /* SignExtended */ true, ZeroExtended, NonNegative).sext(BitWidth);
     }
     else if (isa<ZExtInst>(V))
     {
@@ -487,8 +483,7 @@ Value *HI_ConstantOffsetExtractor::Extract(Value *Idx, GetElementPtrInst *GEP, U
 {
     HI_ConstantOffsetExtractor Extractor(GEP, DT);
     // Find a non-zero constant offset first.
-    APInt ConstantOffset =
-        Extractor.find(Idx, /* SignExtended */ false, /* ZeroExtended */ false, GEP->isInBounds());
+    APInt ConstantOffset = Extractor.find(Idx, /* SignExtended */ false, /* ZeroExtended */ false, GEP->isInBounds());
     if (ConstantOffset == 0)
     {
         UserChainTail = nullptr;
@@ -500,8 +495,7 @@ Value *HI_ConstantOffsetExtractor::Extract(Value *Idx, GetElementPtrInst *GEP, U
     return IdxWithoutConstOffset;
 }
 
-int64_t HI_ConstantOffsetExtractor::Find(Value *Idx, GetElementPtrInst *GEP,
-                                         const DominatorTree *DT)
+int64_t HI_ConstantOffsetExtractor::Find(Value *Idx, GetElementPtrInst *GEP, const DominatorTree *DT)
 {
     // If Idx is an index of an inbound GEP, Idx is guaranteed to be non-negative.
     return HI_ConstantOffsetExtractor(GEP, DT)
@@ -529,8 +523,7 @@ bool HI_SeparateConstOffsetFromGEP::canonicalizeArrayIndicesToPointerSize(GetEle
     return Changed;
 }
 
-int64_t HI_SeparateConstOffsetFromGEP::accumulateByteOffset(GetElementPtrInst *GEP,
-                                                            bool &NeedsExtraction)
+int64_t HI_SeparateConstOffsetFromGEP::accumulateByteOffset(GetElementPtrInst *GEP, bool &NeedsExtraction)
 {
     NeedsExtraction = false;
     int64_t AccumulativeByteOffset = 0;
@@ -549,9 +542,8 @@ int64_t HI_SeparateConstOffsetFromGEP::accumulateByteOffset(GetElementPtrInst *G
                 // the original GEP with this byte offset.
 
                 AccumulativeByteOffset +=
-                    ConstantOffset *
-                    getLength(GTI.getIndexedType()); // HI-MODIFICATION: In HLS, data are not stored
-                                                     // in bytes.
+                    ConstantOffset * getLength(GTI.getIndexedType()); // HI-MODIFICATION: In HLS, data are not stored
+                                                                      // in bytes.
             }
         }
         else if (LowerGEP)
@@ -571,8 +563,7 @@ int64_t HI_SeparateConstOffsetFromGEP::accumulateByteOffset(GetElementPtrInst *G
     return AccumulativeByteOffset;
 }
 
-void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(GetElementPtrInst *Variadic,
-                                                           int64_t AccumulativeByteOffset)
+void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(GetElementPtrInst *Variadic, int64_t AccumulativeByteOffset)
 {
     if (DEBUG)
         *Sep_Log << "\nlowering GEP (lowerToSingleIndexGEPs): " << *Variadic << "\n";
@@ -583,8 +574,7 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(GetElementPtrInst *Va
     Value *ResultPtr = Variadic->getOperand(0);
     Loop *L = LI->getLoopFor(Variadic->getParent());
     // Check if the base is not loop invariant or used more than once.
-    bool isSwapCandidate =
-        L && L->isLoopInvariant(ResultPtr) && !hasMoreThanOneUseInLoop(ResultPtr, L);
+    bool isSwapCandidate = L && L->isLoopInvariant(ResultPtr) && !hasMoreThanOneUseInLoop(ResultPtr, L);
     Value *FirstResult = nullptr;
 
     if (ResultPtr->getType() != I8PtrTy)
@@ -603,18 +593,16 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(GetElementPtrInst *Va
                 if (CI->isZero())
                     continue;
 
-            APInt ElementSize =
-                APInt(IntPtrTy->getIntegerBitWidth(), // 1);   //HI-MODIFICATION: we don't need to
-                                                      // calculate by byte in HLS
-                      getLength(GTI.getIndexedType()));
+            APInt ElementSize = APInt(IntPtrTy->getIntegerBitWidth(), // 1);   //HI-MODIFICATION: we don't need to
+                                                                      // calculate by byte in HLS
+                                      getLength(GTI.getIndexedType()));
 
             // Scale the index by element size.
             if (ElementSize != 1)
             {
                 if (ElementSize.isPowerOf2())
                 {
-                    Idx =
-                        Builder.CreateShl(Idx, ConstantInt::get(IntPtrTy, ElementSize.logBase2()));
+                    Idx = Builder.CreateShl(Idx, ConstantInt::get(IntPtrTy, ElementSize.logBase2()));
                 }
                 else
                 {
@@ -652,8 +640,7 @@ void HI_SeparateConstOffsetFromGEP::lowerToSingleIndexGEPs(GetElementPtrInst *Va
     Variadic->eraseFromParent();
 }
 
-void HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic,
-                                                       int64_t AccumulativeByteOffset)
+void HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variadic, int64_t AccumulativeByteOffset)
 {
     IRBuilder<> Builder(Variadic);
     Type *IntPtrTy = DL->getIntPtrType(Variadic->getType());
@@ -688,23 +675,20 @@ void HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variad
             if (DEBUG)
                 *Sep_Log << " --- handling IndexedType " << *GTI.getIndexedType() << "\n";
             if (DEBUG)
-                *Sep_Log << " --- handling TypeAllocSize "
-                         << DL->getTypeAllocSize(GTI.getIndexedType()) << "\n";
+                *Sep_Log << " --- handling TypeAllocSize " << DL->getTypeAllocSize(GTI.getIndexedType()) << "\n";
             if (DEBUG)
                 *Sep_Log << " --- handling Length " << getLength(GTI.getIndexedType()) << "\n";
             if (DEBUG)
                 Sep_Log->flush();
-            APInt ElementSize =
-                APInt(IntPtrTy->getIntegerBitWidth(), // HI-MODIFICATION: we don't need to calculate
-                                                      // by byte in HLS
-                      getLength(GTI.getIndexedType()));
+            APInt ElementSize = APInt(IntPtrTy->getIntegerBitWidth(), // HI-MODIFICATION: we don't need to calculate
+                                                                      // by byte in HLS
+                                      getLength(GTI.getIndexedType()));
             // Scale the index by element size.
             if (ElementSize != 1)
             {
                 if (ElementSize.isPowerOf2())
                 {
-                    Idx =
-                        Builder.CreateShl(Idx, ConstantInt::get(IntPtrTy, ElementSize.logBase2()));
+                    Idx = Builder.CreateShl(Idx, ConstantInt::get(IntPtrTy, ElementSize.logBase2()));
                 }
                 else
                 {
@@ -733,8 +717,7 @@ void HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variad
     {
         if (tmp_ResultPtr)
         {
-            tmp_ResultPtr = Builder.CreateAdd(tmp_ResultPtr,
-                                              ConstantInt::get(IntPtrTy, AccumulativeByteOffset));
+            tmp_ResultPtr = Builder.CreateAdd(tmp_ResultPtr, ConstantInt::get(IntPtrTy, AccumulativeByteOffset));
         }
         else
         {
@@ -776,8 +759,7 @@ void HI_SeparateConstOffsetFromGEP::lowerToArithmetics(GetElementPtrInst *Variad
 bool HI_SeparateConstOffsetFromGEP::splitGEP(GetElementPtrInst *GEP)
 {
     if (DEBUG)
-        *Sep_Log << "\n================================================\nSplitting GEP : " << *GEP
-                 << "\n";
+        *Sep_Log << "\n================================================\nSplitting GEP : " << *GEP << "\n";
     // Skip vector GEPs.
     if (GEP->getType()->isVectorTy())
     {
@@ -811,8 +793,7 @@ bool HI_SeparateConstOffsetFromGEP::splitGEP(GetElementPtrInst *GEP)
         //   return Changed;
     }
 
-    TargetTransformInfo &TTI =
-        getAnalysis<TargetTransformInfoWrapperPass>().getTTI(*GEP->getFunction());
+    TargetTransformInfo &TTI = getAnalysis<TargetTransformInfoWrapperPass>().getTTI(*GEP->getFunction());
 
     // If LowerGEP is disabled, before really splitting the GEP, check whether the
     // backend supports the addressing mode we are about to produce. If no, this
@@ -947,9 +928,8 @@ bool HI_SeparateConstOffsetFromGEP::splitGEP(GetElementPtrInst *GEP)
         // Very likely. As long as %gep is naturally aligned, the byte offset we
         // extracted should be a multiple of sizeof(*%gep).
         int64_t Index = AccumulativeByteOffset / ElementTypeSizeOfGEP;
-        NewGEP =
-            GetElementPtrInst::Create(GEP->getResultElementType(), NewGEP,
-                                      ConstantInt::get(IntPtrTy, Index, true), GEP->getName(), GEP);
+        NewGEP = GetElementPtrInst::Create(GEP->getResultElementType(), NewGEP, ConstantInt::get(IntPtrTy, Index, true),
+                                           GEP->getName(), GEP);
         NewGEP->copyMetadata(*GEP);
         // Inherit the inbounds attribute of the original GEP.
         cast<GetElementPtrInst>(NewGEP)->setIsInBounds(GEPWasInBounds);
@@ -973,8 +953,7 @@ bool HI_SeparateConstOffsetFromGEP::splitGEP(GetElementPtrInst *GEP)
         Type *I8PtrTy = Type::getInt8PtrTy(GEP->getContext(), GEP->getPointerAddressSpace());
         NewGEP = new BitCastInst(NewGEP, I8PtrTy, "", GEP);
         NewGEP = GetElementPtrInst::Create(Type::getInt8Ty(GEP->getContext()), NewGEP,
-                                           ConstantInt::get(IntPtrTy, AccumulativeByteOffset, true),
-                                           "uglygep", GEP);
+                                           ConstantInt::get(IntPtrTy, AccumulativeByteOffset, true), "uglygep", GEP);
         NewGEP->copyMetadata(*GEP);
         // Inherit the inbounds attribute of the original GEP.
         cast<GetElementPtrInst>(NewGEP)->setIsInBounds(GEPWasInBounds);
@@ -1055,8 +1034,7 @@ bool HI_SeparateConstOffsetFromGEP::runOnFunction(Function &F)
     }
 
     if (DEBUG)
-        *Sep_Log << "\n\n after constant hoisting, F=\n"
-                 << F << "\n================================\n";
+        *Sep_Log << "\n\n after constant hoisting, F=\n" << F << "\n================================\n";
     if (DEBUG)
         Sep_Log->flush();
 
@@ -1079,8 +1057,7 @@ bool HI_SeparateConstOffsetFromGEP::runOnFunction(Function &F)
     return Changed;
 }
 
-Instruction *HI_SeparateConstOffsetFromGEP::findClosestMatchingDominator(const SCEV *Key,
-                                                                         Instruction *Dominatee)
+Instruction *HI_SeparateConstOffsetFromGEP::findClosestMatchingDominator(const SCEV *Key, Instruction *Dominatee)
 {
     auto Pos = DominatingExprs.find(Key);
     if (Pos == DominatingExprs.end())
@@ -1129,10 +1106,9 @@ bool HI_SeparateConstOffsetFromGEP::reuniteExts(Instruction *I)
     }
 
     // Add I to DominatingExprs if it's an add/sub that can't sign overflow.
-    if (match(I, m_NSWAdd(m_Value(LHS), m_Value(RHS))) ||
-        match(I, m_NSWSub(m_Value(LHS), m_Value(RHS))))
+    if (match(I, m_NSWAdd(m_Value(LHS), m_Value(RHS))) || match(I, m_NSWSub(m_Value(LHS), m_Value(RHS))))
     {
-        if (programUndefinedIfFullPoison(I))
+        if (programUndefinedIfPoison(I))
         {
             const SCEV *Key = SE->getAddExpr(SE->getUnknown(LHS), SE->getUnknown(RHS));
             DominatingExprs[Key].push_back(I);
@@ -1174,8 +1150,7 @@ void HI_SeparateConstOffsetFromGEP::verifyNoDeadCode(Function &F)
     }
 }
 
-bool HI_SeparateConstOffsetFromGEP::isLegalToSwapOperand(GetElementPtrInst *FirstGEP,
-                                                         GetElementPtrInst *SecondGEP,
+bool HI_SeparateConstOffsetFromGEP::isLegalToSwapOperand(GetElementPtrInst *FirstGEP, GetElementPtrInst *SecondGEP,
                                                          Loop *CurLoop)
 {
     if (!FirstGEP || !FirstGEP->hasOneUse())
@@ -1215,8 +1190,7 @@ bool HI_SeparateConstOffsetFromGEP::isLegalToSwapOperand(GetElementPtrInst *Firs
     //   %uglygep161 = getelementptr i8* %uglygep160, i64 -1024
 
     // Skip constant shift instruction which may be generated by Splitting GEPs.
-    if (FirstOffsetDef && FirstOffsetDef->isShift() &&
-        isa<ConstantInt>(FirstOffsetDef->getOperand(1)))
+    if (FirstOffsetDef && FirstOffsetDef->isShift() && isa<ConstantInt>(FirstOffsetDef->getOperand(1)))
         FirstOffsetDef = dyn_cast<Instruction>(FirstOffsetDef->getOperand(0));
 
     // Give up if FirstOffsetDef is an Add or Sub with constant.
@@ -1245,8 +1219,7 @@ bool HI_SeparateConstOffsetFromGEP::hasMoreThanOneUseInLoop(Value *V, Loop *L)
     return false;
 }
 
-void HI_SeparateConstOffsetFromGEP::swapGEPOperand(GetElementPtrInst *First,
-                                                   GetElementPtrInst *Second)
+void HI_SeparateConstOffsetFromGEP::swapGEPOperand(GetElementPtrInst *First, GetElementPtrInst *Second)
 {
     Value *Offset1 = First->getOperand(1);
     Value *Offset2 = Second->getOperand(1);

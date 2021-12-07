@@ -125,11 +125,9 @@ LLVMXCoreDisassembler
 LLVMXCoreCodeGen 
 LLVMXCoreDesc 
 LLVMXCoreInfo 
-LLVMXCoreAsmPrinter 
 LLVMObjectYAML 
 LLVMLibDriver 
 LLVMOption 
-LLVMOptRemarks 
 LLVMWindowsManifest 
 LLVMTextAPI 
 LLVMFuzzMutate 
@@ -142,8 +140,6 @@ LLVMAsmPrinter
 LLVMX86Desc 
 LLVMMCDisassembler 
 LLVMX86Info 
-LLVMX86AsmPrinter 
-LLVMX86Utils 
 LLVMMCJIT 
 LLVMLineEditor 
 LLVMInterpreter 

@@ -53,7 +53,6 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
@@ -106,7 +105,6 @@
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/ConstantRange.h"
 #include "llvm/IR/Constants.h"
@@ -165,7 +163,6 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Optional.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Intrinsics.h"
@@ -209,8 +206,7 @@ using namespace llvm;
 class HI_RemoveRedundantAccess : public ModulePass
 {
   public:
-    HI_RemoveRedundantAccess(const char *RemoveRedundantLoad_Log_Name, std::string tp_name,
-                             bool DEBUG = false)
+    HI_RemoveRedundantAccess(const char *RemoveRedundantLoad_Log_Name, std::string tp_name, bool DEBUG = false)
         : ModulePass(ID), DEBUG(DEBUG)
     {
         Instruction_Counter = 0;
@@ -218,8 +214,7 @@ class HI_RemoveRedundantAccess : public ModulePass
         BasicBlock_Counter = 0;
         Loop_Counter = 0;
         callCounter = 0;
-        RemoveRedundantAccess_Log =
-            new raw_fd_ostream(RemoveRedundantLoad_Log_Name, ErrInfo, sys::fs::F_None);
+        RemoveRedundantAccess_Log = new raw_fd_ostream(RemoveRedundantLoad_Log_Name, ErrInfo, sys::fs::F_None);
         tmp_stream = new raw_string_ostream(tmp_stream_str);
         top_function_name = tp_name;
     } // define a pass, which can be inherited from ModulePass, LoopPass, FunctionPass and etc.

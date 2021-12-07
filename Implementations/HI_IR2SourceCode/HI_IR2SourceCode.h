@@ -53,7 +53,6 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
@@ -106,7 +105,6 @@
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/ConstantRange.h"
 #include "llvm/IR/Constants.h"
@@ -165,7 +163,6 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Optional.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Intrinsics.h"
@@ -208,8 +205,7 @@ using namespace llvm;
 class HI_IR2SourceCode : public ModulePass
 {
   public:
-    HI_IR2SourceCode(const char *IR2Src_Log_Name,
-                     std::map<std::string, std::string> &_IRLoop2LoopLabel,
+    HI_IR2SourceCode(const char *IR2Src_Log_Name, std::map<std::string, std::string> &_IRLoop2LoopLabel,
                      std::map<std::string, std::vector<int>> &IRFunc2BeginLine,
                      std::map<std::string, int> &IRLoop2OriginTripCount, bool DEBUG = false)
         : ModulePass(ID), IRLoop2LoopLabel(_IRLoop2LoopLabel), IRFunc2BeginLine(IRFunc2BeginLine),

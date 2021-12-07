@@ -15,8 +15,7 @@
 using namespace llvm;
 
 // find the array declaration in the function F and trace the accesses to them
-void HI_MuxInsertionArrayPartition::findMemoryDeclarationAndAnalyzeAccessin(Function *F,
-                                                                            bool isTopFunction)
+void HI_MuxInsertionArrayPartition::findMemoryDeclarationAndAnalyzeAccessin(Function *F, bool isTopFunction)
 {
     if (DEBUG)
         *BRAM_log << "checking the BRAM information in Function: " << F->getName() << "\n";
@@ -118,8 +117,8 @@ void HI_MuxInsertionArrayPartition::findMemoryDeclarationAndAnalyzeAccessin(Func
 void HI_MuxInsertionArrayPartition::TraceAccessForTarget(Value *cur_node, Value *ori_node)
 {
     if (DEBUG)
-        *BRAM_log << "\n\n\nTracing the access to Array " << ori_node->getName()
-                  << " and looking for the users of " << *cur_node << "\n";
+        *BRAM_log << "\n\n\nTracing the access to Array " << ori_node->getName() << " and looking for the users of "
+                  << *cur_node << "\n";
 
     if (Instruction *tmpI = dyn_cast<Instruction>(cur_node))
     {
@@ -161,8 +160,7 @@ void HI_MuxInsertionArrayPartition::TraceAccessForTarget(Value *cur_node, Value 
     for (auto it = cur_node->use_begin(), ie = cur_node->use_end(); it != ie; ++it)
     {
         if (DEBUG)
-            *BRAM_log << "    find user of " << ori_node->getName() << " --> " << *it->getUser()
-                      << "\n";
+            *BRAM_log << "    find user of " << ori_node->getName() << " --> " << *it->getUser() << "\n";
         Instruction2Target[it->getUser()].push_back(ori_node);
         // Load and Store Instructions are leaf nodes in the DFS
         if (LoadInst *LoadI = dyn_cast<LoadInst>(it->getUser()))
@@ -173,8 +171,7 @@ void HI_MuxInsertionArrayPartition::TraceAccessForTarget(Value *cur_node, Value 
                     *BRAM_log << "    is an LOAD instruction: " << *LoadI << "\n";
                 std::vector<Value *> tmp_vec;
                 tmp_vec.push_back(ori_node);
-                Access2TargetMap.insert(
-                    std::pair<Instruction *, std::vector<Value *>>(LoadI, tmp_vec));
+                Access2TargetMap.insert(std::pair<Instruction *, std::vector<Value *>>(LoadI, tmp_vec));
             }
             else
             {
@@ -189,8 +186,7 @@ void HI_MuxInsertionArrayPartition::TraceAccessForTarget(Value *cur_node, Value 
                     *BRAM_log << "    is an STORE instruction: " << *StoreI << "\n";
                 std::vector<Value *> tmp_vec;
                 tmp_vec.push_back(ori_node);
-                Access2TargetMap.insert(
-                    std::pair<Instruction *, std::vector<Value *>>(StoreI, tmp_vec));
+                Access2TargetMap.insert(std::pair<Instruction *, std::vector<Value *>>(StoreI, tmp_vec));
             }
             else
             {
@@ -204,8 +200,7 @@ void HI_MuxInsertionArrayPartition::TraceAccessForTarget(Value *cur_node, Value 
                 *BRAM_log << "    is an CALL instruction: " << *CallI << "\n";
             for (int i = 0; i < CallI->getNumArgOperands(); ++i)
             {
-                if (CallI->getArgOperand(i) ==
-                    cur_node) // find which argument is exactly the pointer we are tracing
+                if (CallI->getArgOperand(i) == cur_node) // find which argument is exactly the pointer we are tracing
                 {
                     auto arg_it = CallI->getCalledFunction()->arg_begin();
                     auto arg_ie = CallI->getCalledFunction()->arg_end();
@@ -255,8 +250,8 @@ void HI_MuxInsertionArrayPartition::TryArrayAccessProcess(Instruction *I, Scalar
     if (!ITP_I)
         return;
 
-    bool isMemoryAccess = dyn_cast<LoadInst>(ITP_I->use_begin()->getUser()) ||
-                          dyn_cast<StoreInst>(ITP_I->use_begin()->getUser());
+    bool isMemoryAccess =
+        dyn_cast<LoadInst>(ITP_I->use_begin()->getUser()) || dyn_cast<StoreInst>(ITP_I->use_begin()->getUser());
 
     if (DEBUG)
         *ArrayLog << *I << " --> is under processing of ArrayAccessProcess\n";
@@ -288,9 +283,8 @@ void HI_MuxInsertionArrayPartition::TryArrayAccessProcess(Instruction *I, Scalar
         // it is a complex SCEV and hard to predict the access pattern, we assume that it could
         // access all possible elements. in the array
         if (DEBUG)
-            *ArrayLog
-                << *I << " --> SCEV: " << *tmp_S
-                << " has multiple unknown values in expression. It will be a complex access.\n";
+            *ArrayLog << *I << " --> SCEV: " << *tmp_S
+                      << " has multiple unknown values in expression. It will be a complex access.\n";
         handleComplexSCEVAccess(I, tmp_S);
         return;
     }
@@ -321,8 +315,7 @@ void HI_MuxInsertionArrayPartition::TryArrayAccessProcess(Instruction *I, Scalar
     else
     {
 
-        const SCEVAddRecExpr *SAREtmp =
-            dyn_cast<SCEVAddRecExpr>(bypassExtTruntSCEV(SAE->getOperand(0)));
+        const SCEVAddRecExpr *SAREtmp = dyn_cast<SCEVAddRecExpr>(bypassExtTruntSCEV(SAE->getOperand(0)));
         const SCEVUnknown *SU = dyn_cast<SCEVUnknown>(findUnknown(tmp_S));
         const PtrToIntInst *PTI_I = dyn_cast<PtrToIntInst>(SU->getValue());
         if (SAE && SAREtmp && SU && PTI_I)
@@ -344,9 +337,9 @@ void HI_MuxInsertionArrayPartition::TryArrayAccessProcess(Instruction *I, Scalar
 
 // generate AccessInformation according to the target and the initial access
 HI_MuxInsertionArrayPartition::HI_AccessInfo
-HI_MuxInsertionArrayPartition::getAccessInfoFor(Value *target, Instruction *access,
-                                                int initial_offset, std::vector<int> *inc_indices,
-                                                std::vector<int> *trip_counts, bool unpredictable)
+HI_MuxInsertionArrayPartition::getAccessInfoFor(Value *target, Instruction *access, int initial_offset,
+                                                std::vector<int> *inc_indices, std::vector<int> *trip_counts,
+                                                bool unpredictable)
 {
     if (Alias2Target.find(target) != Alias2Target.end())
     {
@@ -401,8 +394,8 @@ HI_MuxInsertionArrayPartition::getAccessInfoFor(Value *target, Instruction *acce
             res.partition_id[i] = res.index[i] % res.partition_size[i];
         else
         {
-            res.partition_id[i] = res.index[i] / ((res.dim_size[i] + res.partition_size[i] - 1) /
-                                                  res.partition_size[i]);
+            res.partition_id[i] =
+                res.index[i] / ((res.dim_size[i] + res.partition_size[i] - 1) / res.partition_size[i]);
         }
     }
 
@@ -435,8 +428,7 @@ const SCEV *HI_MuxInsertionArrayPartition::findTheActualStartValue(const SCEVAdd
         {
             if (DEBUG)
                 ArrayLog->flush();
-            llvm::errs() << "nextStart: " << *nextStart << " and its type is "
-                         << nextStart->getSCEVType() << "\n";
+            llvm::errs() << "nextStart: " << *nextStart << " and its type is " << nextStart->getSCEVType() << "\n";
             llvm::errs() << "bypass trunc nextStart: " << *bypassExtTruntSCEV(nextStart) << "\n";
             assert(false && "should not reach here.");
         }
@@ -444,11 +436,11 @@ const SCEV *HI_MuxInsertionArrayPartition::findTheActualStartValue(const SCEVAdd
 }
 
 // get the index incremental value of the array access in the loop
-void HI_MuxInsertionArrayPartition::findTheIncrementalIndexAndTripCount(
-    const SCEVAddRecExpr *S, std::vector<int> &inc_indices, std::vector<int> &trip_counts)
+void HI_MuxInsertionArrayPartition::findTheIncrementalIndexAndTripCount(const SCEVAddRecExpr *S,
+                                                                        std::vector<int> &inc_indices,
+                                                                        std::vector<int> &trip_counts)
 {
-    const SCEVConstant *IncrementalIndex =
-        dyn_cast<SCEVConstant>(bypassExtTruntSCEV(S->getOperand(1)));
+    const SCEVConstant *IncrementalIndex = dyn_cast<SCEVConstant>(bypassExtTruntSCEV(S->getOperand(1)));
     assert(IncrementalIndex && "the incremental index should be found.");
     int inc_const = IncrementalIndex->getAPInt().getSExtValue();
     inc_indices.push_back(inc_const);
@@ -533,8 +525,7 @@ void HI_MuxInsertionArrayPartition::findTheIncrementalIndexAndTripCount(
 void HI_MuxInsertionArrayPartition::TraceMemoryAccessinFunction(Function &F)
 {
     if (F.getName().find("llvm.") != std::string::npos ||
-        F.getName().find("HIPartitionMux") !=
-            std::string::npos) // bypass the "llvm.xxx" functions..
+        F.getName().find("HIPartitionMux") != std::string::npos) // bypass the "llvm.xxx" functions..
         return;
     findMemoryAccessin(&F);
 }
@@ -554,8 +545,7 @@ void HI_MuxInsertionArrayPartition::findMemoryAccessin(Function *F)
             if (IntToPtrInst *ITP_I = dyn_cast<IntToPtrInst>(&I))
             {
                 if (DEBUG)
-                    *ArrayLog << "find a IntToPtrInst: [" << *ITP_I
-                              << "] backtrace to its operands.\n";
+                    *ArrayLog << "find a IntToPtrInst: [" << *ITP_I << "] backtrace to its operands.\n";
                 TraceAccessRelatedInstructionForTarget(ITP_I);
             }
             else if (I.getOpcode() == Instruction::Load || I.getOpcode() == Instruction::Store)
@@ -603,8 +593,7 @@ void HI_MuxInsertionArrayPartition::TraceAccessRelatedInstructionForTarget(Value
     ArrayValueVisited.erase(cur_node);
 }
 
-HI_MuxInsertionArrayPartition::HI_ArrayInfo
-HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
+HI_MuxInsertionArrayPartition::HI_ArrayInfo HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
 {
     if (Target2ArrayInfo.find(target) != Target2ArrayInfo.end())
         return Target2ArrayInfo[target];
@@ -616,8 +605,8 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
         assert(false && "wrong type for array target.");
     }
     if (DEBUG)
-        *ArrayLog << "\n\nchecking type : " << *ptr_type << " and its ElementType is: ["
-                  << *ptr_type->getElementType() << "]\n";
+        *ArrayLog << "\n\nchecking type : " << *ptr_type << " and its ElementType is: [" << *ptr_type->getElementType()
+                  << "]\n";
     Type *tmp_type = ptr_type->getElementType();
     int total_ele = 1;
     int tmp_dim_size[10];
@@ -625,9 +614,8 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
     while (auto array_T = dyn_cast<ArrayType>(tmp_type))
     {
         if (DEBUG)
-            *ArrayLog << "----- element type of : " << *tmp_type << " is "
-                      << *(array_T->getElementType()) << " and the number of its elements is "
-                      << (array_T->getNumElements()) << "\n";
+            *ArrayLog << "----- element type of : " << *tmp_type << " is " << *(array_T->getElementType())
+                      << " and the number of its elements is " << (array_T->getNumElements()) << "\n";
         total_ele *= (array_T->getNumElements());
         tmp_dim_size[num_dims] = (array_T->getNumElements());
         num_dims++;
@@ -644,8 +632,7 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
     res_array_info.sub_element_num[0] = 1;
     for (int i = 1; i < num_dims; i++)
     {
-        res_array_info.sub_element_num[i] =
-            res_array_info.sub_element_num[i - 1] * res_array_info.dim_size[i - 1];
+        res_array_info.sub_element_num[i] = res_array_info.sub_element_num[i - 1] * res_array_info.dim_size[i - 1];
     }
 
     if (auto arg_v = dyn_cast<Argument>(target))
@@ -655,8 +642,7 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
             res_array_info.sub_element_num[num_dims] = 1;
         else
             res_array_info.sub_element_num[num_dims] =
-                res_array_info.sub_element_num[num_dims - 1] *
-                res_array_info.dim_size[num_dims - 1];
+                res_array_info.sub_element_num[num_dims - 1] * res_array_info.dim_size[num_dims - 1];
 
         std::string FuncName = demangleFunctionName(arg_v->getParent()->getName().str());
         std::string funcLine;
@@ -671,8 +657,7 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
         }
 
         res_array_info.dim_size[num_dims] =
-            FuncParamLine2OutermostSize[FuncName + "-" + argName + "-" +
-                                        funcLine]; // set to nearly infinite
+            FuncParamLine2OutermostSize[FuncName + "-" + argName + "-" + funcLine]; // set to nearly infinite
         res_array_info.num_dims++;
         res_array_info.isArgument = 1;
     }
@@ -707,8 +692,7 @@ HI_MuxInsertionArrayPartition::getArrayInfo(Value *target)
 
     if (!res_array_info.completePartition)
     {
-        if (res_array_info.sub_element_num[num_dims - 1] * res_array_info.dim_size[num_dims - 1] ==
-            totalPartitionNum)
+        if (res_array_info.sub_element_num[num_dims - 1] * res_array_info.dim_size[num_dims - 1] == totalPartitionNum)
             res_array_info.completePartition = 1;
     }
 
@@ -754,8 +738,7 @@ HI_MuxInsertionArrayPartition::getPartitionFor(Instruction *access)
                 for (auto target : Access2TargetMap[access])
                     llvm::errs() << "    " << *target << "\n";
             }
-            assert(tmp_target == tmp_reftarget &&
-                   "currently, we do not support 1-access-multi-target.");
+            assert(tmp_target == tmp_reftarget && "currently, we do not support 1-access-multi-target.");
         }
         // llvm::errs() << "handling access: " << *access << " (addr=" <<access << ") include
         // following targets:  \n"; for (auto target : targetVec)
@@ -768,8 +751,7 @@ HI_MuxInsertionArrayPartition::getPartitionFor(Instruction *access)
     HI_AccessInfo tmp_res = getAccessInfoForAccessInst(access);
     std::vector<partition_info> partitions;
 
-    assert(!tmp_res.unpredictable &&
-           "unpredictable access shoudl not be considered to use getPartitionFor.");
+    assert(!tmp_res.unpredictable && "unpredictable access shoudl not be considered to use getPartitionFor.");
 
     int tripCountMax = 1;
     if (LI->getLoopFor(access->getParent()))
@@ -782,8 +764,7 @@ HI_MuxInsertionArrayPartition::getPartitionFor(Instruction *access)
         if (DEBUG)
             *ArrayLog << tmp_offset << ", ";
         // ArrayLog->flush();
-        partition_info newPartitionForCheck =
-            getAccessPartitionBasedOnAccessInfoAndInc(tmp_res, tmp_offset);
+        partition_info newPartitionForCheck = getAccessPartitionBasedOnAccessInfoAndInc(tmp_res, tmp_offset);
         // int cur_dim_index = (tmp_offset / tmp_res.sub_element_num[partition_dimension] %
         // tmp_res.sub_element_num[partition_dimension+1]); if (!tryRecordPartition(partitions,
         // newPartitionForCheck))
@@ -819,8 +800,7 @@ bool HI_MuxInsertionArrayPartition::ArrayAccessCheckForFunction(Function *F)
         {
             if (DEBUG)
                 *ArrayLog << "TryArrayAccessProcess: " << I << "\n";
-            TryArrayAccessProcess(&I,
-                                  SE /*, demangleFunctionName(F->getName()) == top_function_name*/);
+            TryArrayAccessProcess(&I, SE /*, demangleFunctionName(F->getName()) == top_function_name*/);
         }
     }
     for (auto &B : *F)
@@ -863,9 +843,8 @@ HI_MuxInsertionArrayPartition::getAccessInfoForAccessInst(Instruction *Load_or_S
     {
         address_addI = pointer_V; // the access may not need the calculation of address, take the
                                   // pointer directly
-        if (Alias2Target.find(address_addI) !=
-            Alias2Target.end()) // it could be argument. We need to trace back to get its original
-                                // array declaration
+        if (Alias2Target.find(address_addI) != Alias2Target.end()) // it could be argument. We need to trace back to get
+                                                                   // its original array declaration
         {
             address_addI = Alias2Target[address_addI];
         }
@@ -888,8 +867,14 @@ HI_MuxInsertionArrayPartition::getAccessInfoForAccessInst(Instruction *Load_or_S
         }
     }
 
-    assert(AddressInst2AccessInfo.find(address_addI) != AddressInst2AccessInfo.end() &&
-           "The pointer should be checked by TryArrayAccessProcess() previously.");
+    // assert(AddressInst2AccessInfo.find(address_addI) != AddressInst2AccessInfo.end() &&
+    //        "The pointer should be checked by TryArrayAccessProcess() previously.");
+    if (AddressInst2AccessInfo.find(address_addI) == AddressInst2AccessInfo.end())
+    {
+        assert(Instruction2Target[address_addI].size() > 0);
+        AddressInst2AccessInfo[address_addI] = HI_AccessInfo(Target2ArrayInfo[Instruction2Target[address_addI][0]]);
+        AddressInst2AccessInfo[address_addI].unpredictable = true;
+    }
     return AddressInst2AccessInfo[address_addI];
 }
 
@@ -934,8 +919,7 @@ Value *HI_MuxInsertionArrayPartition::getTargetFromInst(Instruction *accessI)
                 for (auto target : Access2TargetMap[accessI])
                     llvm::errs() << "    " << *target << "\n";
             }
-            assert(tmp_target == tmp_reftarget &&
-                   "currently, we do not support 1-access-multi-target.");
+            assert(tmp_target == tmp_reftarget && "currently, we do not support 1-access-multi-target.");
         }
     }
     Value *target = Access2TargetMap[accessI][0];
@@ -945,8 +929,7 @@ Value *HI_MuxInsertionArrayPartition::getTargetFromInst(Instruction *accessI)
         return Alias2Target[target];
 }
 
-HI_MuxInsertionArrayPartition::partition_info
-HI_MuxInsertionArrayPartition::getAccessPartitionBasedOnAccessInfoAndInc(
+HI_MuxInsertionArrayPartition::partition_info HI_MuxInsertionArrayPartition::getAccessPartitionBasedOnAccessInfoAndInc(
     HI_MuxInsertionArrayPartition::HI_AccessInfo refInfo, int cur_offset)
 {
     partition_info res_partiton_info;
@@ -972,8 +955,7 @@ HI_MuxInsertionArrayPartition::getAccessPartitionBasedOnAccessInfoAndInc(
         else
         {
             refInfo.partition_id[i] =
-                refInfo.index[i] /
-                ((refInfo.dim_size[i] + refInfo.partition_size[i] - 1) / refInfo.partition_size[i]);
+                refInfo.index[i] / ((refInfo.dim_size[i] + refInfo.partition_size[i] - 1) / refInfo.partition_size[i]);
             res_partiton_info.partition_id[i] = refInfo.partition_id[i];
         }
     }
@@ -983,8 +965,7 @@ HI_MuxInsertionArrayPartition::getAccessPartitionBasedOnAccessInfoAndInc(
 bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Store)
 {
 
-    if (Load_or_Store->getOpcode() != Instruction::Load &&
-        Load_or_Store->getOpcode() != Instruction::Store)
+    if (Load_or_Store->getOpcode() != Instruction::Load && Load_or_Store->getOpcode() != Instruction::Store)
         return false;
 
     Instruction *pointer_I = nullptr;
@@ -1005,9 +986,8 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
         Value *target = pointer_V;
         if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
         {
-            if (Alias2Target.find(target) !=
-                Alias2Target.end()) // it could be argument. We need to trace back to get its
-                                    // original array declaration
+            if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get
+                                                                 // its original array declaration
             {
                 target = Alias2Target[target];
             }
@@ -1053,29 +1033,23 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
             *ArrayLog << "processNaiveAccess: target" << *target << "\n";
         if (auto arg_pointer = dyn_cast<Argument>(target))
         {
-            AddressInst2AccessInfo[target] =
-                getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+            AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG)
-                *ArrayLog << " -----> access info with array index: "
-                          << AddressInst2AccessInfo[target] << "\n\n\n";
+                *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
             // ArrayLog->flush();
         }
         else if (auto alloc_pointer = dyn_cast<AllocaInst>(target))
         {
-            AddressInst2AccessInfo[target] =
-                getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+            AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG)
-                *ArrayLog << " -----> access info with array index: "
-                          << AddressInst2AccessInfo[target] << "\n\n\n";
+                *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
             // ArrayLog->flush();
         }
         else if (auto GV = dyn_cast<GlobalVariable>(target))
         {
-            AddressInst2AccessInfo[target] =
-                getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+            AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG)
-                *ArrayLog << " -----> access info with array index: "
-                          << AddressInst2AccessInfo[target] << "\n\n\n";
+                *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target] << "\n\n\n";
         }
     }
 
@@ -1088,9 +1062,8 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
                 Value *target = PTI->getOperand(0);
                 if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
                 {
-                    if (Alias2Target.find(target) !=
-                        Alias2Target.end()) // it could be argument. We need to trace back to get
-                                            // its original array declaration
+                    if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back
+                                                                         // to get its original array declaration
                     {
                         target = Alias2Target[target];
                     }
@@ -1109,35 +1082,29 @@ bool HI_MuxInsertionArrayPartition::processNaiveAccess(Instruction *Load_or_Stor
                 }
                 if (auto arg_pointer = dyn_cast<Argument>(target))
                 {
-                    AddressInst2AccessInfo[target] =
-                        getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
-                    AddressInst2AccessInfo[PTI] =
-                        getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+                    AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+                    AddressInst2AccessInfo[PTI] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
                     if (DEBUG)
-                        *ArrayLog << " -----> access info with array index: "
-                                  << AddressInst2AccessInfo[target] << "\n\n\n";
+                        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target]
+                                  << "\n\n\n";
                     // ArrayLog->flush();
                 }
                 else if (auto alloc_pointer = dyn_cast<AllocaInst>(target))
                 {
-                    AddressInst2AccessInfo[target] =
-                        getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
-                    AddressInst2AccessInfo[PTI] =
-                        getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+                    AddressInst2AccessInfo[target] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
+                    AddressInst2AccessInfo[PTI] = getAccessInfoFor(target, Load_or_Store, 0, nullptr, nullptr);
                     if (DEBUG)
-                        *ArrayLog << " -----> access info with array index: "
-                                  << AddressInst2AccessInfo[target] << "\n\n\n";
+                        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[target]
+                                  << "\n\n\n";
                     // ArrayLog->flush();
                 }
             }
         }
         else if (auto alloc_pointer = dyn_cast<AllocaInst>(pointer_I))
         {
-            AddressInst2AccessInfo[pointer_I] =
-                getAccessInfoFor(pointer_I, Load_or_Store, 0, nullptr, nullptr);
+            AddressInst2AccessInfo[pointer_I] = getAccessInfoFor(pointer_I, Load_or_Store, 0, nullptr, nullptr);
             if (DEBUG)
-                *ArrayLog << " -----> access info with array index: "
-                          << AddressInst2AccessInfo[pointer_I] << "\n\n\n";
+                *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[pointer_I] << "\n\n\n";
             if (DEBUG)
                 ArrayLog->flush();
         }
@@ -1154,11 +1121,10 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
         int initial_const = -1;
 
         if (DEBUG)
-            *ArrayLog << *I << " --> is add rec Affine Add: " << *SARE << " it operand (0) "
-                      << *SARE->getOperand(0) << " it operand (1) " << *SARE->getOperand(1) << "\n";
+            *ArrayLog << *I << " --> is add rec Affine Add: " << *SARE << " it operand (0) " << *SARE->getOperand(0)
+                      << " it operand (1) " << *SARE->getOperand(1) << "\n";
         if (DEBUG)
-            *ArrayLog << " -----> intial offset expression: " << *findTheActualStartValue(SARE)
-                      << "\n";
+            *ArrayLog << " -----> intial offset expression: " << *findTheActualStartValue(SARE) << "\n";
 
         std::vector<int> inc_indices, trip_counts;
         findTheIncrementalIndexAndTripCount(SARE, inc_indices, trip_counts);
@@ -1188,8 +1154,7 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
             // find the constant in the SCEV and that will be the initial offset
             for (int i = 0; i < initial_expr_add->getNumOperands(); i++)
             {
-                if (const SCEVConstant *start_V =
-                        dyn_cast<SCEVConstant>(initial_expr_add->getOperand(i)))
+                if (const SCEVConstant *start_V = dyn_cast<SCEVConstant>(initial_expr_add->getOperand(i)))
                 {
                     initial_const = start_V->getAPInt().getSExtValue();
                     if (DEBUG)
@@ -1200,31 +1165,26 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
                     {
                         llvm::errs() << " -----> intial offset const: " << initial_const << "\n";
                         llvm::errs() << "    -----> (1<<getMinSignedBits)-1 "
-                                     << ((initial_const) &
-                                         ((1 << start_V->getAPInt().getMinSignedBits()) - 1))
-                                     << " [" << start_V->getAPInt().getMinSignedBits() << "]"
+                                     << ((initial_const) & ((1 << start_V->getAPInt().getMinSignedBits()) - 1)) << " ["
+                                     << start_V->getAPInt().getMinSignedBits() << "]"
                                      << "\n";
-                        llvm::errs()
-                            << "    -----> (1<<getActiveBits)-1 "
-                            << ((initial_const) & ((1 << start_V->getAPInt().getActiveBits()) - 1))
-                            << " [" << start_V->getAPInt().getActiveBits() << "]"
-                            << "\n";
+                        llvm::errs() << "    -----> (1<<getActiveBits)-1 "
+                                     << ((initial_const) & ((1 << start_V->getAPInt().getActiveBits()) - 1)) << " ["
+                                     << start_V->getAPInt().getActiveBits() << "]"
+                                     << "\n";
                         llvm::errs() << "    -----> (getZExtValue) "
                                      << (((1 << start_V->getAPInt().getZExtValue()) - 1)) << " bw=["
                                      << start_V->getAPInt().getBitWidth() << "]"
                                      << "\n";
-                        initial_const =
-                            (initial_const) & ((1 << start_V->getAPInt().getZExtValue()) - 1);
+                        initial_const = (initial_const) & ((1 << start_V->getAPInt().getZExtValue()) - 1);
                     }
                 }
                 else
                 {
-                    if (const SCEVUnknown *array_value_scev =
-                            dyn_cast<SCEVUnknown>(initial_expr_add->getOperand(i)))
+                    if (const SCEVUnknown *array_value_scev = dyn_cast<SCEVUnknown>(initial_expr_add->getOperand(i)))
                     {
                         if (DEBUG)
-                            *ArrayLog << " -----> access target: " << *array_value_scev->getValue()
-                                      << "\n";
+                            *ArrayLog << " -----> access target: " << *array_value_scev->getValue() << "\n";
                         if (auto tmp_PTI_I = dyn_cast<PtrToIntInst>(array_value_scev->getValue()))
                         {
                             target = tmp_PTI_I->getOperand(0);
@@ -1245,9 +1205,8 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
                             }
                             else
                             {
-                                llvm::errs()
-                                    << "ERRORS: cannot find target [" << *target
-                                    << "] in Target2ArrayInfo and its address=" << target << "\n";
+                                llvm::errs() << "ERRORS: cannot find target [" << *target
+                                             << "] in Target2ArrayInfo and its address=" << target << "\n";
                                 assert(Target2ArrayInfo.find(target) != Target2ArrayInfo.end() &&
                                        Alias2Target.find(target) != Alias2Target.end() &&
                                        "Fail to find the array inforamtion for the target.");
@@ -1255,8 +1214,7 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
                         }
 
                         if (DEBUG)
-                            *ArrayLog << " -----> access target info: " << Target2ArrayInfo[target]
-                                      << "\n";
+                            *ArrayLog << " -----> access target info: " << Target2ArrayInfo[target] << "\n";
                         // ArrayLog->flush();
                     }
                     else
@@ -1282,15 +1240,13 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
             }
             else
             {
-                assert(target &&
-                       "There should be an PtrToInt Instruction for the addition operation.\n");
+                assert(target && "There should be an PtrToInt Instruction for the addition operation.\n");
             }
 
             if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
             {
-                if (Alias2Target.find(target) !=
-                    Alias2Target.end()) // it could be argument. We need to trace back to get its
-                                        // original array declaration
+                if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to
+                                                                     // get its original array declaration
                 {
                     target = Alias2Target[target];
                 }
@@ -1317,11 +1273,9 @@ void HI_MuxInsertionArrayPartition::handleSAREAccess(Instruction *I, const SCEVA
         // some time, using 2-complement will end with fake negative initial offset
 
         assert(target && "the target array should be found.\n");
-        AddressInst2AccessInfo[I] =
-            getAccessInfoFor(target, I, initial_const, &inc_indices, &trip_counts);
+        AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, initial_const, &inc_indices, &trip_counts);
         if (DEBUG)
-            *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I]
-                      << "\n\n\n";
+            *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
         // ArrayLog->flush();
     }
 }
@@ -1342,9 +1296,8 @@ void HI_MuxInsertionArrayPartition::handleDirectAccess(Instruction *I, const SCE
 
     target = PTI->getOperand(0);
 
-    if (Alias2Target.find(target) !=
-        Alias2Target.end()) // it could be argument. We need to trace back to get its original array
-                            // declaration
+    if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get its
+                                                         // original array declaration
     {
         target = Alias2Target[target];
     }
@@ -1353,13 +1306,11 @@ void HI_MuxInsertionArrayPartition::handleDirectAccess(Instruction *I, const SCE
     assert(target && "the target array should be found.\n");
     AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, initial_const, nullptr, nullptr);
     if (DEBUG)
-        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I]
-                  << "\n\n\n";
+        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
     // ArrayLog->flush();
 }
 
-void HI_MuxInsertionArrayPartition::handleConstantOffsetAccess(Instruction *I,
-                                                               const SCEVAddExpr *SAE)
+void HI_MuxInsertionArrayPartition::handleConstantOffsetAccess(Instruction *I, const SCEVAddExpr *SAE)
 {
     auto constOffset = dyn_cast<SCEVConstant>(SAE->getOperand(0));
     auto ptrUnknown = dyn_cast<SCEVUnknown>(SAE->getOperand(1));
@@ -1380,9 +1331,8 @@ void HI_MuxInsertionArrayPartition::handleConstantOffsetAccess(Instruction *I,
 
     target = PTI->getOperand(0);
 
-    if (Alias2Target.find(target) !=
-        Alias2Target.end()) // it could be argument. We need to trace back to get its original array
-                            // declaration
+    if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get its
+                                                         // original array declaration
     {
         target = Alias2Target[target];
     }
@@ -1391,8 +1341,7 @@ void HI_MuxInsertionArrayPartition::handleConstantOffsetAccess(Instruction *I,
     assert(target && "the target array should be found.\n");
     AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, initial_const, nullptr, nullptr);
     if (DEBUG)
-        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I]
-                  << "\n\n\n";
+        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
     // ArrayLog->flush();
 }
 
@@ -1411,11 +1360,10 @@ void HI_MuxInsertionArrayPartition::handleUnstandardSCEVAccess(Instruction *I, c
         int initial_const = -1;
 
         if (DEBUG)
-            *ArrayLog << *I << " --> is add rec Affine Add: " << *SARE << " it operand (0) "
-                      << *SARE->getOperand(0) << " it operand (1) " << *SARE->getOperand(1) << "\n";
+            *ArrayLog << *I << " --> is add rec Affine Add: " << *SARE << " it operand (0) " << *SARE->getOperand(0)
+                      << " it operand (1) " << *SARE->getOperand(1) << "\n";
         if (DEBUG)
-            *ArrayLog << " -----> intial offset expression: " << *findTheActualStartValue(SARE)
-                      << "\n";
+            *ArrayLog << " -----> intial offset expression: " << *findTheActualStartValue(SARE) << "\n";
 
         std::vector<int> inc_indices, trip_counts;
         findTheIncrementalIndexAndTripCount(SARE, inc_indices, trip_counts);
@@ -1458,21 +1406,18 @@ void HI_MuxInsertionArrayPartition::handleUnstandardSCEVAccess(Instruction *I, c
                     ArrayLog->flush();
                 llvm::errs() << " -----> intial offset const: " << initial_const << "\n";
                 llvm::errs() << "    -----> (1<<getMinSignedBits)-1 "
-                             << ((initial_const) &
-                                 ((1 << initial_const_scev->getAPInt().getMinSignedBits()) - 1))
+                             << ((initial_const) & ((1 << initial_const_scev->getAPInt().getMinSignedBits()) - 1))
                              << " [" << initial_const_scev->getAPInt().getMinSignedBits() << "]"
                              << "\n";
                 llvm::errs() << "    -----> (1<<getActiveBits)-1 "
-                             << ((initial_const) &
-                                 ((1 << initial_const_scev->getAPInt().getActiveBits()) - 1))
-                             << " [" << initial_const_scev->getAPInt().getActiveBits() << "]"
+                             << ((initial_const) & ((1 << initial_const_scev->getAPInt().getActiveBits()) - 1)) << " ["
+                             << initial_const_scev->getAPInt().getActiveBits() << "]"
                              << "\n";
                 llvm::errs() << "    -----> (getZExtValue) "
-                             << (((1 << initial_const_scev->getAPInt().getZExtValue()) - 1))
-                             << " bw=[" << initial_const_scev->getAPInt().getBitWidth() << "]"
+                             << (((1 << initial_const_scev->getAPInt().getZExtValue()) - 1)) << " bw=["
+                             << initial_const_scev->getAPInt().getBitWidth() << "]"
                              << "\n";
-                initial_const =
-                    (initial_const) & ((1 << initial_const_scev->getAPInt().getZExtValue()) - 1);
+                initial_const = (initial_const) & ((1 << initial_const_scev->getAPInt().getZExtValue()) - 1);
             }
 
             if (const SCEVUnknown *array_value_scev = dyn_cast<SCEVUnknown>(SU))
@@ -1485,15 +1430,13 @@ void HI_MuxInsertionArrayPartition::handleUnstandardSCEVAccess(Instruction *I, c
                 }
                 else
                 {
-                    assert(target &&
-                           "There should be an PtrToInt Instruction for the addition operation.\n");
+                    assert(target && "There should be an PtrToInt Instruction for the addition operation.\n");
                 }
 
                 if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
                 {
-                    if (Alias2Target.find(target) !=
-                        Alias2Target.end()) // it could be argument. We need to trace back to get
-                                            // its original array declaration
+                    if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back
+                                                                         // to get its original array declaration
                     {
                         target = Alias2Target[target];
                     }
@@ -1524,11 +1467,9 @@ void HI_MuxInsertionArrayPartition::handleUnstandardSCEVAccess(Instruction *I, c
         assert(target && "the target array should be found.\n");
         if (DEBUG)
             *ArrayLog << " -----> access target info: " << Target2ArrayInfo[target] << "\n";
-        AddressInst2AccessInfo[I] =
-            getAccessInfoFor(target, I, initial_const, &inc_indices, &trip_counts);
+        AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, initial_const, &inc_indices, &trip_counts);
         if (DEBUG)
-            *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I]
-                      << "\n\n\n";
+            *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
         // ArrayLog->flush();
     }
 }
@@ -1555,9 +1496,8 @@ void HI_MuxInsertionArrayPartition::handleComplexSCEVAccess(Instruction *I, cons
         *ArrayLog << *I << " --> target array: " << *target << "\n";
     if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
     {
-        if (Alias2Target.find(target) !=
-            Alias2Target.end()) // it could be argument. We need to trace back to get its original
-                                // array declaration
+        if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back to get its
+                                                             // original array declaration
         {
             target = Alias2Target[target];
         }
@@ -1572,11 +1512,9 @@ void HI_MuxInsertionArrayPartition::handleComplexSCEVAccess(Instruction *I, cons
     }
 
     assert(target && "the target array should be found.\n");
-    AddressInst2AccessInfo[I] =
-        getAccessInfoFor(target, I, -1, nullptr, nullptr, /*unpredictable*/ true);
+    AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, -1, nullptr, nullptr, /*unpredictable*/ true);
     if (DEBUG)
-        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I]
-                  << "\n\n\n";
+        *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
     // ArrayLog->flush();
 }
 
@@ -1603,8 +1541,8 @@ std::vector<int> HI_MuxInsertionArrayPartition::generatePotentialOffset(HI_Acces
 {
     std::vector<int> res_offsets;
     if (accessInfo.reverse_loop_dep > 0)
-        getAllPotentialOffsetByRecuresiveSearch(accessInfo, accessInfo.reverse_loop_dep,
-                                                accessInfo.initial_offset, res_offsets);
+        getAllPotentialOffsetByRecuresiveSearch(accessInfo, accessInfo.reverse_loop_dep, accessInfo.initial_offset,
+                                                res_offsets);
     else
         res_offsets.push_back(accessInfo.initial_offset); // offset unrelated to loop
     return res_offsets;
@@ -1612,8 +1550,9 @@ std::vector<int> HI_MuxInsertionArrayPartition::generatePotentialOffset(HI_Acces
 
 // recursively emulate all the loops where the access is inside
 // to check the offset of the access
-void HI_MuxInsertionArrayPartition::getAllPotentialOffsetByRecuresiveSearch(
-    HI_AccessInfo &accessInfo, int loopDep, int last_level_offset, std::vector<int> &res)
+void HI_MuxInsertionArrayPartition::getAllPotentialOffsetByRecuresiveSearch(HI_AccessInfo &accessInfo, int loopDep,
+                                                                            int last_level_offset,
+                                                                            std::vector<int> &res)
 {
     if (loopDep == -1)
     {
@@ -1625,9 +1564,8 @@ void HI_MuxInsertionArrayPartition::getAllPotentialOffsetByRecuresiveSearch(
     {
         for (int i = 0; i < accessInfo.trip_count[loopDep - 1]; i++)
         {
-            getAllPotentialOffsetByRecuresiveSearch(
-                accessInfo, loopDep - 1, last_level_offset + i * accessInfo.inc_index[loopDep - 1],
-                res);
+            getAllPotentialOffsetByRecuresiveSearch(accessInfo, loopDep - 1,
+                                                    last_level_offset + i * accessInfo.inc_index[loopDep - 1], res);
         }
     }
     else
@@ -1635,8 +1573,8 @@ void HI_MuxInsertionArrayPartition::getAllPotentialOffsetByRecuresiveSearch(
         for (int i = 0; i < accessInfo.trip_count[loopDep - 1]; i++)
         {
             int res_offset = last_level_offset + i * accessInfo.inc_index[loopDep - 1];
-            if (res_offset < accessInfo.dim_size[accessInfo.num_dims - 1] *
-                                 accessInfo.sub_element_num[accessInfo.num_dims - 1])
+            if (res_offset <
+                accessInfo.dim_size[accessInfo.num_dims - 1] * accessInfo.sub_element_num[accessInfo.num_dims - 1])
                 res.push_back(res_offset);
         }
     }

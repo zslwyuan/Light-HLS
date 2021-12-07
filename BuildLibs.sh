@@ -19,7 +19,9 @@ do
     fi
 done
 
-cd LLVM_Learner_Libs/build
+cd LLVM_Learner_Libs
+mkdir build
+cd build
 cmake ..
 make -j4
 cp `find -name *.a` ../
