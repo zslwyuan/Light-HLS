@@ -152,7 +152,7 @@ void HI_NoDirectiveTimingResourceEvaluation::analyzeTopFunction(Module &M)
     int FF_needed_by_FSM = state_total_num;
     for (auto &F : M)
     {
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         mangled_name =
@@ -199,7 +199,7 @@ void HI_NoDirectiveTimingResourceEvaluation::TraceMemoryDeclarationinModule(Modu
             F.getName().find("HIPartitionMux") !=
                 std::string::npos) // bypass the "llvm.xxx" functions..
             continue;
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         findMemoryDeclarationin(&F, demangled_name == top_function_name &&

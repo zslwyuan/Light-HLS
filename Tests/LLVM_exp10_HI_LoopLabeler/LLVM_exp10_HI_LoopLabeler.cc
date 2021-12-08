@@ -19,8 +19,7 @@ void ReplaceAll(std::string &strSource, const std::string &strOld, const std::st
 
 void pathAdvice()
 {
-    std::cout << "==============================================================================="
-              << std::endl;
+    std::cout << "===============================================================================" << std::endl;
     std::cout << "if undefined reference occurs, please check whether the following include paths "
                  "are required."
               << std::endl;
@@ -51,8 +50,7 @@ void pathAdvice()
             break;
         }
     }
-    std::cout << "==============================================================================="
-              << std::endl;
+    std::cout << "===============================================================================" << std::endl;
 }
 
 using namespace clang;
@@ -75,7 +73,7 @@ int main(int argc, const char **argv)
 
     // run the Clang Tool, creating a new FrontendAction, which will run the AST consumer
     Tool.run(HI_LoopLabeler_rewrite_newFrontendActionFactory<HI_LoopLabeler_FrontendAction>("PLog", TheRewriter,
-                                                                                "rewriteOut")
+                                                                                            "rewriteOut")
                  .get());
 
     return 0;

@@ -1,4 +1,4 @@
-# Light-HLS: Fast, Accurate and Convenient 
+# Light-HLS (LLVM v11): Fast, Accurate and Convenient 
 
 *Let's try to make HLS developemnt easier for everyone~ ^\_^.*
      

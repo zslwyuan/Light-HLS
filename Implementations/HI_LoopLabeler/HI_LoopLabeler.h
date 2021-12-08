@@ -241,7 +241,7 @@ class HI_LoopLabeler_FrontendAction : public ASTFrontendAction
     {
         llvm::errs() << "** Creating AST consumer for: " << file << "\n";
         TheRewriter.setSourceMgr(CI.getSourceManager(), CI.getLangOpts());
-        return llvm::make_unique<HI_LoopLabeler_ASTConsumer>(CI, TheRewriter, parselog_name);
+        return std::make_unique<HI_LoopLabeler_ASTConsumer>(CI, TheRewriter, parselog_name);
     }
 
   private:
@@ -266,9 +266,10 @@ HI_LoopLabeler_rewrite_newFrontendActionFactory(const char *_parseLog_name, Rewr
             : parseLog_name(_parseLog_name), TheRewriter(R), outputCode_name(_outputCode_name)
         {
         }
-        FrontendAction *create() override
+        std::unique_ptr<FrontendAction> create() override
         {
-            return new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str());
+            std::unique_ptr<FrontendAction> frontendaction(new T(parseLog_name.c_str(), TheRewriter, outputCode_name.c_str()));
+            return std::move(frontendaction);
         }
         std::string parseLog_name;
         std::string outputCode_name;

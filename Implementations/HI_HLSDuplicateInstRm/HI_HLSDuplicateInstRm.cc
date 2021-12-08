@@ -16,9 +16,8 @@
 
 using namespace llvm;
 
-bool HI_HLSDuplicateInstRm::runOnFunction(
-    Function &F) // The runOnModule declaration will overide the virtual one in ModulePass, which
-                 // will be executed for each Module.
+bool HI_HLSDuplicateInstRm::runOnFunction(Function &F) // The runOnModule declaration will overide the virtual one in
+                                                       // ModulePass, which will be executed for each Module.
 {
     print_status("Running HI_HLSDuplicateInstRm pass.");
     if (F.getName().find("llvm.") != std::string::npos)
@@ -29,80 +28,84 @@ bool HI_HLSDuplicateInstRm::runOnFunction(
     }
     bool removed = 0;
 
-    Block2Inst2DupInst.clear();
-
-    std::vector<Instruction *> PHINodeList;
-    for (BasicBlock &B : F)
-    {
-        for (Instruction &I : B)
-        {
-            if (I.getOpcode() == Instruction::PHI)
-            {
-                PHINodeList.push_back(&I);
-            }
-            if (I.getOpcode() == Instruction::Load || I.getOpcode() == Instruction::Store ||
-                I.getOpcode() == Instruction::Call || I.getOpcode() == Instruction::Alloca ||
-                I.getOpcode() == Instruction::Br)
-                continue;
-            checkDuplicationInBlock(&B, &I);
-        }
-    }
-
     std::set<Instruction *> removedI;
-    removedI.clear();
 
-    for (BasicBlock &B : F)
+    while (true)
     {
-        for (auto dupIMap : Block2Inst2DupInst[&B])
+        removedI.clear();
+        Block2Inst2DupInst.clear();
+        std::vector<Instruction *> PHINodeList;
+        for (BasicBlock &B : F)
         {
-            if (removedI.find(dupIMap.first) == removedI.end())
+            for (Instruction &I : B)
             {
-                Instruction *I = dupIMap.first;
-                for (auto dupI : dupIMap.second)
+                if (I.getOpcode() == Instruction::PHI)
                 {
-                    if (removedI.find(dupI) != removedI.end())
-                        continue;
-                    if (dupI->getType() != I->getType())
-                        continue;
-                    if (DEBUG)
-                        *RemoveLog << "duplicated: " << *I << " -------  " << *dupI << "\n";
-                    if (DEBUG)
-                        *RemoveLog << "Remove: " << *dupI << "\n";
-                    if (DEBUG)
-                        *RemoveLog << "Block: \n" << B << "\n";
-                    if (DEBUG)
-                        RemoveLog->flush();
-                    dupI->replaceAllUsesWith(I);
-                    removedI.insert(dupI);
-                    // RecursivelyDeleteTriviallyDeadInstructions(dupI);
+                    PHINodeList.push_back(&I);
+                }
+                if (I.getOpcode() == Instruction::Load || I.getOpcode() == Instruction::Store ||
+                    I.getOpcode() == Instruction::Call || I.getOpcode() == Instruction::Alloca ||
+                    I.getOpcode() == Instruction::Br)
+                    continue;
+                checkDuplicationInBlock(&B, &I);
+            }
+        }
 
-                    dupI->eraseFromParent();
-                    removed = 1;
+        for (BasicBlock &B : F)
+        {
+            for (auto dupIMap : Block2Inst2DupInst[&B])
+            {
+                if (removedI.find(dupIMap.first) == removedI.end())
+                {
+                    Instruction *I = dupIMap.first;
+                    for (auto dupI : dupIMap.second)
+                    {
+                        if (removedI.find(dupI) != removedI.end())
+                            continue;
+                        if (dupI->getType() != I->getType())
+                            continue;
+                        if (DEBUG)
+                            *RemoveLog << "duplicated: " << *I << " -------  " << *dupI << "\n";
+                        if (DEBUG)
+                            *RemoveLog << "Remove: " << *dupI << "\n";
+                        if (DEBUG)
+                            *RemoveLog << "Block: \n" << B << "\n";
+                        if (DEBUG)
+                            RemoveLog->flush();
+                        dupI->replaceAllUsesWith(I);
+                        removedI.insert(dupI);
+                        // RecursivelyDeleteTriviallyDeadInstructions(dupI);
+
+                        dupI->eraseFromParent();
+                        removed = 1;
+                    }
                 }
             }
         }
-    }
 
-    for (Instruction *tmp_PHI_I : PHINodeList)
-    {
-        auto PHI_I = dyn_cast<llvm::PHINode>(tmp_PHI_I);
-        assert(PHI_I);
-        if (PHI_I->getNumIncomingValues() == 1)
+        for (Instruction *tmp_PHI_I : PHINodeList)
         {
-            PHI_I->replaceAllUsesWith(PHI_I->getOperand(0));
-            removedI.insert(PHI_I);
-            PHI_I->eraseFromParent();
-            removed = 1;
+            auto PHI_I = dyn_cast<llvm::PHINode>(tmp_PHI_I);
+            assert(PHI_I);
+            if (PHI_I->getNumIncomingValues() == 1)
+            {
+                PHI_I->replaceAllUsesWith(PHI_I->getOperand(0));
+                removedI.insert(PHI_I);
+                PHI_I->eraseFromParent();
+                removed = 1;
+            }
         }
+
+        RemoveLog->flush();
+        if (removedI.size() == 0)
+            break;
     }
 
-    RemoveLog->flush();
-    return removed;
+    return true;
 }
 
-char HI_HLSDuplicateInstRm::ID =
-    0; // the ID for pass should be initialized but the value does not matter, since LLVM uses the
-       // address of this variable as label instead of its value.
+char HI_HLSDuplicateInstRm::ID = 0; // the ID for pass should be initialized but the value does not matter, since LLVM
+                                    // uses the address of this variable as label instead of its value.
 
 void HI_HLSDuplicateInstRm::getAnalysisUsage(AnalysisUsage &AU) const
 {
@@ -150,7 +153,16 @@ Instruction *HI_HLSDuplicateInstRm::checkDuplicationInBlock(BasicBlock *B, Instr
                     PHINode *tmpI1 = dyn_cast<PHINode>(I);
                     for (int i = 0; i < tmpI->getNumOperands(); ++i)
                     {
-                        sameOperands &= (tmpI->getOperand(i) == I->getOperand(i));
+                        if ((dyn_cast<Constant>(tmpI->getOperand(i))) && (dyn_cast<Constant>(I->getOperand(i))))
+                        {
+                            Constant *constVal0 = (dyn_cast<Constant>(tmpI->getOperand(i)));
+                            Constant *constVal1 = (dyn_cast<Constant>(I->getOperand(i)));
+                            sameOperands &= (constVal0->isElementWiseEqual(constVal1));
+                        }
+                        else
+                        {
+                            sameOperands &= (tmpI->getOperand(i) == I->getOperand(i));
+                        }
                         sameOperands &= tmpI0->getIncomingBlock(i) == tmpI1->getIncomingBlock(i);
                     }
                 }
@@ -158,7 +170,16 @@ Instruction *HI_HLSDuplicateInstRm::checkDuplicationInBlock(BasicBlock *B, Instr
                 {
                     for (int i = 0; i < tmpI->getNumOperands(); ++i)
                     {
-                        sameOperands &= (tmpI->getOperand(i) == I->getOperand(i));
+                        if ((dyn_cast<Constant>(tmpI->getOperand(i))) && (dyn_cast<Constant>(I->getOperand(i))))
+                        {
+                            Constant *constVal0 = (dyn_cast<Constant>(tmpI->getOperand(i)));
+                            Constant *constVal1 = (dyn_cast<Constant>(I->getOperand(i)));
+                            sameOperands &= (constVal0->isElementWiseEqual(constVal1));
+                        }
+                        else
+                        {
+                            sameOperands &= (tmpI->getOperand(i) == I->getOperand(i));
+                        }
                     }
                 }
             }

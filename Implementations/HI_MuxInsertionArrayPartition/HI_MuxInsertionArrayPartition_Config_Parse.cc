@@ -198,8 +198,7 @@ void HI_MuxInsertionArrayPartition::parseArrayPartition(std::stringstream &iss)
         case hash_compile_time("dim"):
             consumeEqual(iss);
             iss >> tmp_val;
-            ans_pragma.dim =
-                std::stoi(tmp_val) - 1; // count from dim="0" to match the storage format
+            ans_pragma.dim = std::stoi(tmp_val) - 1; // count from dim="0" to match the storage format
             break;
 
         case hash_compile_time("factor"):
@@ -257,8 +256,7 @@ void HI_MuxInsertionArrayPartition::parseArrayPortNum(std::stringstream &iss)
         case hash_compile_time("port_num"):
             consumeEqual(iss);
             iss >> tmp_val;
-            ans_pragma.port_num =
-                std::stoi(tmp_val); // count from dim="0" to match the storage format
+            ans_pragma.port_num = std::stoi(tmp_val); // count from dim="0" to match the storage format
             break;
 
         default:
@@ -414,8 +412,7 @@ void HI_MuxInsertionArrayPartition::parseLoopUnroll(std::stringstream &iss)
 }
 
 // match the configuration and the corresponding declaration of memory (array)
-void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target,
-                                                               HI_ArrayInfo &resArrayInfo)
+void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target, HI_ArrayInfo &resArrayInfo)
 {
     // by default, we set the port number for BRAM to 1 (single port BRAM)
     resArrayInfo.port_num = 1;
@@ -423,10 +420,10 @@ void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target,
     {
         if (pragma.HI_PragmaInfoType == HI_PragmaInfo::arrayPartition_Pragma)
         {
-            if (target->getName() == pragma.targetStr)
+            if (target->getName().str() == pragma.targetStr)
             {
                 Function *F = getFunctionOfValue(target);
-                std::string nameOfFunction = demangleFunctionName(F->getName());
+                std::string nameOfFunction = demangleFunctionName(F->getName().str());
                 assert(F && "the parent function of the value should be found.");
                 if (nameOfFunction != pragma.scopeStr)
                 {
@@ -447,10 +444,10 @@ void HI_MuxInsertionArrayPartition::matchArrayAndConfiguration(Value *target,
         }
         else if (pragma.HI_PragmaInfoType == HI_PragmaInfo::arrayPortNum_Pragma)
         {
-            if (target->getName() == pragma.targetStr)
+            if (target->getName().str() == pragma.targetStr)
             {
                 Function *F = getFunctionOfValue(target);
-                std::string nameOfFunction = demangleFunctionName(F->getName());
+                std::string nameOfFunction = demangleFunctionName(F->getName().str());
                 assert(F && "the parent function of the value should be found.");
                 if (nameOfFunction != pragma.scopeStr)
                 {

@@ -38,7 +38,7 @@
 #include "llvm/IR/Value.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
-#include "llvm/PassAnalysisSupport.h"
+#include "llvm/Pass.h"
 #include "llvm/Support/Casting.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/ErrorHandling.h"
@@ -138,7 +138,7 @@ class HI_LoopUnroll : public LoopPass
     tryToUnrollLoop(Loop *L, DominatorTree &DT, LoopInfo *LI, ScalarEvolution &SE,
                     const TargetTransformInfo &TTI, AssumptionCache &AC,
                     OptimizationRemarkEmitter &ORE, bool PreserveLCSSA, int OptLevel,
-                    bool OnlyWhenForced, int ProvidedCount, Optional<unsigned> ProvidedThreshold,
+                    bool OnlyWhenForced, unsigned int  ProvidedCount, Optional<unsigned> ProvidedThreshold,
                     Optional<bool> ProvidedAllowPartial, Optional<bool> ProvidedRuntime,
                     Optional<bool> ProvidedUpperBound, Optional<bool> ProvidedAllowPeeling);
 

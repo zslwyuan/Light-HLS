@@ -140,11 +140,11 @@ void HI_ReplaceSelectAccess::From_SelectAccess_To_AccessSelect(Instruction *I)
 
     Instruction *accessI = getAccessInst(I);
     IRBuilder<> Builder(I->getNextNode());
-    std::string op0str = I->getName();
+    std::string op0str = I->getName().str();
     op0str += ".access0";
-    std::string op1str = I->getName();
+    std::string op1str = I->getName().str();
     op1str += ".access1";
-    std::string selectNewStr = selectI->getName();
+    std::string selectNewStr = selectI->getName().str();
     selectNewStr += ".accessSelect";
 
     Value *ResultPtr = nullptr;

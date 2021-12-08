@@ -26,7 +26,7 @@ bool HI_InstructionLatencyCollect::runOnFunction(
     SE = &getAnalysis<ScalarEvolutionWrapperPass>().getSE();
     LI = &getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
     LAA = &getAnalysis<LoopAccessLegacyAnalysis>();
-    if (F.getName() == top_function_name)
+    if (F.getName().str() == top_function_name)
     {
         *Evaluating_log << "Top Function: " << F.getName()
                         << " is found and start to evaluate its latency.\n\n\n";

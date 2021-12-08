@@ -190,9 +190,9 @@ void HI_AggressiveLSR_MUL::LSR_Process(Instruction *Mul_I, APInt start_val, APIn
     if (DEBUG)
         *AggrLSRLog << "find the PHINode: [" << *PHI_I << "] for Mul: [" << *Mul_I << "]\n";
 
-    std::string LSR_PHI_Name = Mul_I->getName();
+    std::string LSR_PHI_Name = Mul_I->getName().str();
     LSR_PHI_Name += ".PHI";
-    std::string LSR_Add_Name = Mul_I->getName();
+    std::string LSR_Add_Name = Mul_I->getName().str();
     LSR_Add_Name += ".Add";
     IRBuilder<> Builder(Mul_I->getParent()->getFirstNonPHI());
     // BasicBlock *CurBlock = Mul_I->getParent();

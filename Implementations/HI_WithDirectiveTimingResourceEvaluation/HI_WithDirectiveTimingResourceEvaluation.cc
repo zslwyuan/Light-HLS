@@ -157,7 +157,7 @@ void HI_WithDirectiveTimingResourceEvaluation::analyzeTopFunction(Module &M)
     int FF_needed_by_FSM = state_total_num;
     for (auto &F : M)
     {
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         mangled_name =
@@ -175,7 +175,7 @@ void HI_WithDirectiveTimingResourceEvaluation::analyzeTopFunction(Module &M)
 
             // The top function BRAM interface should be considered.
             FunctionResource[&F] = FunctionResource[&F] + BRAMRelatedCostForTopFunction(F);
-            FuncName2Resource[F.getName()] =
+            FuncName2Resource[F.getName().str()] =
                 FunctionResource[&F]; // update the resource evaluation for top function
 
             topFunction_resource =
@@ -229,7 +229,7 @@ void HI_WithDirectiveTimingResourceEvaluation::TraceMemoryDeclarationAndAnalyzeA
             F.getName().find("HIPartitionMux") !=
                 std::string::npos) // bypass the "llvm.xxx" functions..
             continue;
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         findMemoryDeclarationAndAnalyzeAccessin(&F, demangled_name == top_function_name &&

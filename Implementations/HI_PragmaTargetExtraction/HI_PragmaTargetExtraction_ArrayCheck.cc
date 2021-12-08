@@ -46,7 +46,7 @@ void HI_PragmaTargetExtraction::findMemoryDeclarationAndAnalyzeAccessin(Function
                         *arrayTarget_Log << "  get array information of [" << it->getName()
                                          << "] from argument and its address=" << it << "\n";
                     Target2ArrayInfo[it] = getArrayInfo(it);
-                    Array2Info[std::pair<std::string, std::string>(F->getName(), it->getName())] =
+                    Array2Info[std::pair<std::string, std::string>(F->getName().str(), it->getName().str())] =
                         Target2ArrayInfo[it];
                     FuncTargetSet.insert(std::pair<Function *, Value *>(F, it));
                     TraceAccessForTarget(it, it);
@@ -62,7 +62,7 @@ void HI_PragmaTargetExtraction::findMemoryDeclarationAndAnalyzeAccessin(Function
                                          << "] from argument and its address=" << it << "\n";
                     FuncTargetSet.insert(std::pair<Function *, Value *>(F, it));
                     Target2ArrayInfo[it] = getArrayInfo(it);
-                    Array2Info[std::pair<std::string, std::string>(F->getName(), it->getName())] =
+                    Array2Info[std::pair<std::string, std::string>(F->getName().str(), it->getName().str())] =
                         Target2ArrayInfo[it];
                     TraceAccessForTarget(it, it);
                     if (DEBUG)
@@ -92,7 +92,7 @@ void HI_PragmaTargetExtraction::findMemoryDeclarationAndAnalyzeAccessin(Function
                     *arrayTarget_Log << "  get array information of [" << *allocI
                                      << "] from allocaInst and its address=" << allocI << "\n";
                 Target2ArrayInfo[allocI] = getArrayInfo(allocI);
-                Array2Info[std::pair<std::string, std::string>(F->getName(), allocI->getName())] =
+                Array2Info[std::pair<std::string, std::string>(F->getName().str(), allocI->getName().str())] =
                     Target2ArrayInfo[allocI];
                 FuncTargetSet.insert(std::pair<Function *, Value *>(F, allocI));
                 TraceAccessForTarget(allocI, allocI);
@@ -294,9 +294,9 @@ HI_PragmaArrayInfo HI_PragmaTargetExtraction::getArrayInfo(Value *target)
                 res_array_info.sub_element_num[num_dims - 1] *
                 res_array_info.dim_size[num_dims - 1];
 
-        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName());
+        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName().str());
         std::string funcLine;
-        std::string argName(arg_v->getName());
+        std::string argName(arg_v->getName().str());
 
         for (int possibleLine : IRFunc2BeginLine[FuncName])
         {
@@ -315,7 +315,7 @@ HI_PragmaArrayInfo HI_PragmaTargetExtraction::getArrayInfo(Value *target)
 
     res_array_info.elementType = tmp_type;
     res_array_info.target = target;
-    res_array_info.targetName = target->getName();
+    res_array_info.targetName = target->getName().str();
 
     return res_array_info;
 }

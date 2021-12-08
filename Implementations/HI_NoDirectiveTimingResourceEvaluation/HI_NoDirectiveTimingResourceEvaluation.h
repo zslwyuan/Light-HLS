@@ -36,7 +36,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
-#include "llvm/PassAnalysisSupport.h"
+#include "llvm/Pass.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
@@ -793,18 +793,18 @@ class HI_NoDirectiveTimingResourceEvaluation : public ModulePass
     */
     Value *getAccessTarget(Instruction *Load_or_Store);
 
-    class HI_AAResult : public AAResultBase<HI_AAResult>
-    {
-      public:
-        explicit HI_AAResult() : AAResultBase()
-        {
-        }
-        HI_AAResult(HI_AAResult &&Arg) : AAResultBase(std::move(Arg))
-        {
-        }
+    // class HI_AAResult : public AAResultBase<HI_AAResult>
+    // {
+    //   public:
+    //     explicit HI_AAResult() : AAResultBase()
+    //     {
+    //     }
+    //     HI_AAResult(HI_AAResult &&Arg) : AAResultBase(std::move(Arg))
+    //     {
+    //     }
 
-        AliasResult alias(const MemoryLocation &LocA, const MemoryLocation &LocB);
-    };
+    //     AliasResult alias(const MemoryLocation &LocA, const MemoryLocation &LocB);
+    // };
 
     /// Timer
 

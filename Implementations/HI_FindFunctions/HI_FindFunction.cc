@@ -26,12 +26,12 @@ bool HI_FindFunctions::runOnModule(
         *Function_Demangle << "Found function Definition named == " << GI->getName()
                            << "\n"; // a Function class is inherited from Value class, which has a
                                     // function to get the name of the value (function).
-        std::string fname(GI->getName());
+        std::string fname(GI->getName().str());
         if (fname[0] == '_')
         {
             *Function_Demangle << "     its demangled name == "
-                               << DemangleFunctionName(GI->getName()) << "\n";
-            Function_Demangle_Map[GI->getName()] = DemangleFunctionName(fname);
+                               << DemangleFunctionName(GI->getName().str()) << "\n";
+            Function_Demangle_Map[GI->getName().str()] = DemangleFunctionName(fname);
         }
     }
 

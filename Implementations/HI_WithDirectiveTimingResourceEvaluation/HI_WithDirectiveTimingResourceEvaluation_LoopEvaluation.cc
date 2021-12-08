@@ -52,13 +52,11 @@ void HI_WithDirectiveTimingResourceEvaluation::getLoopBlockMap(Function *F)
     {
         Loop *L = *i;
         if (DEBUG)
-            *Evaluating_log << "--------- Loop: " << L->getName() << " address: " << L->getHeader()
-                            << " contains:\n ";
+            *Evaluating_log << "--------- Loop: " << L->getName() << " address: " << L->getHeader() << " contains:\n ";
         for (auto BinL : L->getBlocks())
         {
             if (DEBUG)
-                *Evaluating_log << "------------- Block: " << BinL->getName()
-                                << " address: " << BinL << " \n";
+                *Evaluating_log << "------------- Block: " << BinL->getName() << " address: " << BinL << " \n";
             std::vector<BasicBlock *> *tmp_vec_block;
             std::vector<Loop *> *tmp_vec_loop;
 
@@ -99,8 +97,7 @@ Loop *HI_WithDirectiveTimingResourceEvaluation::getInnerUnevaluatedLoop(Loop *ou
     {
         if (DEBUG)
             *Evaluating_log << "--------- checking sub-loop: " << tmp_Loop->getName()
-                            << " address:" << tmp_Loop->getHeader()
-                            << " -> dep = " << tmp_Loop->getLoopDepth() << " ";
+                            << " address:" << tmp_Loop->getHeader() << " -> dep = " << tmp_Loop->getLoopDepth() << " ";
         if (LoopEvaluated.find(tmp_Loop->getHeader()) != LoopEvaluated.end())
         {
             if (DEBUG)
@@ -122,26 +119,22 @@ Loop *HI_WithDirectiveTimingResourceEvaluation::getInnerUnevaluatedLoop(Loop *ou
                 LoopEvaluated.find(tmp_inner_Sub_Loop->getHeader()) == LoopEvaluated.end())
             {
                 dep = tmp_inner_Sub_Loop->getLoopDepth();
-                tmp_inner_Loop =
-                    tmp_inner_Sub_Loop; //  the sub-sub-...-loop could be the most inner loop
+                tmp_inner_Loop = tmp_inner_Sub_Loop; //  the sub-sub-...-loop could be the most inner loop
                 if (DEBUG)
-                    *Evaluating_log
-                        << "--------- update target sub-loop to Loop: " << tmp_inner_Loop->getName()
-                        << "\n";
+                    *Evaluating_log << "--------- update target sub-loop to Loop: " << tmp_inner_Loop->getName()
+                                    << "\n";
             }
         }
         else
         {
-            if (tmp_Loop->getLoopDepth() > dep &&
-                LoopEvaluated.find(tmp_Loop->getHeader()) == LoopEvaluated.end())
+            if (tmp_Loop->getLoopDepth() > dep && LoopEvaluated.find(tmp_Loop->getHeader()) == LoopEvaluated.end())
             {
                 dep = tmp_Loop->getLoopDepth();
                 tmp_inner_Loop = tmp_Loop; //  no the sub-sub-...-loop could be the most inner loop
                                            //  but current sub-loop could be
                 if (DEBUG)
-                    *Evaluating_log
-                        << "--------- update target sub-loop to Loop: " << tmp_inner_Loop->getName()
-                        << "\n";
+                    *Evaluating_log << "--------- update target sub-loop to Loop: " << tmp_inner_Loop->getName()
+                                    << "\n";
             }
         }
     }
@@ -150,8 +143,7 @@ Loop *HI_WithDirectiveTimingResourceEvaluation::getInnerUnevaluatedLoop(Loop *ou
     {
         if (DEBUG)
             *Evaluating_log << "--------- checking loop itself: " << tmp_Loop->getName()
-                            << " address:" << tmp_Loop->getHeader()
-                            << " -> dep = " << tmp_Loop->getLoopDepth() << " ";
+                            << " address:" << tmp_Loop->getHeader() << " -> dep = " << tmp_Loop->getLoopDepth() << " ";
         if (LoopEvaluated.find(tmp_Loop->getHeader()) != LoopEvaluated.end())
             if (DEBUG)
                 *Evaluating_log << " which is evaluated.\n";
@@ -159,14 +151,12 @@ Loop *HI_WithDirectiveTimingResourceEvaluation::getInnerUnevaluatedLoop(Loop *ou
                 *Evaluating_log << " which is NOT evaluated.\n";
 
         // larger depth means more inner
-        if (tmp_Loop->getLoopDepth() > dep &&
-            LoopEvaluated.find(tmp_Loop->getHeader()) == LoopEvaluated.end())
+        if (tmp_Loop->getLoopDepth() > dep && LoopEvaluated.find(tmp_Loop->getHeader()) == LoopEvaluated.end())
         {
             dep = tmp_Loop->getLoopDepth();
             tmp_inner_Loop = tmp_Loop;
             if (DEBUG)
-                *Evaluating_log << "--------- update target loop to Loop: "
-                                << tmp_inner_Loop->getName() << "\n";
+                *Evaluating_log << "--------- update target loop to Loop: " << tmp_inner_Loop->getName() << "\n";
         }
     }
 
@@ -185,14 +175,12 @@ HI_WithDirectiveTimingResourceEvaluation::timingBase
 HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
 {
     if (DEBUG)
-        *Evaluating_log << "\n Evaluating Outer Loop Latency for Loop " << outerL->getName()
-                        << ":\n";
+        *Evaluating_log << "\n Evaluating Outer Loop Latency for Loop " << outerL->getName() << ":\n";
     if (LoopLatency.find(outerL->getHeader()) != LoopLatency.end())
     {
         if (DEBUG)
             *Evaluating_log << "Done evaluation outer Loop Latency for Loop " << outerL->getName()
-                            << " and its latency is " << LoopLatency[outerL->getHeader()]
-                            << " cycles.\n\n\n";
+                            << " and its latency is " << LoopLatency[outerL->getHeader()] << " cycles.\n\n\n";
         return LoopLatency[outerL->getHeader()];
     }
     Loop *cur_Loop;
@@ -204,9 +192,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
     while (cur_Loop != NULL)
     {
 
-        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName();
+        std::string tmp_loop_name = cur_Loop->getHeader()->getParent()->getName().str();
         tmp_loop_name += "-";
-        tmp_loop_name += cur_Loop->getHeader()->getName();
+        tmp_loop_name += cur_Loop->getHeader()->getName().str();
 
         if (DEBUG)
             *Evaluating_log << "-- Handling the inner Loop " << cur_Loop->getName() << ":\n";
@@ -218,11 +206,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
         if (tmp_ExitingBlocks.size() != 1)
         {
             assert(tmp_ExitingBlocks.size() > 0);
-            print_warning(
-                "the loop could be better to have only one exiting block for the accuracy of "
-                "latency evaluation, but the following loop has multiple exits:");
-            llvm::errs() << "loop: " << cur_Loop->getName()
-                         << " (label=" << IRLoop2LoopLabel[tmp_loop_name]
+            print_warning("the loop could be better to have only one exiting block for the accuracy of "
+                          "latency evaluation, but the following loop has multiple exits:");
+            llvm::errs() << "loop: " << cur_Loop->getName() << " (label=" << IRLoop2LoopLabel[tmp_loop_name]
                          << ") has multiple exits and they are:\n";
             for (auto B_it : tmp_ExitingBlocks)
             {
@@ -242,12 +228,11 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
         timingBase max_critial_path_in_curLoop(0, 0, 1, clock_period);
         resourceBase resourceAccumulator(0, 0, 0, clock_period);
         tmp_BlockCriticalPath_inLoop.clear(); // record the block level critical path in the loop
-        tmp_SubLoop_CriticalPath
-            .clear(); // record the critical path to the end of sub-loops in the loop
+        tmp_SubLoop_CriticalPath.clear();     // record the critical path to the end of sub-loops in the loop
 
         BlockVisited.clear();
-        LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(
-            origin_latency, cur_Loop, tmp_LoopHeader, resourceAccumulator);
+        LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(origin_latency, cur_Loop, tmp_LoopHeader,
+                                                                       resourceAccumulator);
         BlockCriticalPath_inLoop[cur_Loop] = tmp_BlockCriticalPath_inLoop;
 
         for (auto tmp_it : tmp_BlockCriticalPath_inLoop)
@@ -282,9 +267,8 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
                     LoopLabel2AchievedII[opt_LoopLabel] = max_critial_path_in_curLoop.latency;
                     Loop2AchievedII[cur_Loop->getHeader()] = max_critial_path_in_curLoop.latency;
                 }
-                print_warning("Loop  " + std::string(cur_Loop->getName()) +
-                              " is pipelined with II=" + std::to_string(II_for_loop) +
-                              " which means it is not worthy to pipeline the loop.");
+                print_warning("Loop  " + std::string(cur_Loop->getName().str()) + " is pipelined with II=" +
+                              std::to_string(II_for_loop) + " which means it is not worthy to pipeline the loop.");
             }
             BasicBlock *innerHeader = nullptr;
             int total_nesttripcount = 1;
@@ -301,20 +285,18 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
                     *Evaluating_log << "This is a perfectly nested loop containing a pipelined "
                                        "subloop, we should flatten it.\n";
                 if (DEBUG)
-                    *Evaluating_log << "total tripcount is " << total_nesttripcount
-                                    << " inner pipeline II is " << Loop2AchievedII[innerHeader]
-                                    << " inner iteration latency is "
+                    *Evaluating_log << "total tripcount is " << total_nesttripcount << " inner pipeline II is "
+                                    << Loop2AchievedII[innerHeader] << " inner iteration latency is "
                                     << Loop2IterationLatency[innerHeader] << "\n";
-                tmp_total_latency = (total_nesttripcount - 1) * Loop2AchievedII[innerHeader] *
-                                        timingBase(1, 0, 1, clock_period) +
-                                    Loop2IterationLatency[innerHeader];
+                tmp_total_latency =
+                    (total_nesttripcount - 1) * Loop2AchievedII[innerHeader] * timingBase(1, 0, 1, clock_period) +
+                    Loop2IterationLatency[innerHeader];
             }
             else
             {
                 int tmp_unroll_factor = -1;
                 int original_tripcount = -1;
-                if (LoopLabel2UnrollFactor.find(IRLoop2LoopLabel[tmp_loop_name]) !=
-                    LoopLabel2UnrollFactor.end())
+                if (LoopLabel2UnrollFactor.find(IRLoop2LoopLabel[tmp_loop_name]) != LoopLabel2UnrollFactor.end())
                 {
                     tmp_unroll_factor = LoopLabel2UnrollFactor[IRLoop2LoopLabel[tmp_loop_name]];
                     original_tripcount = IRLoop2OriginTripCount[tmp_loop_name];
@@ -330,8 +312,7 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
                 //     * 11  + 9) / 10;
                 // }
 
-                tmp_total_latency =
-                    SE->getSmallConstantMaxTripCount(cur_Loop) * max_critial_path_in_curLoop;
+                tmp_total_latency = SE->getSmallConstantMaxTripCount(cur_Loop) * max_critial_path_in_curLoop;
             }
 
             costRescheduleFPDSPOperators_forNotPipelineLoop(cur_Loop, tmp_BlockCriticalPath_inLoop);
@@ -343,8 +324,7 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
 
             int tmp_unroll_factor = -1;
             int original_tripcount = -1;
-            if (LoopLabel2UnrollFactor.find(IRLoop2LoopLabel[tmp_loop_name]) !=
-                LoopLabel2UnrollFactor.end())
+            if (LoopLabel2UnrollFactor.find(IRLoop2LoopLabel[tmp_loop_name]) != LoopLabel2UnrollFactor.end())
             {
                 tmp_unroll_factor = LoopLabel2UnrollFactor[IRLoop2LoopLabel[tmp_loop_name]];
                 original_tripcount = IRLoop2OriginTripCount[tmp_loop_name];
@@ -353,10 +333,8 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
             // original trip count is not the multiple of the unroll factor
             // and the overhead of the remainder iterations is too high
             // VivadoHLS might shut down the last iteration ASAP
-            if (tmp_unroll_factor > 0 && original_tripcount > 0 &&
-                original_tripcount % tmp_unroll_factor != 0 &&
-                (original_tripcount % tmp_unroll_factor < original_tripcount / 2) &&
-                II_for_loop > 10)
+            if (tmp_unroll_factor > 0 && original_tripcount > 0 && original_tripcount % tmp_unroll_factor != 0 &&
+                (original_tripcount % tmp_unroll_factor < original_tripcount / 2) && II_for_loop > 10)
             {
                 if (DEBUG)
                     *Evaluating_log << "the overhead of the remainder iterations after unrolling "
@@ -364,14 +342,12 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
                                        "last iteration after unrolling\n";
                 if (DEBUG)
                     *Evaluating_log << "the original trip count is " << original_tripcount << "\n";
-                timingBase tmp_total_latency_0 = (SE->getSmallConstantMaxTripCount(cur_Loop) - 2) *
-                                                     II_for_loop *
-                                                     timingBase(1, 0, 1, clock_period) +
-                                                 max_critial_path_in_curLoop;
-                timingBase tmp_total_latency_1 = (SE->getSmallConstantMaxTripCount(cur_Loop) - 1) *
-                                                     II_for_loop *
-                                                     timingBase(1, 0, 1, clock_period) +
-                                                 max_critial_path_in_curLoop / 2;
+                timingBase tmp_total_latency_0 =
+                    (SE->getSmallConstantMaxTripCount(cur_Loop) - 2) * II_for_loop * timingBase(1, 0, 1, clock_period) +
+                    max_critial_path_in_curLoop;
+                timingBase tmp_total_latency_1 =
+                    (SE->getSmallConstantMaxTripCount(cur_Loop) - 1) * II_for_loop * timingBase(1, 0, 1, clock_period) +
+                    max_critial_path_in_curLoop / 2;
                 if (tmp_total_latency_0 > tmp_total_latency_1)
                     tmp_total_latency = tmp_total_latency_0;
                 else
@@ -379,9 +355,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
             }
             else
             {
-                tmp_total_latency = (SE->getSmallConstantMaxTripCount(cur_Loop) - 1) * II_for_loop *
-                                        timingBase(1, 0, 1, clock_period) +
-                                    max_critial_path_in_curLoop;
+                tmp_total_latency =
+                    (SE->getSmallConstantMaxTripCount(cur_Loop) - 1) * II_for_loop * timingBase(1, 0, 1, clock_period) +
+                    max_critial_path_in_curLoop;
             }
 
             Loop2AchievedII[cur_Loop->getHeader()] = II_for_loop;
@@ -390,11 +366,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
 
             LoopLabel2AchievedII[opt_LoopLabel] = II_for_loop;
 
-            resourceAccumulator =
-                resourceAccumulator + costRescheduleIntDSPOperators_forLoop(
-                                          cur_Loop, tmp_BlockCriticalPath_inLoop, II_for_loop);
-            recordCostRescheduleFPDSPOperators_forLoop(cur_Loop, tmp_BlockCriticalPath_inLoop,
-                                                       II_for_loop);
+            resourceAccumulator = resourceAccumulator + costRescheduleIntDSPOperators_forLoop(
+                                                            cur_Loop, tmp_BlockCriticalPath_inLoop, II_for_loop);
+            recordCostRescheduleFPDSPOperators_forLoop(cur_Loop, tmp_BlockCriticalPath_inLoop, II_for_loop);
 
             // assert(false && "TODO : implementation!!");
         }
@@ -426,23 +400,20 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
             *Evaluating_log << "Trip Count for Loop " << cur_Loop->getName() << " is "
                             << SE->getSmallConstantMaxTripCount(cur_Loop) << "\n";
         if (DEBUG)
-            *Evaluating_log << "Done evaluation Loop Latency for Loop " << cur_Loop->getName()
-                            << "(" << IRLoop2LoopLabel[tmp_loop_name] << ")"
+            *Evaluating_log << "Done evaluation Loop Latency for Loop " << cur_Loop->getName() << "("
+                            << IRLoop2LoopLabel[tmp_loop_name] << ")"
                             << " and its latency is " << tmp_total_latency
-                            << " cycles and its resource cost is: "
-                            << LoopResource[cur_Loop->getHeader()] << ".\n\n\n";
+                            << " cycles and its resource cost is: " << LoopResource[cur_Loop->getHeader()] << ".\n\n\n";
 
         LoopLabel2Latency[IRLoop2LoopLabel[tmp_loop_name]] = tmp_total_latency;
         LoopLabel2Resource[IRLoop2LoopLabel[tmp_loop_name]] = resourceAccumulator;
         // (1) iteratively handle the most inner loop
         cur_Loop = getInnerUnevaluatedLoop(outerL);
     }
-    outerL_latency =
-        tmp_total_latency; // finally, we will get the latency of outer loop in the last iteration
+    outerL_latency = tmp_total_latency; // finally, we will get the latency of outer loop in the last iteration
     if (DEBUG)
-        *Evaluating_log << "Done evaluation outer Loop Latency for Loop " << outerL->getName()
-                        << " and its latency is " << outerL_latency
-                        << " cycles and its resource cost is: " << LoopResource[outerL->getHeader()]
+        *Evaluating_log << "Done evaluation outer Loop Latency for Loop " << outerL->getName() << " and its latency is "
+                        << outerL_latency << " cycles and its resource cost is: " << LoopResource[outerL->getHeader()]
                         << ".\n\n\n";
     assert(outerL_latency.latency > -0.5 && "The latency for a loop should be not be negative");
     return outerL_latency * 1;
@@ -461,11 +432,9 @@ HI_WithDirectiveTimingResourceEvaluation::analyzeOuterLoop(Loop *outerL)
     (4) Release the block from visited flag, as a step of typical DFS
 
 */
-void HI_WithDirectiveTimingResourceEvaluation::
-    LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(
-        HI_WithDirectiveTimingResourceEvaluation::timingBase tmp_critical_path, Loop *L,
-        BasicBlock *curBlock,
-        HI_WithDirectiveTimingResourceEvaluation::resourceBase &resourceAccumulator)
+void HI_WithDirectiveTimingResourceEvaluation::LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(
+    HI_WithDirectiveTimingResourceEvaluation::timingBase tmp_critical_path, Loop *L, BasicBlock *curBlock,
+    HI_WithDirectiveTimingResourceEvaluation::resourceBase &resourceAccumulator)
 {
 
     // (1) Mark the block visited, as a step of typical DFS
@@ -485,9 +454,8 @@ void HI_WithDirectiveTimingResourceEvaluation::
         if (DEBUG)
             *Evaluating_log << " LoopLatency =  " << LoopLatency[tmp_SubLoop->getHeader()] << " ";
         timingBase try_critical_path =
-            tmp_critical_path +
-            LoopLatency[tmp_SubLoop->getHeader()]; // first, get the critical path to the end of
-                                                   // sub-loop
+            tmp_critical_path + LoopLatency[tmp_SubLoop->getHeader()]; // first, get the critical path to the end of
+                                                                       // sub-loop
         if (DEBUG)
             *Evaluating_log << " NewCP =  " << try_critical_path << " ";
         bool checkFlag = false;
@@ -506,8 +474,7 @@ void HI_WithDirectiveTimingResourceEvaluation::
             if (tmp_SubLoop_CriticalPath.find(tmp_SubLoop) != tmp_SubLoop_CriticalPath.end())
             {
                 if (DEBUG)
-                    *Evaluating_log << " OriCP =  " << tmp_SubLoop_CriticalPath[tmp_SubLoop]
-                                    << "\n";
+                    *Evaluating_log << " OriCP =  " << tmp_SubLoop_CriticalPath[tmp_SubLoop] << "\n";
             }
             else
             {
@@ -525,15 +492,13 @@ void HI_WithDirectiveTimingResourceEvaluation::
             {
                 for (auto B : successors(ExitB))
                 {
-                    if (L->contains(B) && BlockVisited.find(B) == BlockVisited.end() &&
-                        !tmp_SubLoop->contains(B))
+                    if (L->contains(B) && BlockVisited.find(B) == BlockVisited.end() && !tmp_SubLoop->contains(B))
                     {
                         if (DEBUG)
-                            *Evaluating_log
-                                << "---- loop continue to traverser to Block: " << B->getName()
-                                << " from " << curBlock->getName() << " ";
-                        LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(
-                            try_critical_path, L, B, resourceAccumulator);
+                            *Evaluating_log << "---- loop continue to traverser to Block: " << B->getName() << " from "
+                                            << curBlock->getName() << " ";
+                        LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(try_critical_path, L, B,
+                                                                                       resourceAccumulator);
                     }
                 }
             }
@@ -570,8 +535,7 @@ void HI_WithDirectiveTimingResourceEvaluation::
             if (tmp_BlockCriticalPath_inLoop.find(curBlock) != tmp_BlockCriticalPath_inLoop.end())
             {
                 if (DEBUG)
-                    *Evaluating_log << " OriCP =  " << tmp_BlockCriticalPath_inLoop[curBlock]
-                                    << "\n";
+                    *Evaluating_log << " OriCP =  " << tmp_BlockCriticalPath_inLoop[curBlock] << "\n";
             }
             else
             {
@@ -591,11 +555,10 @@ void HI_WithDirectiveTimingResourceEvaluation::
                 if (L->contains(B) && BlockVisited.find(B) == BlockVisited.end())
                 {
                     if (DEBUG)
-                        *Evaluating_log
-                            << "---- loop continue to traverser to Block: " << B->getName()
-                            << " from " << curBlock->getName() << " ";
-                    LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(
-                        try_critical_path, L, B, resourceAccumulator);
+                        *Evaluating_log << "---- loop continue to traverser to Block: " << B->getName() << " from "
+                                        << curBlock->getName() << " ";
+                    LoopLatencyResourceEvaluation_traversFromHeaderToExitingBlocks(try_critical_path, L, B,
+                                                                                   resourceAccumulator);
                 }
             }
         }
@@ -608,8 +571,7 @@ void HI_WithDirectiveTimingResourceEvaluation::
     Simply mark all the blocks in the loop with the totoal_latency by DFS-traverse
 */
 void HI_WithDirectiveTimingResourceEvaluation::MarkBlock_traversFromHeaderToExitingBlocks(
-    HI_WithDirectiveTimingResourceEvaluation::timingBase total_latency, Loop *L,
-    BasicBlock *curBlock)
+    HI_WithDirectiveTimingResourceEvaluation::timingBase total_latency, Loop *L, BasicBlock *curBlock)
 {
     BlockVisited.insert(curBlock);
     Block2EvaluatedLoop[curBlock] = L;
@@ -630,9 +592,9 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (curLoop->getSubLoops().size() != 0)
         return -1;
     BasicBlock *Header = curLoop->getHeader();
-    std::string tmp_loop_name = Header->getParent()->getName();
+    std::string tmp_loop_name = Header->getParent()->getName().str();
     tmp_loop_name += "-";
-    tmp_loop_name += Header->getName();
+    tmp_loop_name += Header->getName().str();
     if (IRLoop2LoopLabel.find(tmp_loop_name) == IRLoop2LoopLabel.end())
         return -1;
 
@@ -645,8 +607,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
             if (CallInst *callI = dyn_cast<CallInst>(&I))
             {
                 if (callI->getCalledFunction()->getName().find("llvm.") != std::string::npos ||
-                    callI->getCalledFunction()->getName().find("HIPartitionMux") !=
-                        std::string::npos)
+                    callI->getCalledFunction()->getName().find("HIPartitionMux") != std::string::npos)
                 {
                     continue;
                 }
@@ -654,9 +615,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
                 {
                     if (LoopLabel2II.find(label) != LoopLabel2II.end())
                     {
-                        print_warning("Failed to pipeline the loop [" + label +
-                                      "] due to subfunction(s) ["+ callI->getCalledFunction()->getName().str() 
-                                      +"] called in it.\n");
+                        print_warning("Failed to pipeline the loop [" + label + "] due to subfunction(s) [" +
+                                      callI->getCalledFunction()->getName().str() + "] called in it.\n");
                         LoopLabel2SmallestII[label] = 1000000000;
                         return -1;
                     }
@@ -675,14 +635,13 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
 
     if (II_BRAM != II_BRAM_enum)
     {
-        print_warning("Loop II of " + std::string(curLoop->getName()) +
-                      " has conflict prediction: ideal=" + std::to_string(II_BRAM) +
-                      " enum=" + std::to_string(II_BRAM_enum));
+        print_warning("Loop II of " + std::string(curLoop->getName().str()) + " has conflict prediction: ideal=" +
+                      std::to_string(II_BRAM) + " enum=" + std::to_string(II_BRAM_enum));
         if (II_BRAM_enum < 0)
         {
             if (LoopLabel2II.find(label) == LoopLabel2II.end())
-                print_warning("Don't worry for the negative enum=" + std::to_string(II_BRAM_enum) +
-                              " because " + label + " is not pipelined.\n");
+                print_warning("Don't worry for the negative enum=" + std::to_string(II_BRAM_enum) + " because " +
+                              label + " is not pipelined.\n");
             else
             {
                 assert(false && "This loop is unable to be pipelined");
@@ -716,7 +675,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     // When pipelined, the loop should not have any sub-loop inside
     if (curLoop->getSubLoops().size() > 0)
     {
-        std::string loopName = curLoop->getName();
+        std::string loopName = curLoop->getName().str();
         print_warning(loopName + " should not be pipelined with subloops.");
         return -1;
     }
@@ -729,15 +688,13 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (DEBUG)
         *Evaluating_log << "--------- Loop pipeline BRAM-related II is " << II_BRAM << "\n";
     if (DEBUG)
-        *Evaluating_log << "--------- Loop pipeline Dependence-related II is " << II_dependence
-                        << "\n";
+        *Evaluating_log << "--------- Loop pipeline Dependence-related II is " << II_dependence << "\n";
 
     if (II_BRAM > min_II)
     {
         min_II = II_BRAM;
-        print_warning(std::string(curLoop->getName()) +
-                      " has hit the limitation of BRAM port, min_II is updated to " +
-                      std::to_string(min_II));
+        print_warning(std::string(curLoop->getName().str()) +
+                      " has hit the limitation of BRAM port, min_II is updated to " + std::to_string(min_II));
         if (DEBUG)
             *Evaluating_log << "--------- Loop pipeline cannot achieve expected II because of BRAM "
                                "limitation\n";
@@ -746,8 +703,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkIIForLoop(
     if (II_dependence > min_II)
     {
         min_II = II_dependence;
-        print_warning(std::string(curLoop->getName()) +
-                      " has loop carried dependence, min_II is updated to " +
+        print_warning(std::string(curLoop->getName().str()) + " has loop carried dependence, min_II is updated to " +
                       std::to_string(min_II));
         if (DEBUG)
             *Evaluating_log << "--------- Loop pipeline cannot achieve expected II because of loop "
@@ -790,28 +746,24 @@ int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop(Loop *curLoop
             Value *target = it_value_partition_2_cnt.first.first;
             partition_info partID = it_value_partition_2_cnt.first.second;
             assert(partID.port_num > 0 && "the port number for the partition should be set.");
-            if (existingAccessCntForLoop.find(it_value_partition_2_cnt.first) ==
-                existingAccessCntForLoop.end())
+            if (existingAccessCntForLoop.find(it_value_partition_2_cnt.first) == existingAccessCntForLoop.end())
             {
-                existingAccessCntForLoop[it_value_partition_2_cnt.first] =
-                    it_value_partition_2_cnt.second;
+                existingAccessCntForLoop[it_value_partition_2_cnt.first] = it_value_partition_2_cnt.second;
             }
             else
             {
-                existingAccessCntForLoop[it_value_partition_2_cnt.first] +=
-                    it_value_partition_2_cnt.second;
+                existingAccessCntForLoop[it_value_partition_2_cnt.first] += it_value_partition_2_cnt.second;
             }
             int accessTotalCntInLoop = existingAccessCntForLoop[it_value_partition_2_cnt.first];
             if ((accessTotalCntInLoop + partID.port_num - 1) / partID.port_num > min_II)
             {
                 if (DEBUG)
-                    *Evaluating_log
-                        << "--------- min II is updated to "
-                        << (accessTotalCntInLoop + partID.port_num - 1) / partID.port_num
-                        << " because\n";
+                    *Evaluating_log << "--------- min II is updated to "
+                                    << (accessTotalCntInLoop + partID.port_num - 1) / partID.port_num << " because\n";
                 if (DEBUG)
-                    *Evaluating_log << "--------- access to the partition#" << partID << " of "
-                                    << *target << " exceed the bandwidth\n";
+                    *Evaluating_log << "--------- accessTotalCntInLoop=" << accessTotalCntInLoop
+                                    << " access to the partition#" << partID << " of " << *target
+                                    << " exceed the bandwidth\n";
 
                 min_II = (accessTotalCntInLoop + partID.port_num - 1) / partID.port_num;
             }
@@ -825,9 +777,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop(Loop *curLoop
 int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop_enumerateCheck(Loop *curLoop)
 {
     if (DEBUG)
-        *ArrayLog
-            << "\n\n============================\n \n checkAccessIIForLoop_enumerateCheck for Loop:"
-            << curLoop->getName() << " \n ============================\n \n";
+        *ArrayLog << "\n\n============================\n \n checkAccessIIForLoop_enumerateCheck for Loop:"
+                  << curLoop->getName() << " \n ============================\n \n";
 
     // initialize an empty seq for later tests for different partitions of different targets
     int latLoop = Loop2CP[curLoop->getHeader()];
@@ -846,15 +797,14 @@ int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop_enumerateChec
         }
         for (auto it_value_partition_2_cnt : accessCounterForBlock[tmp_B])
         {
-            if (accessPartitionsForIITest.find(it_value_partition_2_cnt.first) ==
-                accessPartitionsForIITest.end())
+            if (accessPartitionsForIITest.find(it_value_partition_2_cnt.first) == accessPartitionsForIITest.end())
                 accessPartitionsForIITest.insert(it_value_partition_2_cnt.first);
         }
     }
 
     if (DEBUG)
-        *ArrayLog << "\n\n============================\n \n printing out accesses in Loop:"
-                  << curLoop->getName() << " \n ============================\n \n";
+        *ArrayLog << "\n\n============================\n \n printing out accesses in Loop:" << curLoop->getName()
+                  << " \n ============================\n \n";
 
     if (DEBUG)
         for (auto val_partition_pair : accessPartitionsForIITest) // check whether all partitions
@@ -865,9 +815,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop_enumerateChec
 
             for (auto block_cycle_pair : targetPartition2BlockCycleAccessCnt[val_partition_pair])
             {
-                *ArrayLog << block_cycle_pair.first->getParent()->getName() << "-"
-                          << block_cycle_pair.first->getName() << ":" << block_cycle_pair.second
-                          << "\n";
+                *ArrayLog << block_cycle_pair.first->getParent()->getName() << "-" << block_cycle_pair.first->getName()
+                          << ":" << block_cycle_pair.second << "\n";
             }
             *ArrayLog << "\n";
         }
@@ -890,18 +839,17 @@ int HI_WithDirectiveTimingResourceEvaluation::checkAccessIIForLoop_enumerateChec
 
             for (int test_iter = 0; test_iter < latLoop; test_iter += test_II)
             {
-                for (auto block_cycle_pair :
-                     targetPartition2BlockCycleAccessCnt[val_partition_pair])
+                for (auto block_cycle_pair : targetPartition2BlockCycleAccessCnt[val_partition_pair])
                 {
                     if (!curLoop->contains(block_cycle_pair.first))
                         continue;
 
-                    int slotoffset = BlockBegin_inLoop[block_cycle_pair.first].latency +
-                                     block_cycle_pair.second + test_iter;
+                    int slotoffset =
+                        BlockBegin_inLoop[block_cycle_pair.first].latency + block_cycle_pair.second + test_iter;
                     if (DEBUG)
-                        *ArrayLog << "----->" << block_cycle_pair.first->getParent()->getName()
-                                  << "-" << block_cycle_pair.first->getName() << ":"
-                                  << block_cycle_pair.second << " exactSlot:" << slotoffset << "\n";
+                        *ArrayLog << "----->" << block_cycle_pair.first->getParent()->getName() << "-"
+                                  << block_cycle_pair.first->getName() << ":" << block_cycle_pair.second
+                                  << " exactSlot:" << slotoffset << "\n";
 
                     if (slotoffset <= latLoop)
                     {
@@ -963,15 +911,15 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
 {
 
     BasicBlock *Header = curLoop->getHeader();
-    std::string tmp_loop_name = Header->getParent()->getName();
+    std::string tmp_loop_name = Header->getParent()->getName().str();
     tmp_loop_name += "-";
-    tmp_loop_name += Header->getName();
+    tmp_loop_name += Header->getName().str();
     assert(IRLoop2LoopLabel.find(tmp_loop_name) != IRLoop2LoopLabel.end());
     std::string label = IRLoop2LoopLabel[tmp_loop_name];
 
     if (DEBUG)
-        *ArrayLog << "\n========================\n\ncheckDependenceIIForLoop: "
-                  << curLoop->getName() << "(" << label << ")\n========================\n\n="
+        *ArrayLog << "\n========================\n\ncheckDependenceIIForLoop: " << curLoop->getName() << "(" << label
+                  << ")\n========================\n\n="
                   << "\n";
     int min_II = 1;
     std::vector<Instruction *> potentialAccesses;
@@ -1022,8 +970,7 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
 
     for (auto potentialAccess0 : potentialAccesses)
     {
-        if (potentialAccess0->getOpcode() == Instruction::Store ||
-            potentialAccess0->getOpcode() == Instruction::Call)
+        if (potentialAccess0->getOpcode() == Instruction::Store || potentialAccess0->getOpcode() == Instruction::Call)
         {
             for (auto potentialAccess1 : potentialAccesses)
             {
@@ -1043,18 +990,16 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
         Instruction *W_I = InstInst2DependenceDistance_pair.first.first;
         Instruction *R_I = InstInst2DependenceDistance_pair.first.second;
         if (DEBUG)
-            *ArrayLog << "checking loop-carried dependence II: LOAD:" << *R_I
-                      << " <===>  STORE:" << *W_I << "\n";
+            *ArrayLog << "checking loop-carried dependence II: LOAD:" << *R_I << " <===>  STORE:" << *W_I << "\n";
         if (DEBUG)
             ArrayLog->flush();
-        int W_I_time_offset =
-            BlockBegin_inLoop[W_I->getParent()].latency + Inst_Schedule[W_I].second;
+        int W_I_time_offset = BlockBegin_inLoop[W_I->getParent()].latency + Inst_Schedule[W_I].second;
         int R_I_time_offset = findEarlietUseTimeInTheLoop(
             curLoop,
             R_I); // BlockBegin_inLoop[R_I->getParent()].latency +  Inst_Schedule[R_I].second;
         if (DEBUG)
-            *ArrayLog << "    W_I_time_offset:" << W_I_time_offset
-                      << " <===>  R_I_time_offset:" << R_I_time_offset << "\n";
+            *ArrayLog << "    W_I_time_offset:" << W_I_time_offset << " <===>  R_I_time_offset:" << R_I_time_offset
+                      << "\n";
         if (DEBUG)
             ArrayLog->flush();
         // here, we assume that the load can be rescheduled as late as possible
@@ -1067,13 +1012,11 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
             min_II = tmp_II;
             if (DEBUG)
                 *ArrayLog << "\n      min_II updated to min_II=" << min_II
-                          << " due to RAW loop carried dependence between store: [" << *W_I
-                          << "] and load [" << *R_I << "]\n";
+                          << " due to RAW loop carried dependence between store: [" << *W_I << "] and load [" << *R_I
+                          << "]\n";
             if (DEBUG)
-                *ArrayLog << "      W_I_time_offset=" << W_I_time_offset
-                          << " R_I_time_offset=" << R_I_time_offset
-                          << " DependenceDistance=" << InstInst2DependenceDistance_pair.second
-                          << "\n";
+                *ArrayLog << "      W_I_time_offset=" << W_I_time_offset << " R_I_time_offset=" << R_I_time_offset
+                          << " DependenceDistance=" << InstInst2DependenceDistance_pair.second << "\n";
         }
     }
 
@@ -1088,23 +1031,22 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
                     if (auto tmp_I = dyn_cast<Instruction>(PHI_I->getIncomingValue(i)))
                     {
                         if (DEBUG)
-                            *ArrayLog << "      PHI Feedback dependence between " << *PHI_I
-                                      << "  and " << *tmp_I << "\n";
-                        int W_I_time_offset = BlockBegin_inLoop[tmp_I->getParent()].latency +
-                                              Inst_Schedule[tmp_I].second;
+                            *ArrayLog << "      PHI Feedback dependence between " << *PHI_I << "  and " << *tmp_I
+                                      << "\n";
+                        int W_I_time_offset =
+                            BlockBegin_inLoop[tmp_I->getParent()].latency + Inst_Schedule[tmp_I].second;
                         int R_I_time_offset = findEarlietUseTimeInTheLoop(
-                            curLoop, PHI_I); // BlockBegin_inLoop[PHI_I->getParent()].latency +
-                                             // Inst_Schedule[PHI_I].second;
+                            curLoop, PHI_I); // BlockBegin_inLoop[PHI_I->getParent()].latency
+                                             // + Inst_Schedule[PHI_I].second;
 
                         if (DEBUG)
                             *ArrayLog << "      W_I_time_offset=" << W_I_time_offset << "("
                                       << BlockBegin_inLoop[tmp_I->getParent()].latency << "+"
-                                      << Inst_Schedule[tmp_I].second
-                                      << ") R_I_time_offset=" << R_I_time_offset << "\n";
+                                      << Inst_Schedule[tmp_I].second << ") R_I_time_offset=" << R_I_time_offset << "\n";
 
                         int interval = W_I_time_offset - R_I_time_offset;
-                        if (interval < 2)
-                            interval = 2;
+                        if (interval < 1)
+                            interval = 1;
                         if (interval > min_II)
                         {
                             min_II = interval;
@@ -1116,8 +1058,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
     }
 
     if (DEBUG)
-        *ArrayLog << "\n========================\n\ncheckDependenceIIForLoop: "
-                  << curLoop->getName() << "(" << label << ") II_dep=" << min_II << "\n";
+        *ArrayLog << "\n========================\n\ncheckDependenceIIForLoop: " << curLoop->getName() << "(" << label
+                  << ") II_dep=" << min_II << "\n";
     return min_II;
 }
 
@@ -1141,8 +1083,7 @@ int HI_WithDirectiveTimingResourceEvaluation::getTimeslotForInstInLoop(Instructi
 
 // check whether the two instructions have loop carried dependence
 // if there is such dependence, record the distance in InstInst2DependenceDistance
-void HI_WithDirectiveTimingResourceEvaluation::checkLoopCarriedDependent(Instruction *I0,
-                                                                         Instruction *I1,
+void HI_WithDirectiveTimingResourceEvaluation::checkLoopCarriedDependent(Instruction *I0, Instruction *I1,
                                                                          Loop *curLoop)
 {
     if (DEBUG)
@@ -1225,12 +1166,10 @@ void HI_WithDirectiveTimingResourceEvaluation::checkLoopCarriedDependent(Instruc
                 *ArrayLog << " stepLen=" << stepLen << "\n";
             if (offset_dis % stepLen == 0)
             {
-                InstInst2DependenceDistance[std::pair<Instruction *, Instruction *>(I0, I1)] =
-                    offset_dis / stepLen;
+                InstInst2DependenceDistance[std::pair<Instruction *, Instruction *>(I0, I1)] = offset_dis / stepLen;
                 if (DEBUG)
-                    *ArrayLog << "**** distance:" << *I0 << " <=> " << *I1 << " ="
-                              << offset_dis / stepLen << " offset_dis=" << offset_dis
-                              << " stepLen=" << stepLen << "\n";
+                    *ArrayLog << "**** distance:" << *I0 << " <=> " << *I1 << " =" << offset_dis / stepLen
+                              << " offset_dis=" << offset_dis << " stepLen=" << stepLen << "\n";
             }
             return;
         }
@@ -1238,10 +1177,9 @@ void HI_WithDirectiveTimingResourceEvaluation::checkLoopCarriedDependent(Instruc
         {
             if (DEBUG)
             {
-                *ArrayLog << "ready to checkConstantAccessInLoop: I0=" << *I0 << "   I1=" << *I1
+                *ArrayLog << "ready to checkConstantAccessInLoop: I0=" << *I0 << "   I1=" << *I1 << "\n";
+                *ArrayLog << "ready to checkConstantAccessInLoop: tmp_S0=" << *tmp_S0 << "   tmp_S1=" << *tmp_S1
                           << "\n";
-                *ArrayLog << "ready to checkConstantAccessInLoop: tmp_S0=" << *tmp_S0
-                          << "   tmp_S1=" << *tmp_S1 << "\n";
                 ArrayLog->flush();
             }
             if (!checkConstantAccessInLoop(tmp_S0, tmp_S1, curLoop))
@@ -1254,9 +1192,8 @@ void HI_WithDirectiveTimingResourceEvaluation::checkLoopCarriedDependent(Instruc
                     *ArrayLog << " stepLen=" << stepLen << "\n";
                 InstInst2DependenceDistance[std::pair<Instruction *, Instruction *>(I0, I1)] = 1;
                 if (DEBUG)
-                    *ArrayLog << "**** distance:" << *I0 << " <=> " << *I1 << " =" << 1
-                              << " offset_dis=" << offset_dis << " stepLen=" << stepLen
-                              << " but constant in loop II should be greater than 1.\n";
+                    *ArrayLog << "**** distance:" << *I0 << " <=> " << *I1 << " =" << 1 << " offset_dis=" << offset_dis
+                              << " stepLen=" << stepLen << " but constant in loop II should be greater than 1.\n";
 
                 return;
             }
@@ -1285,8 +1222,7 @@ bool HI_WithDirectiveTimingResourceEvaluation::hasSameTargets(Instruction *I0, I
 }
 
 // find the earliest user of the load instruction (maybe for reschedule)
-int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *curLoop,
-                                                                          Instruction *ori_R_I)
+int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *curLoop, Instruction *ori_R_I)
 {
     // initialize the result with the current time slot
     Instruction *R_I = nullptr;
@@ -1297,10 +1233,9 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
         {
             R_I = callI; // if there is mux for the load, check the users of the mux instead
             timingBase tmpMuxDelay = getInstructionLatency(R_I);
-            if (((tmpMuxDelay.timing +
-                  get_inst_TimingInfo_result("store", -1, -1, clock_period_str).timing) /
+            if (((tmpMuxDelay.timing + get_inst_TimingInfo_result("store", -1, -1, clock_period_str).timing) /
                  clock_period) > 0.5) // when the mux delay is too high to fit in the current
-            { // cycle, we should leave one more cycle before the earliest user
+            {                         // cycle, we should leave one more cycle before the earliest user
                 muxDelayIsHigh = true;
             }
         }
@@ -1324,8 +1259,7 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
 
         if (Instruction *tmp_user_I = dyn_cast<Instruction>(tmp_user))
         {
-            if (curLoop->contains(tmp_user_I->getParent()) &&
-                curLoop->getLoopPreheader() != tmp_user_I->getParent())
+            if (curLoop->contains(tmp_user_I->getParent()) && curLoop->getLoopPreheader() != tmp_user_I->getParent())
             {
                 *ArrayLog << "       checking user: " << *tmp_user << "\n";
                 // the load might be scheduled in one or two cycles in advance
@@ -1334,14 +1268,10 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
                 if (muxDelayIsHigh)
                     cycle_inadvance = 2;
 
-                if (tmp_user_I->getOpcode() == Instruction::Mul ||
-                    tmp_user_I->getOpcode() == Instruction::UDiv ||
-                    tmp_user_I->getOpcode() == Instruction::FDiv ||
-                    tmp_user_I->getOpcode() == Instruction::FSub ||
-                    tmp_user_I->getOpcode() == Instruction::FMul ||
-                    tmp_user_I->getOpcode() == Instruction::FAdd ||
-                    tmp_user_I->getOpcode() == Instruction::URem ||
-                    tmp_user_I->getOpcode() == Instruction::SRem ||
+                if (tmp_user_I->getOpcode() == Instruction::Mul || tmp_user_I->getOpcode() == Instruction::UDiv ||
+                    tmp_user_I->getOpcode() == Instruction::FDiv || tmp_user_I->getOpcode() == Instruction::FSub ||
+                    tmp_user_I->getOpcode() == Instruction::FMul || tmp_user_I->getOpcode() == Instruction::FAdd ||
+                    tmp_user_I->getOpcode() == Instruction::URem || tmp_user_I->getOpcode() == Instruction::SRem ||
                     tmp_user_I->getOpcode() == Instruction::SDiv)
                     cycle_inadvance = 2;
 
@@ -1359,10 +1289,8 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
                     }
                 }
 
-                if (tmp_user_I->getOpcode() == Instruction::FDiv ||
-                    tmp_user_I->getOpcode() == Instruction::FSub ||
-                    tmp_user_I->getOpcode() == Instruction::FMul ||
-                    tmp_user_I->getOpcode() == Instruction::FAdd)
+                if (tmp_user_I->getOpcode() == Instruction::FDiv || tmp_user_I->getOpcode() == Instruction::FSub ||
+                    tmp_user_I->getOpcode() == Instruction::FMul || tmp_user_I->getOpcode() == Instruction::FAdd)
                 {
                     std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub",
                                                              "dmul", "dadd", "ddiv", "dsub"};
@@ -1385,8 +1313,7 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
 
                 if (tmp_tmp_slot < earliest_time_slot && R_I_time_offset <= tmp_tmp_slot)
                 {
-                    *ArrayLog << "       find earlier user: " << *tmp_user_I
-                              << "  @ timeslot:" << tmp_tmp_slot << "\n";
+                    *ArrayLog << "       find earlier user: " << *tmp_user_I << "  @ timeslot:" << tmp_tmp_slot << "\n";
                     earliest_time_slot = tmp_tmp_slot;
                 }
             }
@@ -1426,8 +1353,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleIntDSPOperators_forLoop(
                 continue;
 
             if (DEBUG)
-                *Evaluating_log << "checking schedule unit : " << tmp_schUnit0
-                                << " at following time points: ";
+                *Evaluating_log << "checking schedule unit : " << tmp_schUnit0 << " at following time points: ";
 
             processed.push_back(tmp_schUnit0);
 
@@ -1481,8 +1407,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleIntDSPOperators_forLoop(
                                 << getInstructionResource(tmp_schUnit0.opI) *
                                        (max_newConflictCnt - max_originalConflictCnt)
                                 << "\n";
-            res = res + getInstructionResource(tmp_schUnit0.opI) *
-                            (max_newConflictCnt - max_originalConflictCnt);
+            res = res + getInstructionResource(tmp_schUnit0.opI) * (max_newConflictCnt - max_originalConflictCnt);
         }
     }
 
@@ -1496,8 +1421,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleFPDSPOperators_forNotPip
     Loop *curLoop, std::map<BasicBlock *, timingBase> &tmp_BlockCriticalPath_inLoop)
 {
     resourceBase res(0, 0, 0, clock_period);
-    std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub",
-                                             "dmul", "dadd", "ddiv", "dsub"};
+    std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub", "dmul", "dadd", "ddiv", "dsub"};
 
     // Block2FPDSPReuseScheduleUnits[I->getParent()][opcode].push_back(schUnit);
     for (auto cur_opcode : checkopcodes)
@@ -1508,8 +1432,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleFPDSPOperators_forNotPip
         {
             if (curLoop != LI->getLoopFor(tmp_block))
                 continue;
-            if (Block2FPDSPReuseScheduleUnits.find(tmp_block) ==
-                Block2FPDSPReuseScheduleUnits.end())
+            if (Block2FPDSPReuseScheduleUnits.find(tmp_block) == Block2FPDSPReuseScheduleUnits.end())
                 continue;
             if (Block2FPDSPReuseScheduleUnits[tmp_block].find(cur_opcode) ==
                 Block2FPDSPReuseScheduleUnits[tmp_block].end())
@@ -1528,8 +1451,7 @@ HI_WithDirectiveTimingResourceEvaluation::costRescheduleFPDSPOperators_forNotPip
                     continue;
 
                 if (DEBUG)
-                    *Evaluating_log << "checking schedule unit : " << tmp_schUnit0
-                                    << " at following time points: ";
+                    *Evaluating_log << "checking schedule unit : " << tmp_schUnit0 << " at following time points: ";
 
                 processed.push_back(tmp_schUnit0);
 
@@ -1586,8 +1508,7 @@ void HI_WithDirectiveTimingResourceEvaluation::recordCostRescheduleFPDSPOperator
 {
     resourceBase res(0, 0, 0, clock_period);
 
-    std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub",
-                                             "dmul", "dadd", "ddiv", "dsub"};
+    std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub", "dmul", "dadd", "ddiv", "dsub"};
 
     // Block2FPDSPReuseScheduleUnits[I->getParent()][opcode].push_back(schUnit);
     for (auto cur_opcode : checkopcodes)
@@ -1598,8 +1519,7 @@ void HI_WithDirectiveTimingResourceEvaluation::recordCostRescheduleFPDSPOperator
         {
             if (curLoop != LI->getLoopFor(tmp_block))
                 continue;
-            if (Block2FPDSPReuseScheduleUnits.find(tmp_block) ==
-                Block2FPDSPReuseScheduleUnits.end())
+            if (Block2FPDSPReuseScheduleUnits.find(tmp_block) == Block2FPDSPReuseScheduleUnits.end())
                 continue;
             if (Block2FPDSPReuseScheduleUnits[tmp_block].find(cur_opcode) ==
                 Block2FPDSPReuseScheduleUnits[tmp_block].end())
@@ -1615,9 +1535,8 @@ void HI_WithDirectiveTimingResourceEvaluation::recordCostRescheduleFPDSPOperator
             reuse_DSPModule = (op_totalcnt + II - 1) / II;
 
         if (DEBUG)
-            *Evaluating_log << "  for block: the amount of floating point operators (refI):"
-                            << cur_opcode << " is " << reuse_DSPModule << " each cost =["
-                            << checkFPOperatorCost(cur_opcode) << "]\n";
+            *Evaluating_log << "  for block: the amount of floating point operators (refI):" << cur_opcode << " is "
+                            << reuse_DSPModule << " each cost =[" << checkFPOperatorCost(cur_opcode) << "]\n";
 
         // color the blocks in the loop with the same number of reuse module
         for (auto tmp_block : curLoop->getBlocks())
@@ -1630,8 +1549,7 @@ void HI_WithDirectiveTimingResourceEvaluation::recordCostRescheduleFPDSPOperator
 }
 
 // check whether the loop is perfectly nested
-bool HI_WithDirectiveTimingResourceEvaluation::isPerfectPipelinedNest(Loop *L,
-                                                                      BasicBlock *&innerHeader,
+bool HI_WithDirectiveTimingResourceEvaluation::isPerfectPipelinedNest(Loop *L, BasicBlock *&innerHeader,
                                                                       int &total_nesttripcount)
 {
     // check to see if we're the innermost nest
@@ -1660,8 +1578,7 @@ bool HI_WithDirectiveTimingResourceEvaluation::isPerfectPipelinedNest(Loop *L,
         if (L->getSubLoops().size() != 1)
         {
             if (DEBUG)
-                *Evaluating_log << "  curLoop:" << L->getName()
-                                << " has more than one sub-loops:\n";
+                *Evaluating_log << "  curLoop:" << L->getName() << " has more than one sub-loops:\n";
             for (auto tmpL : L->getSubLoops())
             {
                 if (DEBUG)
@@ -1669,16 +1586,21 @@ bool HI_WithDirectiveTimingResourceEvaluation::isPerfectPipelinedNest(Loop *L,
             }
             return false;
         }
-        // make sure all our non-nested loop blocks are innocuous
-        for (Loop::block_iterator b = L->block_begin(), e = L->block_end(); b != e; b++)
-        {
-            BasicBlock *block = *b;
-            if (LI->getLoopFor(block) == L)
-            {
-                if (!hasNoMemoryOps(block))
-                    return false;
-            }
-        }
+        // // make sure all our non-nested loop blocks are innocuous
+        // for (Loop::block_iterator b = L->block_begin(), e = L->block_end(); b != e; b++)
+        // {
+        //     BasicBlock *block = *b;
+        //     if (LI->getLoopFor(block) == L)
+        //     {
+        //         if (!hasNoMemoryOps(block))
+        //         {
+        //             if (DEBUG)
+        //                 *Evaluating_log << "  curLoop:" << L->getName() << " subblock:" << block->getName()
+        //                                 << " has memory access. Is not perfect loop\n";
+        //             return false;
+        //         }
+        //     }
+        // }
 
         // recursively check subloops
         return isPerfectPipelinedNest(*L->begin(), innerHeader, total_nesttripcount);

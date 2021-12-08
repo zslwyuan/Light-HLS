@@ -35,7 +35,6 @@
 #include "llvm/ADT/Twine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/BasicBlock.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DataLayout.h"
@@ -88,7 +87,6 @@
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/CFG.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constant.h"
 #include "llvm/IR/ConstantRange.h"
 #include "llvm/IR/Constants.h"
@@ -147,7 +145,6 @@
 #include "llvm/ADT/APInt.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Optional.h"
-#include "llvm/IR/CallSite.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/Intrinsics.h"
@@ -189,8 +186,7 @@ using namespace llvm;
 class HI_VarWidthReduce : public FunctionPass
 {
   public:
-    HI_VarWidthReduce(const char *VarWidthChangeLog_Name, bool DEBUG = 0)
-        : FunctionPass(ID), DEBUG(DEBUG)
+    HI_VarWidthReduce(const char *VarWidthChangeLog_Name, bool DEBUG = 0) : FunctionPass(ID), DEBUG(DEBUG)
     {
         Instruction_Counter = 0;
         Function_Counter = 0;
@@ -308,7 +304,7 @@ class HI_VarWidthReduce : public FunctionPass
 
     // Forward Process of BinaryOperator: check the bitwidth of operands and output of an
     // instruction, trunc/ext the operands, update the bitwidth of the instruction
-    void BOI_WidthCast(BinaryOperator *BOI);
+    void BOI_WidthCast(llvm::BinaryOperator *BOI);
 
     // Forward Process of StoreOperator: check the bitwidth of operands and output of an
     // instruction, trunc/ext the operands, update the bitwidth of the instruction

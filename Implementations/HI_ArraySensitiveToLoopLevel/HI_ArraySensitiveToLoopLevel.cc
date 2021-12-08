@@ -235,7 +235,7 @@ void HI_ArraySensitiveToLoopLevel::TraceMemoryDeclarationAndAnalyzeAccessinModul
             F.getName().find("HIPartitionMux") !=
                 std::string::npos) // bypass the "llvm.xxx" functions..
             continue;
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
         demangled_name = demangleFunctionName(mangled_name);
         findMemoryDeclarationAndAnalyzeAccessin(&F, demangled_name == top_function_name &&

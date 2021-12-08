@@ -35,7 +35,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
-#include "llvm/PassAnalysisSupport.h"
+#include "llvm/Pass.h"
 #include "llvm/Support/GraphWriter.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
@@ -519,6 +519,7 @@ class HI_PragmaTargetExtraction : public ModulePass
 
     // get the array information, including the dimension, type and size
     HI_PragmaArrayInfo getArrayInfo(Value *target);
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////// Parse the configuration for the program //////////////////////////////

@@ -52,7 +52,7 @@ bool HI_SimpleTimingEvaluation::runOnModule(
     for (auto &F : M)
     {
 
-        std::string mangled_name = F.getName();
+        std::string mangled_name = F.getName().str();
         std::string demangled_name;
 
         // demangle the function

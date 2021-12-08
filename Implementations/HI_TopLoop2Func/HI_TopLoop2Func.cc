@@ -28,9 +28,9 @@ bool HI_TopLoop2Func::runOnModule(
         if (F.getName().find("llvm.") != std::string::npos)
             continue;
 
-        if (demangleFunctionName(F.getName()) != top_str ||
+        if (demangleFunctionName(F.getName().str()) != top_str ||
             F.getName().find(".") != std::string::npos)
-            FuncNames.push_back(F.getName());
+            FuncNames.push_back(F.getName().str());
 
         auto &LI = getAnalysis<LoopInfoWrapperPass>(F).getLoopInfo();
         auto &SE = getAnalysis<ScalarEvolutionWrapperPass>(F).getSE();
@@ -38,10 +38,10 @@ bool HI_TopLoop2Func::runOnModule(
         {
             if (Loop->getLoopDepth() == 1)
             {
-                std::string tmp_loop_name = Loop->getHeader()->getParent()->getName();
+                std::string tmp_loop_name = Loop->getHeader()->getParent()->getName().str();
                 tmp_loop_name += "-";
-                tmp_loop_name += Loop->getHeader()->getName();
-                TopLoopIR2FuncName[tmp_loop_name] = Loop->getHeader()->getParent()->getName();
+                tmp_loop_name += Loop->getHeader()->getName().str();
+                TopLoopIR2FuncName[tmp_loop_name] = Loop->getHeader()->getParent()->getName().str();
             }
         }
     }

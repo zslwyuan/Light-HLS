@@ -32,9 +32,9 @@ bool HI_PragmaTargetExtraction::checkLoopsIn(Function *F)
 void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
 {
     int cur_depth = L->getLoopDepth();
-    std::string curLoopName = L->getHeader()->getParent()->getName();
+    std::string curLoopName = L->getHeader()->getParent()->getName().str();
     curLoopName += "-";
-    curLoopName += L->getHeader()->getName();
+    curLoopName += L->getHeader()->getName().str();
     LoopIRName2Depth[curLoopName] = cur_depth;
     for (auto sub_loop : *L)
     {
@@ -42,9 +42,9 @@ void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
         {
             Loop2NextLevelSubLoops[L->getHeader()].push_back(sub_loop->getHeader());
 
-            std::string nextLoopName = sub_loop->getHeader()->getParent()->getName();
+            std::string nextLoopName = sub_loop->getHeader()->getParent()->getName().str();
             nextLoopName += "-";
-            nextLoopName += sub_loop->getHeader()->getName();
+            nextLoopName += sub_loop->getHeader()->getName().str();
             LoopIRName2NextLevelSubLoopIRNames[curLoopName].push_back(nextLoopName);
             if (DEBUG)
                 *loopTarget_log << "parentLoop: " << curLoopName << " ==> sonLoop: " << nextLoopName
@@ -57,9 +57,9 @@ void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
         {
             Loop2NextLevelSubLoops[L->getHeader()].push_back(sub_loop->getHeader());
 
-            std::string nextLoopName = sub_loop->getHeader()->getParent()->getName();
+            std::string nextLoopName = sub_loop->getHeader()->getParent()->getName().str();
             nextLoopName += "-";
-            nextLoopName += sub_loop->getHeader()->getName();
+            nextLoopName += sub_loop->getHeader()->getName().str();
             LoopIRName2NextLevelSubLoopIRNames[curLoopName].push_back(nextLoopName);
             checkSubLoops(sub_loop);
         }
@@ -68,9 +68,9 @@ void HI_PragmaTargetExtraction::checkSubLoops(Loop *L)
 
 void HI_PragmaTargetExtraction::checkArrayAccessInLoop(Loop *L)
 {
-    std::string curLoopName = L->getHeader()->getParent()->getName();
+    std::string curLoopName = L->getHeader()->getParent()->getName().str();
     curLoopName += "-";
-    curLoopName += L->getHeader()->getName();
+    curLoopName += L->getHeader()->getName().str();
     for (auto tmp_Block : L->getBlocks())
     {
         for (auto target : Block2Targets[tmp_Block])
@@ -85,13 +85,13 @@ void HI_PragmaTargetExtraction::checkArrayAccessInLoop(Loop *L)
                 F = allocI->getParent()->getParent();
             }
             LoopIRName2Array[curLoopName].push_back(std::pair<std::string, std::string>(
-                L->getHeader()->getParent()->getName(), target->getName()));
+                L->getHeader()->getParent()->getName().str(), target->getName().str()));
             TargetExtName2ArrayInfo[std::pair<std::string, std::string>(
-                L->getHeader()->getParent()->getName(), target->getName())] =
+                L->getHeader()->getParent()->getName().str(), target->getName().str())] =
                 Target2ArrayInfo[target];
             if (DEBUG)
                 *arrayTarget_Log << "array/pointer : " << target->getName()
-                                 << ", declared at function: " << demangleFunctionName(F->getName())
+                                 << ", declared at function: " << demangleFunctionName(F->getName().str())
                                  << ", is used by loop: " << curLoopName << " in function "
                                  << L->getHeader()->getParent()->getName() << "\n";
         }

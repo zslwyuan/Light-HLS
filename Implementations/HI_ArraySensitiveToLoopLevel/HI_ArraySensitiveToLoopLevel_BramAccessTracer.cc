@@ -985,9 +985,9 @@ void HI_ArraySensitiveToLoopLevel::findTheIncrementalIndexAndTripCount(
     inc_indices.push_back(inc_const);
 
     HI_ArrayInfo refArrayInfo = getArrayInfo(target);
-    std::string tmp_loop_name = S->getLoop()->getHeader()->getParent()->getName();
+    std::string tmp_loop_name = S->getLoop()->getHeader()->getParent()->getName().str();
     tmp_loop_name += "-";
-    tmp_loop_name += S->getLoop()->getHeader()->getName();
+    tmp_loop_name += S->getLoop()->getHeader()->getName().str();
     if (DEBUG)
         *ArrayLog << "we are checking loop: " << IRLoop2LoopLabel[tmp_loop_name]
                   << " (tmp_loop_name=" << tmp_loop_name << ")\n";
@@ -1030,7 +1030,7 @@ void HI_ArraySensitiveToLoopLevel::findTheIncrementalIndexAndTripCount(
 
                 std::pair<std::string, std::pair<std::string, int>> info_triple =
                     std::pair<std::string, std::pair<std::string, int>>(
-                        targetF->getName(), std::pair<std::string, int>(target->getName(), i + 1));
+                        targetF->getName().str(), std::pair<std::string, int>(target->getName().str(), i + 1));
 
                 // if
                 // (LoopLabel2DrivenArrayDimensions[IRLoop2LoopLabel[tmp_loop_name]].find(info_triple)
@@ -1240,9 +1240,9 @@ HI_ArraySensitiveToLoopLevel::HI_ArrayInfo HI_ArraySensitiveToLoopLevel::getArra
                 res_array_info.sub_element_num[num_dims - 1] *
                 res_array_info.dim_size[num_dims - 1];
 
-        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName());
+        std::string FuncName = demangleFunctionName(arg_v->getParent()->getName().str());
         std::string funcLine;
-        std::string argName(arg_v->getName());
+        std::string argName(arg_v->getName().str());
 
         for (int possibleLine : IRFunc2BeginLine[FuncName])
         {
@@ -1412,6 +1412,7 @@ HI_ArraySensitiveToLoopLevel::getAccessInfoForAccessInst(Instruction *Load_or_St
            "The pointer should be checked by TryArrayAccessProcess() previously.");
     return AddressInst2AccessInfo[address_addI];
 }
+
 
 
 bool HI_ArraySensitiveToLoopLevel::checkAccessAlias(Instruction *I0, Instruction *I1)

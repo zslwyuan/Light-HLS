@@ -246,7 +246,8 @@ bool HI_VarWidthReduce::InsturctionUpdate_WidthCast(Function *F)
                     if (DEBUG)
                         *VarWidthChangeLog << "\n\n\n find target instrction " << *I->getType()
                                            << ":" << I;
-                    // VarWidthChangeLog->flush();
+                     if (DEBUG)
+                        VarWidthChangeLog->flush();
 
                     // bypass cast operations
                     if (CastInst *CastI = dyn_cast<CastInst>(I))
@@ -368,7 +369,7 @@ bool HI_VarWidthReduce::InsturctionUpdate_WidthCast(Function *F)
                             changed = 1;
                             //       break;
                         }
-                        else if (BinaryOperator *BOI = dyn_cast<BinaryOperator>(I))
+                        else if (llvm::BinaryOperator *BOI = dyn_cast<llvm::BinaryOperator>(I))
                         {
                             if (DEBUG)
                                 *VarWidthChangeLog << "          " << *BOI
@@ -871,7 +872,7 @@ unsigned int HI_VarWidthReduce::bitNeededFor(ConstantRange CR)
 
 // Forward Process of BinaryOperator: check the bitwidth of operands and output of an instruction,
 // trunc/ext the operands, update the bitwidth of the instruction
-void HI_VarWidthReduce::BOI_WidthCast(BinaryOperator *BOI)
+void HI_VarWidthReduce::BOI_WidthCast(llvm::BinaryOperator *BOI)
 {
     Instruction &I = *(cast<Instruction>(BOI));
 
@@ -988,7 +989,6 @@ void HI_VarWidthReduce::BOI_WidthCast(BinaryOperator *BOI)
     // VarWidthChangeLog->flush();
 }
 
-
 // Forward Process of StoreOperator: check the bitwidth of operands and output of an instruction,
 // trunc/ext the operands, update the bitwidth of the instruction
 void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
@@ -1004,7 +1004,7 @@ void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
     // check whether an instruction involve PTI operation
     PointerType* PtrType = dyn_cast<PointerType>(S_I->getPointerOperandType());
     assert(PtrType);
-
+        
     Instruction_BitNeeded[&I] = PtrType->getElementType()->getIntegerBitWidth();
 
     for (int i = 0; i <= 0;
@@ -1100,8 +1100,6 @@ void HI_VarWidthReduce::Store_WidthCast(StoreInst *S_I)
             << "                         ------->  accomplish erasing of original instruction.\n";
     // VarWidthChangeLog->flush();
 }
-
-
 
 
 // Forward Process of ICmpInst: check the bitwidth of operands and output of an instruction,

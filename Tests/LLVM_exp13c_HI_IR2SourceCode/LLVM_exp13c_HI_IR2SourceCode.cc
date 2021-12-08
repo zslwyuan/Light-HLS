@@ -53,7 +53,7 @@ int main(int argc, char **argv)
     std::map<std::string, std::string> IRLoop2LoopLabel;
     std::map<std::string, int> IRLoop2OriginTripCount;
     std::map<std::string, std::vector<int>> IRFunc2BeginLine;
-
+    
     auto hi_ir2sourcecode = new HI_IR2SourceCode("HI_IR2SourceCode", IRLoop2LoopLabel,IRFunc2BeginLine,IRLoop2OriginTripCount);
     PM_pre.add(hi_ir2sourcecode);
     print_info("Enable HI_IR2SourceCode Pass");

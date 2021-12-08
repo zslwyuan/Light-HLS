@@ -8,6 +8,7 @@ extern double BRAM_limit;
 extern int ClockNum_limit;
 extern bool all_sub_function_inline;
 extern bool dataflowApplied;
+
 void Parse_Config(const char *config_file_name, std::map<std::string, int> &LoopLabel2UnrollFactor,
                   std::map<std::string, int> &LoopLabel2II)
 {
@@ -65,7 +66,6 @@ void Parse_Config(const char *config_file_name, std::map<std::string, int> &Loop
         case hash_compile_time("all_sub_function_inline"):
             all_sub_function_inline = 1;
             break;
-
 
         default:
             break;
@@ -160,6 +160,7 @@ void parseLoopUnroll(std::stringstream &iss, std::map<std::string, int> &LoopLab
     }
     assert(loopLabel != "" && factor > -1);
     LoopLabel2UnrollFactor[loopLabel] = factor;
+    llvm::errs() << "unroll loop: " << loopLabel << " and factor=" << factor << "\n";
 }
 
 // parse the argument for loop pipelining

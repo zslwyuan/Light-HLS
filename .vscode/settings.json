@@ -77,6 +77,11 @@
         "*.tpp": "cpp",
         "*.inc": "cpp",
         "*.def": "cpp",
-        "__functional_03": "cpp"
+        "__functional_03": "cpp",
+        "strstream": "cpp",
+        "complex": "cpp",
+        "shared_mutex": "cpp",
+        "cfenv": "cpp",
+        "typeindex": "cpp"
     }
 }

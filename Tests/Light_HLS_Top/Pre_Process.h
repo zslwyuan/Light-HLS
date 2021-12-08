@@ -32,7 +32,6 @@
 #include "llvm/Analysis/MustExecute.h"
 #include "llvm/Analysis/ScalarEvolution.h"
 #include "llvm/Analysis/ScalarEvolutionAliasAnalysis.h"
-#include "llvm/Analysis/ScalarEvolutionExpander.h"
 #include "llvm/Analysis/ScalarEvolutionExpressions.h"
 #include "llvm/Analysis/TargetTransformInfo.h"
 #include "llvm/Analysis/ValueTracking.h"
@@ -41,7 +40,7 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/DIBuilder.h"
 #include "llvm/IR/DataLayout.h"
-#include "llvm/IR/DomTreeUpdater.h"
+#include "llvm/Analysis/DomTreeUpdater.h"
 #include "llvm/IR/Dominators.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRPrintingPasses.h"
@@ -134,7 +133,6 @@ void pathAdvice();
 void DES_Load_Instruction_Info(const char *config_file_name,
                                std::map<std::string, Info_type_list> &BiOp_Info_name2list_map);
 
-void clangPreProcess(const char **argv, std::string top_str,
-                     std::map<std::string, int> &FuncParamLine2OutermostSize);
+void clangPreProcess(const char **argv, std::string top_str, std::map<std::string, int> &FuncParamLine2OutermostSize);
 
 #endif
