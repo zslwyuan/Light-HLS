@@ -160,6 +160,7 @@ void parseLoopUnroll(std::stringstream &iss, std::map<std::string, int> &LoopLab
     }
     assert(loopLabel != "" && factor > -1);
     LoopLabel2UnrollFactor[loopLabel] = factor;
+    llvm::errs() << "unroll loop: " << loopLabel << " and factor=" << factor << "\n";
 }
 
 // parse the argument for loop pipelining

@@ -550,6 +550,10 @@ class HI_MuxInsertionArrayPartition : public ModulePass
     // and extract array access information from it
     void handleUnstandardSCEVAccess(Instruction *I, const SCEV *tmp_S);
 
+    // handle non-standard SARE, where the pointer value is in the outermost expression,
+    // and extract array access information from it
+    void handleUnstandardSCEVAccessWithHeadOffset(Instruction *I, const SCEV *tmp_S);
+
     // handle complex SCEV, based on which we cannot predict the array access information
     void handleComplexSCEVAccess(Instruction *I, const SCEV *tmp_S);
 

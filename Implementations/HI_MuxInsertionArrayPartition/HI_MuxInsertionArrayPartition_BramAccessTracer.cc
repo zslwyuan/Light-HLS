@@ -327,6 +327,33 @@ void HI_MuxInsertionArrayPartition::TryArrayAccessProcess(Instruction *I, Scalar
             handleUnstandardSCEVAccess(I, tmp_S);
             return;
         }
+        else if (dyn_cast<SCEVAddExpr>(bypassExtTruntSCEV(tmp_S)))
+        {
+            const SCEVAddExpr *SAE = dyn_cast<SCEVAddExpr>(bypassExtTruntSCEV(tmp_S));
+            auto head_const_scev = dyn_cast<SCEVConstant>(SAE->getOperand(0));
+            if (head_const_scev)
+            {
+                const SCEVAddRecExpr *SAREtmp = dyn_cast<SCEVAddRecExpr>(bypassExtTruntSCEV(SAE->getOperand(1)));
+                const SCEVUnknown *SU = dyn_cast<SCEVUnknown>(findUnknown(tmp_S));
+                const PtrToIntInst *PTI_I = dyn_cast<PtrToIntInst>(SU->getValue());
+                if (SAE && SAREtmp && SU && PTI_I)
+                {
+                    // example :   ({{100,+,1}<nuw><nsw><%for.cond1.preheader>,+,200}<nuw><%for.body4> + %0)
+                    if (DEBUG)
+                        *ArrayLog << *I << " --> is a transformed SCEV\n";
+                    handleUnstandardSCEVAccessWithHeadOffset(I, tmp_S);
+                    return;
+                }
+            }
+            if (DEBUG)
+            {
+                *ArrayLog << *I << " --> is a transformed SCEV but it is still hard to figure out the access pattern\n";
+                for (int i = 0; i < SAE->getNumOperands(); i++)
+                {
+                    *ArrayLog << " op#" << i << ": " << *(SAE->getOperand(i)) << "\n";
+                }
+            }
+        }
     }
 
     // it is a complex SCEV and hard to predict the access pattern, we assume that it could access
@@ -1343,6 +1370,134 @@ void HI_MuxInsertionArrayPartition::handleConstantOffsetAccess(Instruction *I, c
     if (DEBUG)
         *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
     // ArrayLog->flush();
+}
+
+// handle non-standard SARE, where the pointer value is in the outermost expression,
+// and extract array access information from it
+void HI_MuxInsertionArrayPartition::handleUnstandardSCEVAccessWithHeadOffset(Instruction *I, const SCEV *tmp_S)
+{
+    // SCEV: (2 + (sext i12 {0,+,64}<nuw><%for.cond66.preheader> to i64) + %29)
+    const SCEVAddExpr *SAE = dyn_cast<SCEVAddExpr>(bypassExtTruntSCEV(tmp_S));
+    auto head_const_scev = dyn_cast<SCEVConstant>(SAE->getOperand(0));
+    assert(head_const_scev);
+    const SCEVAddRecExpr *SARE = dyn_cast<SCEVAddRecExpr>(bypassExtTruntSCEV(SAE->getOperand(1)));
+    const SCEVUnknown *SU = dyn_cast<SCEVUnknown>(findUnknown(tmp_S));
+    const PtrToIntInst *PTI_I = dyn_cast<PtrToIntInst>(SU->getValue());
+
+    if (SARE->isAffine())
+    {
+
+        int initial_const = -1;
+
+        if (DEBUG)
+            *ArrayLog << *I << " --> is add rec Affine Add: " << *SARE << " it operand (0) " << *SARE->getOperand(0)
+                      << " it operand (1) " << *SARE->getOperand(1) << "\n";
+        if (DEBUG)
+            *ArrayLog << " -----> intial offset expression: " << *findTheActualStartValue(SARE) << "\n";
+
+        std::vector<int> inc_indices, trip_counts;
+        findTheIncrementalIndexAndTripCount(SARE, inc_indices, trip_counts);
+        if (DEBUG)
+            *ArrayLog << " -----> inccremental value: ";
+        if (DEBUG)
+            for (auto inc_const_tmp : inc_indices)
+                *ArrayLog << inc_const_tmp << " ";
+        if (DEBUG)
+            *ArrayLog << "\n";
+        if (DEBUG)
+            *ArrayLog << " -----> tripcount value: ";
+        if (DEBUG)
+            for (auto trip_count_tmp : trip_counts)
+                *ArrayLog << trip_count_tmp << " ";
+        if (DEBUG)
+            *ArrayLog << "\n";
+        // ArrayLog->flush();
+
+        const SCEV *initial_expr_tmp = findTheActualStartValue(SARE);
+
+        Value *target = nullptr;
+
+        // the actual start value is (pointer + offset)
+        if (auto initial_const_scev = dyn_cast<SCEVConstant>(initial_expr_tmp))
+        {
+            // find the constant in the SCEV and that will be the initial offset
+            initial_const = initial_const_scev->getAPInt().getSExtValue() + head_const_scev->getAPInt().getSExtValue();
+            if (DEBUG)
+                *ArrayLog << " -----> intial offset const: " << initial_const << "\n";
+            // ArrayLog->flush();
+
+            // assert(initial_const >= 0 && "the initial offset should be found.\n");
+            // some time, using 2-complement will end with fake negative initial offset
+            if (initial_const < 0)
+            {
+                llvm::errs() << " -----> intial offset const: " << initial_const << "\n";
+                llvm::errs() << "    -----> (1<<getMinSignedBits)-1 "
+                             << ((initial_const) & ((1 << initial_const_scev->getAPInt().getMinSignedBits()) - 1))
+                             << " [" << initial_const_scev->getAPInt().getMinSignedBits() << "]"
+                             << "\n";
+                llvm::errs() << "    -----> (1<<getActiveBits)-1 "
+                             << ((initial_const) & ((1 << initial_const_scev->getAPInt().getActiveBits()) - 1)) << " ["
+                             << initial_const_scev->getAPInt().getActiveBits() << "]"
+                             << "\n";
+                llvm::errs() << "    -----> (getZExtValue) "
+                             << (((1 << initial_const_scev->getAPInt().getZExtValue()) - 1)) << " bw=["
+                             << initial_const_scev->getAPInt().getBitWidth() << "]"
+                             << "\n";
+                initial_const = (initial_const) & ((1 << initial_const_scev->getAPInt().getZExtValue()) - 1);
+            }
+
+            if (const SCEVUnknown *array_value_scev = dyn_cast<SCEVUnknown>(SU))
+            {
+                if (DEBUG)
+                    *ArrayLog << " -----> access target: " << *array_value_scev->getValue() << "\n";
+                if (auto tmp_PTI_I = dyn_cast<PtrToIntInst>(array_value_scev->getValue()))
+                {
+                    target = tmp_PTI_I->getOperand(0);
+                }
+                else
+                {
+                    assert(target && "There should be an PtrToInt Instruction for the addition operation.\n");
+                }
+
+                if (Target2ArrayInfo.find(target) == Target2ArrayInfo.end())
+                {
+                    if (Alias2Target.find(target) != Alias2Target.end()) // it could be argument. We need to trace back
+                                                                         // to get its original array declaration
+                    {
+                        target = Alias2Target[target];
+                    }
+                    else
+                    {
+                        llvm::errs() << "ERRORS: cannot find target [" << *target
+                                     << "] in Target2ArrayInfo and its address=" << target << "\n";
+                        assert(Target2ArrayInfo.find(target) != Target2ArrayInfo.end() &&
+                               Alias2Target.find(target) != Alias2Target.end() &&
+                               "Fail to find the array inforamtion for the target.");
+                    }
+                }
+
+                // ArrayLog->flush();
+            }
+            else
+            {
+                assert(false && "The access target should be found.\n");
+            }
+        }
+        else
+        {
+            assert(false && "according to the pattern, the analysis should not reach here.");
+        }
+
+        // assert(initial_const >= 0 && "the initial offset should be found.\n");
+
+        assert(target && "the target array should be found.\n");
+        if (DEBUG)
+            *ArrayLog << " -----> access target info: " << Target2ArrayInfo[target] << "\n";
+        AddressInst2AccessInfo[I] = getAccessInfoFor(target, I, initial_const, &inc_indices, &trip_counts);
+        if (DEBUG)
+            *ArrayLog << " -----> access info with array index: " << AddressInst2AccessInfo[I] << "\n\n\n";
+        // ArrayLog->flush();
+    }
 }
 
 // handle non-standard SARE, where the pointer value is in the outermost expression,

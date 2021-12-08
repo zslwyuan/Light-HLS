@@ -23,5 +23,6 @@ cd LLVM_Learner_Libs
 mkdir build
 cd build
 cmake ..
+echo "update light-hls lib"
 make -j4
 cp `find -name *.a` ../

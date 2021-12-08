@@ -1,0 +1,24 @@
+clock = 10
+HLS_lib_path = ../../../HLS_Data_Lib/
+loop_pipeline label=Loop_syr2k_2 II=1
+loop_pipeline label=Loop_syr2k_12 II=1
+loop_pipeline label=Loop_syr2k_4 II=1
+loop_unroll label=Loop_syr2k_4 factor=2
+loop_unroll label=Loop_syr2k_5 factor=64
+loop_pipeline label=Loop_syr2k_7 II=1
+loop_unroll label=Loop_syr2k_7 factor=2
+loop_unroll label=Loop_syr2k_8 factor=64
+loop_pipeline label=Loop_syr2k_10 II=1
+array_port variable=buff_A0 scope=syr2k port_num=2
+array_port variable=buff_A1 scope=syr2k port_num=2
+array_port variable=buff_B0 scope=syr2k port_num=2
+array_port variable=buff_B1 scope=syr2k port_num=2
+array_port variable=buff_C scope=syr2k port_num=2
+array_port variable=buff_D_out scope=syr2k port_num=2
+array_port variable=tmp1 scope=syr2k port_num=2
+array_port variable=tmp2 scope=syr2k port_num=2
+
+array_partition variable=buff_A0 scope=syr2k dim=1 factor=2 cyclic
+array_partition variable=buff_B0 scope=syr2k dim=1 factor=2 cyclic
+array_partition variable=buff_A0 scope=syr2k dim=2 factor=2 cyclic
+array_partition variable=buff_B0 scope=syr2k dim=2 factor=2 cyclic
