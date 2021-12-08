@@ -365,6 +365,8 @@ void HI_IR2SourceCode::traceLoopSourceCode(LoopInfo &LI, ScalarEvolution &SE, Fu
                                 //  auto Br_I =
                                 //  dyn_cast<BranchInst>(in_I->getParent()->getTerminator());
                                 // if (Br_I->getName().find("indvars") != std::string::npos)
+                                if (!in_I->getType()->isIntegerTy())
+                                    continue;
                                 if (DEBUG)
                                     *IR2Src_Log << "  check feedback Instruction: " << *in_I
                                                 << ": SCEV:" << *SE.getSCEV(in_I) << "\n";
@@ -618,6 +620,7 @@ void HI_IR2SourceCode::mappingLoopIR2LoopLabel(DISubprogram *subprogram)
                         if (DEBUG)
                             *IR2Src_Log << "               mapping to IR loop: " << itLine.first->getName()
                                         << "in Function : " << itLine.first->getParent()->getName() << "\n";
+
                         std::string tmp_loop_name = itLine.first->getParent()->getName().str();
                         tmp_loop_name += "-";
                         tmp_loop_name += itLine.first->getName();
