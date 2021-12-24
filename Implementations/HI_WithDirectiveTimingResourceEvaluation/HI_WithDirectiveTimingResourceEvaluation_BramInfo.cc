@@ -1582,7 +1582,7 @@ HI_WithDirectiveTimingResourceEvaluation::getPartitionFor(Instruction *access)
 
     if (Access2EnableArrayNo.find(access) == Access2EnableArrayNo.end())
     {
-        Access2EnableArrayNo[access] = 1;
+        Access2EnableArrayNo[access] = 0;
     }
 
     if (Access2EnableArrayNo[access])
