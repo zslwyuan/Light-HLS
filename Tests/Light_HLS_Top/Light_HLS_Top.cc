@@ -192,6 +192,10 @@ int main(int argc, const char **argv)
         PM0.add(hi_mulorderopt);
         print_info("Enable HI_MulOrderOpt Pass");
 
+        auto hi_faddorderopt = new HI_FaddOrderOpt("HI_FaddOrderOpt");
+        PM0.add(hi_faddorderopt);
+        print_info("Enable HI_FaddOrderOpt Pass");
+
         auto CFGSimplification_pass22 = createCFGSimplificationPass();
         PM0.add(CFGSimplification_pass22);
         print_info("Enable CFGSimplificationPass Pass");

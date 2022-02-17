@@ -51,6 +51,7 @@ include_directories(./ ../../Implementations/
 ../../Implementations/HI_FunctionInterfaceInfo
 ../../Implementations/HI_Mul2Shl
 ../../Implementations/HI_MulOrderOpt
+../../Implementations/HI_FaddOrderOpt
 ../../Implementations/HI_MuxInsertionArrayPartition
 ../../Implementations/HI_DSE_WithDirectiveTimingResourceEvaluation
 ../../Implementations/HI_LoadALAP
