@@ -58,7 +58,18 @@ bool HI_FaddOrderOpt::runOnFunction(llvm::Function &F) // The runOnModule declar
                 RFAdd = dyn_cast<FPMathOperator>(I->getOperand(1));
                 if (!LFAdd && !RFAdd)
                     continue;
-                if (LFAdd->getOpcode() != Instruction::FAdd || RFAdd->getOpcode() != Instruction::FAdd)
+                bool hasFAddOp = false;
+
+                if (LFAdd)
+                {
+                    hasFAddOp |= (LFAdd->getOpcode() == Instruction::FAdd);
+                }                
+                if (RFAdd)
+                {
+                    hasFAddOp |= (RFAdd->getOpcode() == Instruction::FAdd);
+                }
+
+                if (!hasFAddOp)
                     continue;
 
                 while (heap_opCnt.size() > 0)
@@ -164,10 +175,14 @@ void HI_FaddOrderOpt::recursiveGetFAddOpAndCounter(Value *FAddI)
         for (int i = 0; i < real_FAddI->getNumOperands(); i++)
         {
             FPMathOperator *opFAdd = dyn_cast<FPMathOperator>(real_FAddI->getOperand(i));
-            if (opFAdd)
+            bool continueRecursion = opFAdd;
+            if (continueRecursion)
             {
-                if (opFAdd->getOpcode() != Instruction::FAdd)
-                    return;
+                continueRecursion &= (opFAdd->getOpcode() == Instruction::FAdd);                
+                continueRecursion &= (opFAdd->getParent() == FAddI->getParent());
+            }
+            if (continueRecursion)
+            {
                 recursiveGetFAddOpAndCounter(opFAdd);
                 for (auto val_cnt_pair : op2Cnt[opFAdd])
                 {
