@@ -50,6 +50,7 @@ include_directories(./
 ../../Implementations/HI_FunctionInterfaceInfo
 ../../Implementations/HI_Mul2Shl
 ../../Implementations/HI_MulOrderOpt
+../../Implementations/HI_FaddOrderOpt
 ../../Implementations/HI_MuxInsertionArrayPartition
 ../../Implementations/HI_LoadALAP
 ../../Implementations/HI_PragmaTargetExtraction
@@ -94,6 +95,7 @@ HI_LoopLabeler
 HI_FunctionInterfaceInfo
 HI_Mul2Shl
 HI_MulOrderOpt
+HI_FaddOrderOpt
 HI_MuxInsertionArrayPartition
 HI_LoadALAP
 HI_PragmaTargetExtraction

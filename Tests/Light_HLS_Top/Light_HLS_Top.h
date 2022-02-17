@@ -92,6 +92,7 @@
 #include "HI_LoadALAP.h"
 #include "HI_Mul2Shl.h"
 #include "HI_MulOrderOpt.h"
+#include "HI_FaddOrderOpt.h"
 #include "HI_MuxInsertionArrayPartition.h"
 #include "HI_PragmaTargetExtraction.h"
 #include "HI_SysExec.h"
