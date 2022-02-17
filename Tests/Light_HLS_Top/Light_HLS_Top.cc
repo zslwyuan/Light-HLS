@@ -192,10 +192,6 @@ int main(int argc, const char **argv)
         PM0.add(hi_mulorderopt);
         print_info("Enable HI_MulOrderOpt Pass");
 
-        auto hi_faddorderopt = new HI_FaddOrderOpt("HI_FaddOrderOpt");
-        PM0.add(hi_faddorderopt);
-        print_info("Enable HI_FaddOrderOpt Pass");
-
         auto CFGSimplification_pass22 = createCFGSimplificationPass();
         PM0.add(CFGSimplification_pass22);
         print_info("Enable CFGSimplificationPass Pass");
@@ -223,6 +219,10 @@ int main(int argc, const char **argv)
                                                None); //"HI_LoopUnroll"
         PM1.add(hi_loopunroll);
         print_info("Enable HI_LoopUnroll Pass");
+
+        auto hi_faddorderopt = new HI_FaddOrderOpt("HI_FaddOrderOpt");
+        PM1.add(hi_faddorderopt);
+        print_info("Enable HI_FaddOrderOpt Pass");
 
         auto hi_mul2shl = new HI_Mul2Shl("HI_Mul2Shl", debugFlag);
         PM1.add(hi_mul2shl);
