@@ -857,6 +857,7 @@ class HI_WithDirectiveTimingResourceEvaluation : public ModulePass
 
     // find the earliest user of the load instruction (maybe for reschedule)
     int findEarlietUseTimeInTheLoop(Loop *curLoop, Instruction *R_I);
+    Instruction *findEarlietUseInTheLoop(Loop *curLoop, Instruction *ori_R_I);
 
     // if the loop is pipelined, the reused DSP-related operators might have conflicts when sharing
     // DSPs. therefore, we need to re-check the resource cost FOR INTEGER OPERATION
