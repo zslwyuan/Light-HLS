@@ -1030,6 +1030,8 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
                 {
                     if (auto tmp_I = dyn_cast<Instruction>(PHI_I->getIncomingValue(i)))
                     {
+                        if (curLoop != LI->getLoopFor(tmp_I->getParent()))
+                            continue;
                         if (DEBUG)
                             *ArrayLog << "      PHI Feedback dependence between " << *PHI_I << "  and " << *tmp_I
                                       << "\n";
@@ -1039,12 +1041,19 @@ int HI_WithDirectiveTimingResourceEvaluation::checkDependenceIIForLoop(Loop *cur
                             curLoop, PHI_I); // BlockBegin_inLoop[PHI_I->getParent()].latency
                                              // + Inst_Schedule[PHI_I].second;
 
+                        Instruction *earliest_user_I = findEarlietUseInTheLoop(curLoop, PHI_I);
+
                         if (DEBUG)
                             *ArrayLog << "      W_I_time_offset=" << W_I_time_offset << "("
                                       << BlockBegin_inLoop[tmp_I->getParent()].latency << "+"
                                       << Inst_Schedule[tmp_I].second << ") R_I_time_offset=" << R_I_time_offset << "\n";
 
-                        int interval = W_I_time_offset - R_I_time_offset;
+                        int interval = W_I_time_offset - R_I_time_offset;   
+                        if (earliest_user_I)
+                        {
+                            if (interval < getInstructionLatency(earliest_user_I).latency+ 1)
+                                interval = getInstructionLatency(earliest_user_I).latency+ 1;
+                        }                     
                         if (interval < 1)
                             interval = 1;
                         if (interval > min_II)
@@ -1327,6 +1336,111 @@ int HI_WithDirectiveTimingResourceEvaluation::findEarlietUseTimeInTheLoop(Loop *
     // }
 
     return earliest_time_slot;
+}
+
+
+// find the earliest user of the load instruction (maybe for reschedule)
+Instruction * HI_WithDirectiveTimingResourceEvaluation::findEarlietUseInTheLoop(Loop *curLoop, Instruction *ori_R_I)
+{
+    // initialize the result with the current time slot
+    Instruction *R_I = nullptr;
+    bool muxDelayIsHigh = false;
+    if (auto callI = dyn_cast<CallInst>(ori_R_I->use_begin()->getUser()))
+    {
+        if (callI->getCalledFunction()->getName().find("HIPartitionMux") != std::string::npos)
+        {
+            R_I = callI; // if there is mux for the load, check the users of the mux instead
+            timingBase tmpMuxDelay = getInstructionLatency(R_I);
+            if (((tmpMuxDelay.timing + get_inst_TimingInfo_result("store", -1, -1, clock_period_str).timing) /
+                 clock_period) > 0.5) // when the mux delay is too high to fit in the current
+            {                         // cycle, we should leave one more cycle before the earliest user
+                muxDelayIsHigh = true;
+            }
+        }
+        else
+        {
+            R_I = ori_R_I;
+        }
+    }
+    else
+    {
+        R_I = ori_R_I;
+    }
+
+    int R_I_time_offset = BlockBegin_inLoop[R_I->getParent()].latency + Inst_Schedule[R_I].second;
+    int earliest_time_slot = 100000000;
+    // here, we assume that the load can be rescheduled as late as possible
+    // therefore, we need to find when its ealiest user use the data
+
+    Instruction *earliest_user_I = nullptr;
+    for (auto tmp_user : R_I->users())
+    {
+
+        if (Instruction *tmp_user_I = dyn_cast<Instruction>(tmp_user))
+        {
+            if (curLoop->contains(tmp_user_I->getParent()) && curLoop->getLoopPreheader() != tmp_user_I->getParent())
+            {
+                *ArrayLog << "       checking user: " << *tmp_user << "\n";
+                // the load might be scheduled in one or two cycles in advance
+                int cycle_inadvance = 1;
+
+                if (muxDelayIsHigh)
+                    cycle_inadvance = 2;
+
+                if (tmp_user_I->getOpcode() == Instruction::Mul || tmp_user_I->getOpcode() == Instruction::UDiv ||
+                    tmp_user_I->getOpcode() == Instruction::FDiv || tmp_user_I->getOpcode() == Instruction::FSub ||
+                    tmp_user_I->getOpcode() == Instruction::FMul || tmp_user_I->getOpcode() == Instruction::FAdd ||
+                    tmp_user_I->getOpcode() == Instruction::URem || tmp_user_I->getOpcode() == Instruction::SRem ||
+                    tmp_user_I->getOpcode() == Instruction::SDiv)
+                    cycle_inadvance = 2;
+
+                if (InstructionCriticalPath_inBlock[tmp_user_I->getParent()][tmp_user_I].timing -
+                        getInstructionLatency(tmp_user_I).timing <=
+                    0.001)
+                {
+                    if (getInstructionLatency(tmp_user_I).timing +
+                            get_inst_TimingInfo_result("store", -1, -1, clock_period_str).timing >
+                        0.5 * clock_period)
+                    {
+                        // this situation, the scheduling of the block is relatively tight,
+                        // reschedule the load ealier.
+                        cycle_inadvance = 2;
+                    }
+                }
+
+                if (tmp_user_I->getOpcode() == Instruction::FDiv || tmp_user_I->getOpcode() == Instruction::FSub ||
+                    tmp_user_I->getOpcode() == Instruction::FMul || tmp_user_I->getOpcode() == Instruction::FAdd)
+                {
+                    std::vector<std::string> checkopcodes = {"fmul", "fadd", "fdiv", "fsub",
+                                                             "dmul", "dadd", "ddiv", "dsub"};
+                    std::string tmp_opcode_str = InstToOpcodeString(tmp_user_I);
+                    for (auto checkcode : checkopcodes)
+                        if (checkcode == tmp_opcode_str)
+                        {
+                            if (getInstructionLatency(tmp_user_I).latency >= 2)
+                            {
+                                cycle_inadvance = -1;
+                                break;
+                                // maybe for these kinds of instruction, VivadoHLS can forward the
+                                // result from others iteration
+                            }
+                        }
+                }
+
+                int tmp_tmp_slot = BlockBegin_inLoop[tmp_user_I->getParent()].latency +
+                                   Inst_Schedule[tmp_user_I].second - cycle_inadvance;
+
+                if (tmp_tmp_slot < earliest_time_slot && R_I_time_offset <= tmp_tmp_slot)
+                {
+                    *ArrayLog << "       find earlier user: " << *tmp_user_I << "  @ timeslot:" << tmp_tmp_slot << "\n";
+                    earliest_time_slot = tmp_tmp_slot;
+                    earliest_user_I = tmp_user_I;
+                }
+            }
+        }
+    }
+
+    return earliest_user_I;
 }
 
 // if the loop is pipelined, the reused DSP-related operators might have conflicts when sharing
