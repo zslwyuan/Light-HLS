@@ -82,6 +82,8 @@
         "complex": "cpp",
         "shared_mutex": "cpp",
         "cfenv": "cpp",
-        "typeindex": "cpp"
-    }
+        "typeindex": "cpp",
+        "bit": "cpp"
+    },
+    "editor.formatOnSave": true
 }
