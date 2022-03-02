@@ -1,5 +1,3 @@
-#include "HI_FaddOrderOpt.h"
-#include "HI_print.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instructions.h"
@@ -10,6 +8,9 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/Utils/Local.h"
+
+#include "HI_FaddOrderOpt.h"
+#include "HI_print.h"
 #include <ios>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +64,7 @@ bool HI_FaddOrderOpt::runOnFunction(llvm::Function &F) // The runOnModule declar
                 if (LFAdd)
                 {
                     hasFAddOp |= (LFAdd->getOpcode() == Instruction::FAdd);
-                }                
+                }
                 if (RFAdd)
                 {
                     hasFAddOp |= (RFAdd->getOpcode() == Instruction::FAdd);
@@ -77,12 +78,28 @@ bool HI_FaddOrderOpt::runOnFunction(llvm::Function &F) // The runOnModule declar
                 op2Cnt.clear();
                 recursiveGetFAddOpAndCounter(I);
 
+                std::map<Value *, int> seqOp2Cnt;
+                std::vector<Value *> seqOps;
+                seqOps.clear();
+                seqOp2Cnt.clear();
                 int tot_cnt = 0;
                 for (auto total_val_cnt_pair : op2Cnt[curFAddI])
                 {
+                    if (PHINode *phiNode = dyn_cast<PHINode>(total_val_cnt_pair.first))
+                    {
+                        if (seqOp2Cnt.find(total_val_cnt_pair.first) == seqOp2Cnt.end())
+                            seqOp2Cnt[total_val_cnt_pair.first] = 0;
+                        seqOp2Cnt[total_val_cnt_pair.first] += total_val_cnt_pair.second;
+                        seqOps.push_back(total_val_cnt_pair.first);
+                        assert(total_val_cnt_pair.second == 1 &&
+                               "currently we only support one phiNode in adder tree.");
+                        continue;
+                    }
                     heap_opCnt.push(std::pair<int, Value *>(total_val_cnt_pair.second, total_val_cnt_pair.first));
                     tot_cnt += total_val_cnt_pair.second;
                 }
+
+                assert(seqOp2Cnt.size() <= 1 && "currently we only support one phiNode in adder tree.");
 
                 changed = 1;
                 action = 1;
@@ -93,53 +110,20 @@ bool HI_FaddOrderOpt::runOnFunction(llvm::Function &F) // The runOnModule declar
                 int replcaceCnt = 0;
 
                 Value *newFAdd = recursiveFAdd(heap_opCnt, tot_cnt, Builder);
-                curFAddI->replaceAllUsesWith(newFAdd);
-                RecursivelyDeleteTriviallyDeadInstructions(curFAddI);
+                if (seqOp2Cnt.size())
+                {
+                    Value *newFAddWithPhiNode = Builder.CreateFAdd(newFAdd, seqOps[0]);
+                    generatedI.insert(newFAddWithPhiNode);
+                    curFAddI->replaceAllUsesWith(newFAddWithPhiNode);
+                    RecursivelyDeleteTriviallyDeadInstructions(curFAddI);
+                }
+                else
+                {
+                    curFAddI->replaceAllUsesWith(newFAdd);
+                    RecursivelyDeleteTriviallyDeadInstructions(curFAddI);
+                }
 
                 *FAddOrderOptLog << "\n\nafter replacement#" << replcaceCnt << ":\n\n" << B;
-                // while (1)
-                // {
-                //     replcaceCnt++;
-                //     int FAddcnt = (heap_opCnt.top()).first;
-                //     if (FAddcnt>1)
-                //     {
-                //         *FAddOrderOptLog << "\n\n========================\n  handling " <<
-                //         *heap_opCnt.top().second << "^(" << FAddcnt << ")\n";
-                //         FAddOrderOptLog->flush();
-                //         Value *newFAdd =
-                //         heap_opCnt.pop();
-                //         heap_opCnt.push(std::pair<int, Value*>(1, newFAdd));
-                //         *FAddOrderOptLog << "\n\nafter replacement#" << replcaceCnt <<":\n\n" <<
-                //         B;
-                //     }
-                //     else
-                //     {
-                //         if (heap_opCnt.size()==1)
-                //         {
-                //             *FAddOrderOptLog << "\n\n========================\n  do the
-                //             re-FAddtiplication at " << *heap_opCnt.top().second << "\n";
-                //             FAddOrderOptLog->flush();
-                //             curFAddI->replaceAllUsesWith(heap_opCnt.top().second);
-                //             RecursivelyDeleteTriviallyDeadInstructions(curFAddI);
-                //             *FAddOrderOptLog << "\n\nafter replacement#" << replcaceCnt <<":\n\n"
-                //             << B; break;
-                //         }
-                //         else
-                //         {
-                //             Value *val0 = heap_opCnt.top().second;
-                //             heap_opCnt.pop();
-                //             Value *val1 = heap_opCnt.top().second;
-                //             heap_opCnt.pop();
-                //             Value *newFAdd = Builder.CreateFAdd(val0, val1);
-                //             generatedI.insert(newFAdd);
-                //             *FAddOrderOptLog << "\n\n========================\n  do the
-                //             re-FAddtiplication between " << *val0 << " and " << *val1 << " by " <<
-                //             *newFAdd << "\n"; heap_opCnt.push(std::pair<int, Value*>(1, newFAdd));
-                //             *FAddOrderOptLog << "\n\nafter replacement#" << replcaceCnt <<":\n\n"
-                //             << B;
-                //         }
-                //     }
-                // }
 
                 break;
 
@@ -178,8 +162,10 @@ void HI_FaddOrderOpt::recursiveGetFAddOpAndCounter(Value *FAddI)
             bool continueRecursion = opFAdd;
             if (continueRecursion)
             {
-                continueRecursion &= (opFAdd->getOpcode() == Instruction::FAdd);                
-                continueRecursion &= (opFAdd->getParent() == FAddI->getParent());
+                Instruction *instFAddOp = dyn_cast<Instruction>(real_FAddI->getOperand(i));
+                Instruction *instFAddI = dyn_cast<Instruction>(FAddI);
+                continueRecursion &= (opFAdd->getOpcode() == Instruction::FAdd);
+                continueRecursion &= (instFAddOp->getParent() == instFAddI->getParent());
             }
             if (continueRecursion)
             {
