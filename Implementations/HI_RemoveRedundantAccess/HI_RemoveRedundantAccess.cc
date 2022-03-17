@@ -129,8 +129,12 @@ bool HI_RemoveRedundantAccess::checkMustAlias(Instruction *I0, Instruction *I1)
     }
     else
     {
-        return pointer_I0 == pointer_I1;
+        if (pointer_I0 != pointer_I1)
+            return false;
     }
+
+    if (!(pointer_I1 && pointer_I1->getOpcode() == Instruction::IntToPtr))
+        return false;
 
     assert(pointer_I1 && pointer_I1->getOpcode() == Instruction::IntToPtr &&
            "ITP should be found for the access instruction");

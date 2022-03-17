@@ -642,6 +642,7 @@ void HI_IR2SourceCode::mappingLoopIR2LoopLabel(DISubprogram *subprogram)
                             }
                         }
                         llvm::errs() << "Loop 2 (previous): " << tmp_loop_name << "\n";
+                        llvm::errs() << "target Loop Label: " << IRLoop2LoopLabel[tmp_loop_name] << "\n";
                         assert(false && "They are mapped to the same loop label. One IR loop <==> One label.");
                     }
                 }
